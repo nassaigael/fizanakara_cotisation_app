@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found " + email));
 
-        // Role avec prefix "ROLE_" pour @hasRole('ADMIN')
+        // Role with prefix "ROLE_" for @hasRole('ADMIN')
         Collection<SimpleGrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority("ROLE_ADMIN")
         );

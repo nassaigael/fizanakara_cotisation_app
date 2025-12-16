@@ -21,7 +21,7 @@ import java.util.Map;
 public class DistrictController {
     private final DistrictService districtService;
 
-    // GET ALL (admin only)
+    // GET ALL
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<District>> getAllDistricts() {

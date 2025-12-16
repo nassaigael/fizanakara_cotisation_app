@@ -4,11 +4,18 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -16,17 +23,14 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-
     @Value("${jwt.expiration}")
     private long accessTokenExpirationMs;
-
 
     @Value("${jwt.refresh-expiration}")
     private long refreshTokenExpirationMs;
 
-
     public String generateAccessToken(String subject) {
-        try{
+        try {
             Date now = new Date();
             Date expiry = new Date(now.getTime() + accessTokenExpirationMs);
             return Jwts.builder()
@@ -35,29 +39,49 @@ public class JwtUtil {
                     .setExpiration(expiry)
                     .signWith(getSigningKey(), Jwts.SIG.HS512)
                     .compact();
-        }
-        catch (Exception e){
-            throw new RuntimeException("Echec lors de la génération de token", e);
+        } catch (Exception e) {
+            log.error("Échec génération access token pour {}", subject, e);
+            throw new RuntimeException("Échec lors de la génération de token", e);
         }
     }
 
+    // Surcharge avec UserDetails pour inclure roles (optionnel)
+    public String generateAccessToken(UserDetails userDetails) {
+        try {
+            Date now = new Date();
+            Date expiry = new Date(now.getTime() + accessTokenExpirationMs);
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("roles", userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList()));
+            return Jwts.builder()
+                    .setClaims(claims)
+                    .setSubject(userDetails.getUsername())
+                    .setIssuedAt(now)
+                    .setExpiration(expiry)
+                    .signWith(getSigningKey(), Jwts.SIG.HS512)
+                    .compact();
+        } catch (Exception e) {
+            log.error("Échec génération access token pour {}", userDetails.getUsername(), e);
+            throw new RuntimeException("Échec lors de la génération de token", e);
+        }
+    }
 
     public String generateRefreshToken(String subject) {
-        try{
+        try {
             Date now = new Date();
             Date expiry = new Date(now.getTime() + refreshTokenExpirationMs);
             return Jwts.builder()
                     .setSubject(subject)
                     .setIssuedAt(now)
                     .setExpiration(expiry)
-                    .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                    .signWith(getSigningKey(), Jwts.SIG.HS512)  // Cohérent
                     .compact();
-        }
-        catch (Exception e){
-            throw new RuntimeException("Echec de la génération refresh token", e);
+        } catch (Exception e) {
+            log.error("Échec génération refresh token pour {}", subject, e);
+            throw new RuntimeException("Échec de la génération refresh token", e);
         }
     }
-
 
     public boolean validateToken(String token) {
         try {
@@ -67,6 +91,7 @@ public class JwtUtil {
                     .parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
+            log.warn("Token invalide : {}", ex.getMessage());
             return false;
         }
     }
@@ -74,7 +99,6 @@ public class JwtUtil {
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
-
 
     public String getSubject(String token) {
         try {
@@ -84,9 +108,23 @@ public class JwtUtil {
                     .parseSignedClaims(token)
                     .getPayload();
             return claims.getSubject();
-        } catch (JwtException ex){
+        } catch (JwtException ex) {
+            log.warn("Erreur extraction subject du token : {}", ex.getMessage());
             return null;
         }
     }
-}
 
+    // Extract roles si dans claims
+    public List<String> getRoles(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return (List<String>) claims.get("roles");
+        } catch (JwtException ex) {
+            return List.of();
+        }
+    }
+}

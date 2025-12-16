@@ -33,7 +33,7 @@ public class DistrictController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<District> getDistrictById(@PathVariable Long id) {
-        log.debug("Récupération du district ID : {}", id);  // ← AJOUT : Log debug
+        log.debug("Récupération du district ID : {}", id);
         return ResponseEntity.ok(districtService.getDistrictById(id));
     }
 

@@ -50,7 +50,7 @@ public class DistrictController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<District> updateDistrict(@PathVariable Long id, @RequestBody @Validated DistrictDto dto) {  // ← AJOUT : @Validated
-        log.info("Mise à jour du district ID {} : {}", id, dto.getName());  // ← AJOUT : Log
+        log.info("Mise à jour du district ID {} : {}", id, dto.getName());
         District updated = districtService.updateDistrict(id, dto);
         return ResponseEntity.ok(updated);
     }

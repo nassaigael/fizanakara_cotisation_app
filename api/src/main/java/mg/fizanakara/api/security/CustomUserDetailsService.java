@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // Role avec prefix "ROLE_" pour @hasRole('ADMIN')
         Collection<SimpleGrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_ADMIN")  // Fix prefix
+                new SimpleGrantedAuthority("ROLE_ADMIN")
         );
 
         return User.builder()

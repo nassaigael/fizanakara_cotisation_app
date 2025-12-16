@@ -41,7 +41,7 @@ public class DistrictController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<District> createDistrict(@RequestBody @Validated DistrictDto dto) {  // ← AJOUT : @Validated pour DTO
-        log.info("Création du district : {}", dto.getName());  // ← AJOUT : Log
+        log.info("Création du district : {}", dto.getName());
         District created = districtService.createDistrict(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

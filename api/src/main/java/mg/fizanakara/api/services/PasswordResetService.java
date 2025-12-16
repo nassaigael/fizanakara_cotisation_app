@@ -1,0 +1,119 @@
+package mg.fizanakara.api.services;  // Adapte au package
+
+import jakarta.transaction.Transactional;  // Import pour @Transactional
+import mg.fizanakara.api.exceptions.UserNotFoundException;
+import mg.fizanakara.api.models.Admins;
+import mg.fizanakara.api.models.PasswordResetToken;
+import mg.fizanakara.api.repository.AdminsRepository;
+import mg.fizanakara.api.repository.PasswordResetTokenRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class PasswordResetService {
+    private final PasswordResetTokenRepository tokenRepo;
+    private final AdminsRepository adminsRepository;
+    private final JavaMailSender emailSender;
+    private final PasswordEncoder passwordEncoder;
+
+    private static final Logger log = LoggerFactory.getLogger(PasswordResetService.class);
+
+
+    @Value("${app.token.expiration.minutes:30}")
+    private long tokenExpirationMinutes;
+
+    @Value("${app.client.reset.url:http://localhost:3000/reset-password}")
+    private String clientResetUrl;
+
+    private final String emailSubject = "Réinitialisation de mot de passe - Fizanakara";
+
+    private final String emailBodyTemplate = """
+            Bonjour,
+            Clique sur le lien suivant pour réinitialiser ton mot de passe (valide %d minutes) :
+            %s
+            Si tu n'as pas demandé ce mail, ignore-le.
+            Cordialement,
+            L'équipe Fizanakara.""";
+
+    @Transactional
+    public void createAndSendPasswordResetToken(String email) {
+        Admins admin = adminsRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.warn("Tentative de réinitialisation de mot de passe pour un e-mail inexistant : {}", email);
+                    return new UserNotFoundException("... Aucun mail");
+                });
+
+        // ← FIX FINAL : Load explicite + delete pour forcer suppression
+        Optional<PasswordResetToken> existingTokenOpt = tokenRepo.findByAdmin(admin);
+        if (existingTokenOpt.isPresent()) {
+            PasswordResetToken existingToken = existingTokenOpt.get();
+            tokenRepo.delete(existingToken);  // Delete l'entité loaded (génère DELETE SQL)
+            tokenRepo.flush();  // Force flush pour commit immédiat (évite doublon au next save)
+            log.debug("Ancien token de reset supprimé pour l'admin : {}", admin.getEmail());
+        } else {
+            log.debug("Aucun ancien token trouvé pour l'admin : {}", admin.getEmail());
+        }
+
+        String token = UUID.randomUUID().toString();
+        Instant expiry = Instant.now().plus(tokenExpirationMinutes, ChronoUnit.MINUTES);
+        PasswordResetToken prt = PasswordResetToken.builder()
+                .token(token)
+                .admin(admin)
+                .expiryDate(expiry)
+                .build();
+        tokenRepo.save(prt);  // Maintenant safe : pas de doublon
+
+        log.info("Token de réinitialisation de mot de passe créé pour l'admin : {}", admin.getEmail());
+
+        String resetLink = clientResetUrl + "?token=" + token;
+        String emailBody = String.format(emailBodyTemplate, tokenExpirationMinutes, resetLink);
+
+        // Format To avec nom (du DB)
+        String toAddress = admin.getFirstName() + " " + admin.getLastName() + " <" + admin.getEmail() + ">";
+
+        // Format From avec nom d'app (remplace "ton-email@gmail.com" par ton vrai spring.mail.username)
+        String fromAddress = "Fizanakara App <ton-email@gmail.com>";  // ← REMPLACE ICI !
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromAddress);
+        message.setTo(toAddress);
+        message.setSubject(emailSubject);
+        message.setText(emailBody);
+
+        try {
+            emailSender.send(message);
+            log.info("E-mail de réinitialisation de mot de passe envoyé à : {}", admin.getEmail());
+        } catch (Exception e) {
+            log.error("Échec de l'envoi de l'e-mail de réinitialisation à {} : {}", admin.getEmail(), e.getMessage(), e);
+            // ← OPTION : Ne throw pas pour garder token (email fail, mais reset possible via lien manuel)
+            // throw new RuntimeException("Échec de l'envoi de l'e-mail de réinitialisation", e);  // Rollback total si activé
+        }
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken prt = tokenRepo.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Token invalide"));
+        if (prt.getExpiryDate().isBefore(Instant.now())) {
+            tokenRepo.deleteByToken(token);
+            throw new RuntimeException("Token expiré");
+        }
+
+        Admins admin = prt.getAdmin();
+        admin.setPassword(passwordEncoder.encode(newPassword));
+        adminsRepository.save(admin);
+        tokenRepo.deleteByToken(token);
+    }
+}

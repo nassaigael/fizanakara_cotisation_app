@@ -20,4 +20,18 @@ public class DistrictService {
     public District getDistrictById(Long id) {
         return districtRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("District not found with id " + id));
     }
+
+    // CREATE
+    @Transactional
+    public District createDistrict(DistrictDto dto) {
+        if (districtRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("District avec nom '" + dto.getName() + "' existe déjà");
+        }
+        log.info("Création du district : {}", dto.getName());
+        District district = District.builder()
+                .name(dto.getName())
+                .build();
+        return districtRepository.save(district);
+    }
+
 }

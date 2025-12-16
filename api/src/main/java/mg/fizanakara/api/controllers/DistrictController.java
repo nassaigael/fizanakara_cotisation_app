@@ -29,7 +29,7 @@ public class DistrictController {
         return ResponseEntity.ok(districtService.getAllDistricts());
     }
 
-    // GET BY ID (admin only)
+    // GET BY ID
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<District> getDistrictById(@PathVariable Long id) {

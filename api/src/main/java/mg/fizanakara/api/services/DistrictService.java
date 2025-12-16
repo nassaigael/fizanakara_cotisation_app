@@ -16,5 +16,8 @@ public class DistrictService {
         return districtRepository.findAll();
     }
 
-    
+    // GET BY ID
+    public District getDistrictById(Long id) {
+        return districtRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("District not found with id " + id));
+    }
 }

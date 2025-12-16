@@ -34,4 +34,16 @@ public class DistrictService {
         return districtRepository.save(district);
     }
 
+    // UPDATE
+    @Transactional
+    public District updateDistrict(Long id, DistrictDto dto) {
+        District district = getDistrictById(id);
+        if (!district.getName().equals(dto.getName()) && districtRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("District avec nom '" + dto.getName() + "' existe déjà");
+        }
+        log.info("Mise à jour du district ID {} : {}", id, dto.getName());
+        district.setName(dto.getName());
+        return districtRepository.save(district);
+    }
+
 }

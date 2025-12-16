@@ -45,7 +45,7 @@ public class JwtUtil {
         }
     }
 
-    // Surcharge avec UserDetails pour inclure roles (optionnel)
+    // Override with UserDetails to include roles (optional)
     public String generateAccessToken(UserDetails userDetails) {
         try {
             Date now = new Date();

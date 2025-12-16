@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/admins/districts")  // Admin namespace – bon
+@RequestMapping("/admins/districts")
 @RequiredArgsConstructor
 @Slf4j
 public class DistrictController {

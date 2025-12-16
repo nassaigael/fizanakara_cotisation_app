@@ -86,7 +86,7 @@ public class SecurityConfig {
                         .authenticated()
                         .requestMatchers("/admins/districts/**")  // ← FIX : Authentifié pour districts (role via @PreAuthorize)
                         .authenticated()
-                        .anyRequest().authenticated()  // Tout le reste authentifié
+                        .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable);

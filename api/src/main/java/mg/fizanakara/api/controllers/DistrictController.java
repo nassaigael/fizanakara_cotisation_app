@@ -1,5 +1,20 @@
 package mg.fizanakara.api.controllers;
 
+import lombok.RequiredArgsConstructor;
+import mg.fizanakara.api.dto.DistrictDto;
+import mg.fizanakara.api.models.District;
+import mg.fizanakara.api.services.DistrictService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/admins/districts")
+@RequiredArgsConstructor
 public class DistrictController {
     private final DistrictService districtService;
 

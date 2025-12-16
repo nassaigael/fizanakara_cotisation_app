@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admins/districts")  // Admin namespace – bon
 @RequiredArgsConstructor
-@Slf4j  // ← AJOUT : Active logs
+@Slf4j
 public class DistrictController {
     private final DistrictService districtService;
 

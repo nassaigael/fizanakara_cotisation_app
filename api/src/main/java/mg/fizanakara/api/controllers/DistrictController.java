@@ -16,4 +16,12 @@ public class DistrictController {
     public ResponseEntity<District> getDistrictById(@PathVariable Long id) {
         return ResponseEntity.ok(districtService.getDistrictById(id));
     }
+
+    // CREATE
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<District> createDistrict(@RequestBody DistrictDto dto){
+        District created = districtService.createDistrict(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
 }

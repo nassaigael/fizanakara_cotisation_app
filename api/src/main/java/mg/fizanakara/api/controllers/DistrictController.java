@@ -4,7 +4,7 @@ public class DistrictController {
     private final DistrictService districtService;
 
     // GET ALL
-    @GetMapping("/{id}")
+    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<District>> getAllDistricts(@PathVariable Long id) {
         return ResponseEntity.ok(districtService.getAllDistricts());

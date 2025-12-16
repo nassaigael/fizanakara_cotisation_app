@@ -114,7 +114,7 @@ public class JwtUtil {
         }
     }
 
-    // Extract roles si dans claims
+//     Extract roles if in claims
     public List<String> getRoles(String token) {
         try {
             Claims claims = Jwts.parser()

@@ -77,7 +77,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/login",  // ← FIX : Ajouté prefix /api/admins/
+                                "/login",
                                 "/register",
                                 "/forgot-password",
                                 "/reset-password"

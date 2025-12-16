@@ -32,4 +32,12 @@ public class DistrictController {
         District updated = districtService.updateDistrict(id, dto);
         return ResponseEntity.ok(updated);
     }
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> deleteDistrict(@PathVariable Long id){
+        districtService.deleteDistrict(id);
+        return ResponseEntity.ok(Map.of("message", "District deleted", "success", true));
+    }
 }

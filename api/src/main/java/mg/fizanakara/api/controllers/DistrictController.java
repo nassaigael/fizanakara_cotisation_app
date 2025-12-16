@@ -24,8 +24,8 @@ public class DistrictController {
     // GET ALL (admin only)
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<District>> getAllDistricts() {  // ← FIX : Retiré @PathVariable Long id (erreur path variable)
-        log.info("Récupération de tous les districts");  // ← AJOUT : Log
+    public ResponseEntity<List<District>> getAllDistricts() {
+        log.info("Récupération de tous les districts");
         return ResponseEntity.ok(districtService.getAllDistricts());
     }
 

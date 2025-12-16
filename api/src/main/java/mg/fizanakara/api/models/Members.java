@@ -1,16 +1,56 @@
 package mg.fizanakara.api.models;
 
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import mg.fizanakara.api.models.enums.MemberStatusEnum;  // ← AJOUT : Import enum
 
-public class Member {
-    // Dans Member.java
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tribute_id", nullable = false)
-    private Tribute tribute;  // Tribute (anglais)
+// ← AJOUT : Imports pour relations et super (assume packages corrects)
+import mg.fizanakara.api.models.District;  // Ou ton package pour District
+import mg.fizanakara.api.models.Tribute;  // Ou ton package pour Tribute
+import mg.fizanakara.api.models.Users;  // Super class
+
+import java.util.List;  // Si besoin pour collections futures
+
+@Entity
+@Table(name = "members", indexes = {  // Indexes pour perf sur FK
+        @Index(name = "idx_members_district_id", columnList = "district_id"),
+        @Index(name = "idx_members_tribute_id", columnList = "tribute_id")
+})
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder  // Bien pour héritage (Users doit l'avoir aussi)
+public class Members extends Users {
+
+    @Enumerated(EnumType.STRING)  // ← AJOUT : Stocke enum comme string en DB (ex. "ACTIVE")
+    @Column(name = "status", nullable = false)  // ← AJOUT : Nullable false pour statut obligatoire
+    private MemberStatusEnum status;  // Statut membre (ex. ACTIVE, SUSPENDED)
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "district_id", nullable = false)
-    private District district;  // District (anglais)
+    @NotNull(message = "The district is required")  // ← FIX : Message anglais pour cohérence
+    @JsonIgnore  // ← AJOUT : Évite lazy loading en JSON
+    private District district;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tribute_id", nullable = false)
+    @NotNull(message = "The tribute is required")
+    @JsonIgnore  // ← AJOUT : Évite lazy loading
+    private Tribute tribute;
+
+    /* @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    private Childs child;  // Gardé commenté – ajoute @JsonIgnore si activé */
+
+    @Override
+    public String generatedCustomId() {  // ← FIX : Remis protected (interne)
+        return "MBR" + String.format("%08d", this.getSequenceNumber());
+    }
 }

@@ -1,6 +1,5 @@
 package mg.fizanakara.api.configs;
 
-
 import mg.fizanakara.api.security.CustomUserDetailsService;
 import mg.fizanakara.api.security.JwtAuthenticationFilter;
 import mg.fizanakara.api.security.JwtUtil;
@@ -28,7 +27,6 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
-
     private final JwtUtil jwtUtil;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService, JwtUtil jwtUtil) {
@@ -71,7 +69,6 @@ public class SecurityConfig {
         return source;
     }
 
-
     // 🔐 SECURITY FILTER CHAIN
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -80,18 +77,19 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/login",
+                                "/login",  // ← FIX : Ajouté prefix /api/admins/
                                 "/register",
                                 "/forgot-password",
                                 "/reset-password"
                         ).permitAll()
-                        .requestMatchers("/admins/me", "/admins/districts")
+                        .requestMatchers("/admins/me")  // ← FIX : Authentifié (JWT requis)
                         .authenticated()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/admins/districts/**")  // ← FIX : Authentifié pour districts (role via @PreAuthorize)
+                        .authenticated()
+                        .anyRequest().authenticated()  // Tout le reste authentifié
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable);
-
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

@@ -82,9 +82,9 @@ public class SecurityConfig {
                                 "/forgot-password",
                                 "/reset-password"
                         ).permitAll()
-                        .requestMatchers("/admins/me")  // ← FIX : Authentifié (JWT requis)
+                        .requestMatchers("/admins/me")
                         .authenticated()
-                        .requestMatchers("/admins/districts/**") 
+                        .requestMatchers("/admins/districts/**")
                         .authenticated()
                         .anyRequest().authenticated()
                 )

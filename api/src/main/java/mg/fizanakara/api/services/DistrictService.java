@@ -46,4 +46,12 @@ public class DistrictService {
         return districtRepository.save(district);
     }
 
+    // DELETE
+    @Transactional
+    public void deleteDistrict(Long id) {
+        District district = getDistrictById(id);
+        log.info("Suppression du district ID : {}", id);
+        districtRepository.delete(district);
+    }
+
 }

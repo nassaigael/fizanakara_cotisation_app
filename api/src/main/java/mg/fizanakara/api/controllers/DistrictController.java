@@ -46,7 +46,7 @@ public class DistrictController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // UPDATE (admin only)
+    // UPDATE
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<District> updateDistrict(@PathVariable Long id, @RequestBody @Validated DistrictDto dto) {  // ← AJOUT : @Validated

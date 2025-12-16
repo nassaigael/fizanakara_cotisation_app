@@ -24,4 +24,12 @@ public class DistrictController {
         District created = districtService.createDistrict(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
+
+    // UPDATE
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<District> updateDistrict(@PathVariable Long id, @RequestBody DistrictDto dto){
+        District updated = districtService.updateDistrict(id, dto);
+        return ResponseEntity.ok(updated);
+    }
 }

@@ -12,5 +12,9 @@ public class DistrictService {
     private final DistrictRepository districtRepository;
 
     // GET ALL
+    public List<District> getAllDistricts() {
+        return districtRepository.findAll();
+    }
 
+    
 }

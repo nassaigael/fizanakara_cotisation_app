@@ -75,7 +75,7 @@ public class JwtUtil {
                     .setSubject(subject)
                     .setIssuedAt(now)
                     .setExpiration(expiry)
-                    .signWith(getSigningKey(), Jwts.SIG.HS512)  // Cohérent
+                    .signWith(getSigningKey(), Jwts.SIG.HS512)
                     .compact();
         } catch (Exception e) {
             log.error("Échec génération refresh token pour {}", subject, e);

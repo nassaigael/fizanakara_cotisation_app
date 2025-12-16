@@ -84,7 +84,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/admins/me")  // ← FIX : Authentifié (JWT requis)
                         .authenticated()
-                        .requestMatchers("/admins/districts/**")  // ← FIX : Authentifié pour districts (role via @PreAuthorize)
+                        .requestMatchers("/admins/districts/**") 
                         .authenticated()
                         .anyRequest().authenticated()
                 )

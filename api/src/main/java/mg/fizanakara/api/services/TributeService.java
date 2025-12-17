@@ -27,5 +27,18 @@ public class TributeService {
         return tributeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tribute not found"));
     }
 
+    // CREATE
+    @Transactional
+    public Tribute createTribute(TributeDto dto){
+        if(tributeRepository.existsByName(dto.getName())){
+            throw new IllegalArgumentException("Tribute of name " + dto.getName() + "is exist");
+        }
+        log.info("Creating Tribute : {}", dto.getName());;
+        Tribute tribute = Tribute.builder()
+                .name(dto.getName())
+                .build();
+        return tributeRepository.save(tribute);
+    }
+
     
 }

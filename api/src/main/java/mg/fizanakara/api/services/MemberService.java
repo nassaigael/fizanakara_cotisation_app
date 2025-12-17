@@ -20,7 +20,23 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class MemberService {
-}
+    private final MemberRepository memberRepository;
+    private final DistrictRepository districtRepository;
+    private final TributeRepository tributeRepository;
+    private final SequenceService sequenceService;
+
+    // GET ALL
+    public List<Members> getAllMembers() {
+        log.info("Récupération de tous les membres");
+        return memberRepository.findAll();
+    }
+
+    // GET BY ID
+    public Members getMemberById(String id) {
+        log.info("Récupération du membre avec ID : {}", id);
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("Member non trouvé avec ID : " + id));
+    }
 
     // CREATE
     @Transactional

@@ -60,4 +60,10 @@ public class TributeService {
         Tribute tribute = getTributeByID(id);
         tributeRepository.delete(tribute);
     }
+
+    // DELETE ALL
+    public ResponseEntity<Map<String, Object>> deleteAllTributes() {
+        tributeRepository.deleteAll();
+        return ResponseEntity.ok(Map.of("message", "All districts deleted", "success", true));
+    }
 }

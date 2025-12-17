@@ -23,8 +23,8 @@ public class DistrictService {
     }
 
     // GET BY ID
-    public District getDistrictById(Long id) {
-        return districtRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("District not found with id " + id));
+    public Optional<District> getDistrictById(Long id) {
+        return Optional.ofNullable(districtRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("District not found with id " + id)));
     }
 
     // CREATE

@@ -21,6 +21,7 @@ import java.util.Map;
 public class DistrictController {
     private final DistrictService districtService;
 
+    //  🔒 ALL ROUTES IS PROTECTED BY ADMIN TOKEN
     // GET ALL
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")

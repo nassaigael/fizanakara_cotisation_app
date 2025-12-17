@@ -62,7 +62,7 @@ public class DistrictService {
 
     // DELETE ALL
     @Transactional
-    public void deleteAllDistricts() {
+    public ResponseEntity<Map<String, Object>> deleteAllDistricts() {
         districtRepository.deleteAll();
     }
 

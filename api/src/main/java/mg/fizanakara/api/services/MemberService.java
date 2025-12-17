@@ -50,7 +50,7 @@ public class MemberService {
         Tribute tribute = tributeRepository.findById(dto.getTributeId())
                 .orElseThrow(() -> new IllegalArgumentException("Tribute ID invalide : " + dto.getTributeId()));
 
-        log.info("Création du membre : {} {}", dto.getFirstName(), dto.getLastName());
+        log.info("Creation of member : {} {}", dto.getFirstName(), dto.getLastName());
         Members member = Members.builder()
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())

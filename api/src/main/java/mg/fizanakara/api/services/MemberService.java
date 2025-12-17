@@ -80,7 +80,7 @@ public class MemberService {
         }
 
         Members member = memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("Member non trouvé avec ID : " + id));
+                .orElseThrow(() -> new MemberNotFoundException("Member not find with ID : " + id));
 
         // Partial sets (seulement non-null)
         if (dto.getFirstName() != null) member.setFirstName(dto.getFirstName());

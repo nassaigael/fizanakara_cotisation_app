@@ -46,5 +46,12 @@ public class TributeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    
+    // UPDATE BY ID
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Tribute> updateTribute(@PathVariable Long id, @RequestBody  @Validated TributeDto dto) {
+        log.info("Update district {}", dto.getName());
+        Tribute updated = tributeService.updateTribute(id, dto);
+        return ResponseEntity.ok(updated);
+    }
 }

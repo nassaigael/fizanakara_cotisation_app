@@ -1,17 +1,19 @@
-import axios from 'axios';
-import type { Member } from '../utils/types/memberType';
-
-const API_URL = "http://localhost:8080/api/members";
+import api from './api';
+import type { Member } from '../utils/types/types';
 
 export const memberService = {
   getAll: async (): Promise<Member[]> => {
-    const response = await axios.get(API_URL);
+    // URL Backend : /admins/members (à protéger par ROLE_ADMIN)
+    const response = await api.get('/admins/members');
     return response.data;
   },
-  delete: async (id: number): Promise<void> => {
-    await axios.delete(`${API_URL}/${id}`);
+  
+  // Utilise string car ton generatedCustomId() renvoie un String
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/admins/members/${id}`);
   },
-  deleteMultiple: async (ids: number[]): Promise<void> => {
-    await axios.post(`${API_URL}/delete-batch`, { ids });
+  
+  deleteMultiple: async (ids: string[]): Promise<void> => {
+    await api.post('/admins/members/delete-batch', { ids });
   }
 };

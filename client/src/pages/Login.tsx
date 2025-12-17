@@ -14,13 +14,10 @@ const Login: React.FC = () => {
     handleLogin 
   } = useLoginLogic();
 
-  const iconStyle = "text-gray-400"; 
-
-
   return (
     <div className="bg-slate-50 min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-red-100 rounded-full blur-[120px] opacity-60" /> */}
-      {/* <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-red-200 rounded-full blur-[120px] opacity-50" /> */}
+      {/* Background Decor */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-red-100 rounded-full blur-[120px] opacity-60" />
 
       <div className="relative z-10 w-full max-w-md p-10 bg-white/70 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-white/50">
         
@@ -33,7 +30,7 @@ const Login: React.FC = () => {
         </header>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-xl animate-bounce-subtle">
+          <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-xl animate-pulse">
             {error}
           </div>
         )}
@@ -42,8 +39,9 @@ const Login: React.FC = () => {
           <Input
             label="Adresse Email"
             placeholder="admin@fizanakara.mg"
+            type="email"
             value={email}
-            onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             icon={<AiOutlineMail className="text-gray-400" size={20} />}
           />
 
@@ -52,7 +50,7 @@ const Login: React.FC = () => {
             type="password"
             placeholder="••••••••"
             value={password}
-            onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             icon={<AiOutlineLock className="text-gray-400" size={20} />}
           />
 
@@ -66,18 +64,18 @@ const Login: React.FC = () => {
               />
               <span className="text-sm text-gray-600 group-hover:text-red-600 transition-colors">Rester connecté</span>
             </label>
-            <Link to="/forgot_password" className="text-sm font-bold text-red-600 hover:text-red-700">
+            <Link to="/forgot-password" className="text-sm font-bold text-red-600 hover:text-red-700">
               Oublié ?
             </Link>
           </div>
 
-          <Button type="submit">
-            {loading ? <span className="animate-pulse">Authentification...</span> : "Se connecter"}
+          <Button type="submit" className="w-full py-4 shadow-lg shadow-red-100">
+            {loading ? "Authentification..." : "Se connecter"}
           </Button>
         </form>
 
         <footer className="mt-10 text-center text-sm text-gray-400">
-          &copy; 2025 Fizanakara. Tous droits réservés.
+          &copy; {new Date().getFullYear()} Fizanakara. Tous droits réservés.
         </footer>
       </div>
     </div>

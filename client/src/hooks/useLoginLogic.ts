@@ -14,6 +14,12 @@ export const useLoginLogic = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+        setError("Veuillez remplir tous les champs");
+        return;
+    }
+
     setError(null);
     setLoading(true);
 
@@ -21,7 +27,8 @@ export const useLoginLogic = () => {
       await login(email, password, rememberMe);
       navigate("/admin/dashboard");
     } catch (err: any) {
-      setError(err.message || "Échec de la connexion");
+      // On capture l'erreur venant du service ou du serveur
+      setError(err.response?.data?.message || err.message || "Identifiants invalides");
     } finally {
       setLoading(false);
     }

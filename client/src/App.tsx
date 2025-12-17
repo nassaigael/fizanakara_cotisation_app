@@ -1,45 +1,44 @@
-// src/App.tsx
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { useAuth } from "./context/useAuth";
-import type { JSX } from "react";
-import Login from "./pages/Login";
-import ForgotPassword from "./pages/ForgotPassword";
-import Dashboard from "./pages/Dashboard";
-import MainLayout from "./components/layout/MainLayout";
-import Member from "./pages/Member";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './context/useAuth';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import MemberPage from './pages/Member';
+// Importe ton Layout qui contient la Sidebar
+import MainLayout from './components/layout/MainLayout'; 
+import ForgotPassword from './pages/ForgotPassword';
 
-const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-  const { admin } = useAuth();
-  return admin ? children : <Navigate to="/login" replace />;
+// Composant de protection
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { token } = useAuth();
+  return token ? <>{children}</> : <Navigate to="/" replace />;
 };
-const App = () => {
+
+function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot_password" element={<ForgotPassword />} />
+          {/* Route Publique */}
+          <Route path="/" element={<Login />} />
           <Route path="/reset-password/:token" element={<ForgotPassword />} />
-
-          <Route 
-            path="/admin" 
-            element={
-              <PrivateRoute>
-                <MainLayout />
-              </PrivateRoute>
-            }
-          >
+          {/* Routes Privées (Admin) */}
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }>
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="member" element={<Member />} />
-            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="member" element={<MemberPage />} />
+            {/* Ajoute ici tes autres routes : tributes, settings... */}
           </Route>
 
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/* Redirection par défaut */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </AuthProvider>
   );
-};
+}
 
 export default App;

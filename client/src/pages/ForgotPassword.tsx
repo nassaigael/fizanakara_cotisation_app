@@ -16,70 +16,91 @@ const ForgotPassword: React.FC = () => {
 
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
+  // Synchronise l'affichage de l'alerte avec les messages du hook
   useEffect(() => {
     if (message) setIsAlertOpen(true);
   }, [message]);
 
   const handleAlertConfirm = () => {
     setIsAlertOpen(false);
-    if (message?.type === 'success' && isResetMode) navigate('/login');
+    // Redirige vers le login uniquement en cas de succès de réinitialisation
+    if (message?.type === 'success' && isResetMode) {
+      navigate('/');
+    }
   };
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value);
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)
+
   return (
     <div className="bg-slate-50 min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+      {/* Animation d'entrée pour un effet fluide */}
+      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100 animate-in fade-in zoom-in duration-300">
         
-        <Link to="/login" className="inline-flex items-center text-sm text-gray-500 hover:text-red-600 mb-6 transition-colors">
-          <AiOutlineArrowLeft className="mr-2" /> Retour à la connexion
+        {/* Lien retour : cohérence avec le path racine '/' du Login */}
+        <Link to="/" className="inline-flex items-center text-sm font-bold text-gray-400 hover:text-red-600 mb-8 transition-colors group">
+          <AiOutlineArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" /> 
+          Retour à la connexion
         </Link>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">
           {isResetMode ? "Nouveau mot de passe" : "Mot de passe oublié ?"}
         </h1>
-        <p className="text-gray-500 text-sm mb-8">
+        <p className="text-gray-500 text-sm mb-10 font-medium">
           {isResetMode 
             ? "Veuillez saisir votre nouveau mot de passe sécurisé." 
-            : "Entrez votre email pour recevoir un lien de réinitialisation."}
+            : "Entrez votre email pour recevoir un lien de réinitialisation par courrier électronique."}
         </p>
 
        <form onSubmit={isResetMode ? handleResetPassword : handleRequestEmail} className="space-y-6">
           {!isResetMode ? (
             <Input 
-              label="Votre Email" 
+              label="Adresse Email" 
               type="email" 
+              placeholder="votre@email.mg"
               value={email} 
-              onChange={handleEmailChange} // Utilisation de la fonction typée
+              onChange={(e) => setEmail(e.target.value)} 
               icon={<AiOutlineMail className="text-gray-400" size={20}/>}
-              required 
             />
           ) : (
             <>
               <Input 
                 label="Nouveau mot de passe" 
                 type="password" 
+                placeholder="••••••••"
                 value={password} 
-                onChange={handlePasswordChange} // Utilisation de la fonction typée
+                onChange={(e) => setPassword(e.target.value)} 
                 icon={<AiOutlineLock className="text-gray-400" size={20}/>}
-                required 
               />
               <Input 
                 label="Confirmer le mot de passe" 
                 type="password" 
+                placeholder="••••••••"
                 value={confirmPassword} 
-                onChange={handleConfirmPasswordChange} // Utilisation de la fonction typée
+                onChange={(e) => setConfirmPassword(e.target.value)} 
                 icon={<AiOutlineLock className="text-gray-400" size={20}/>}
-                required 
               />
             </>
           )}
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Traitement..." : isResetMode ? "Réinitialiser" : "Envoyer le lien"}
+          <Button 
+            type="submit" 
+            className="w-full py-4" 
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Traitement...
+              </span>
+            ) : (
+              isResetMode ? "Changer le mot de passe" : "Envoyer le lien"
+            )}
           </Button>
         </form>
       </div>
+
+      <footer className="mt-8 text-gray-400 text-xs font-medium">
+        &copy; 2025 Fizanakara Administration
+      </footer>
+
       <Alert 
         isOpen={isAlertOpen}
         title={message?.type === 'success' ? "Succès" : "Attention"}
@@ -87,7 +108,7 @@ const ForgotPassword: React.FC = () => {
         variant={message?.type === 'success' ? 'success' : 'warning'} 
         onClose={() => setIsAlertOpen(false)}
         onConfirm={handleAlertConfirm}
-        confirmText={isResetMode && message?.type === 'success' ? "Aller au Login" : "OK"}
+        confirmText={isResetMode && message?.type === 'success' ? "Aller au Login" : "Compris"}
       />
     </div>
   );

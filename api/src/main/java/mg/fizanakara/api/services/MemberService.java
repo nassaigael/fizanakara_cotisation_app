@@ -21,3 +21,97 @@ import java.util.List;
 @Slf4j
 public class MemberService {
 }
+
+    // CREATE
+    @Transactional
+    public Members createMember(MemberDto dto) {
+        // Check doublon
+        if (memberRepository.hasDuplicateByKeyFields(dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), null)) {  // null pour create
+            throw new IllegalArgumentException("Membre avec ces informations existe déjà");
+        }
+
+        District district = districtRepository.findById(dto.getDistrictId())
+                .orElseThrow(() -> new IllegalArgumentException("District ID invalide : " + dto.getDistrictId()));
+        Tribute tribute = tributeRepository.findById(dto.getTributeId())
+                .orElseThrow(() -> new IllegalArgumentException("Tribute ID invalide : " + dto.getTributeId()));
+
+        log.info("Création du membre : {} {}", dto.getFirstName(), dto.getLastName());
+        Members member = Members.builder()
+                .firstName(dto.getFirstName())
+                .lastName(dto.getLastName())
+                .birthDate(dto.getBirthDate())
+                .gender(dto.getGender())
+                .imageUrl(dto.getImageUrl())
+                .phoneNumber(dto.getPhoneNumber())
+                .status(dto.getStatus())
+                .district(district)
+                .tribute(tribute)
+                .build();
+
+        Long nextSeq = sequenceService.getNextSequence("users_sequence");
+        member.setCreatedAt(LocalDate.now());
+        member.setSequenceNumber(nextSeq);
+        member.setId(member.generatedCustomId());
+        return memberRepository.save(member);
+    }
+
+    // UPDATE (check avec currentId pour exclure self)
+    @Transactional
+    public Members updateMember(String id, MemberDto dto) {
+        log.info("Update service - ID : {}, DTO champs fournis : firstName={}, lastName={}, birthDate={}, gender={}",
+                id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("ID ne peut pas être null ou vide");
+        }
+
+        Members member = memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("Member non trouvé avec ID : " + id));
+
+        // Partial sets (seulement non-null)
+        if (dto.getFirstName() != null) member.setFirstName(dto.getFirstName());
+        if (dto.getLastName() != null) member.setLastName(dto.getLastName());
+        if (dto.getBirthDate() != null) member.setBirthDate(dto.getBirthDate());
+        if (dto.getGender() != null) member.setGender(dto.getGender());
+        if (dto.getImageUrl() != null) member.setImageUrl(dto.getImageUrl());
+        if (dto.getPhoneNumber() != null) {
+            if (!member.getPhoneNumber().equals(dto.getPhoneNumber()) && memberRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
+                throw new IllegalArgumentException("Phone '" + dto.getPhoneNumber() + "' existe déjà");
+            }
+            member.setPhoneNumber(dto.getPhoneNumber());
+        }
+        if (dto.getStatus() != null) member.setStatus(dto.getStatus());
+        if (dto.getDistrictId() != null) {
+            District district = districtRepository.findById(dto.getDistrictId())
+                    .orElseThrow(() -> new IllegalArgumentException("District ID invalide"));
+            member.setDistrict(district);
+        }
+        if (dto.getTributeId() != null) {
+            Tribute tribute = tributeRepository.findById(dto.getTributeId())
+                    .orElseThrow(() -> new IllegalArgumentException("Tribute ID invalide"));
+            member.setTribute(tribute);
+        }
+
+        // ← FIX : Check doublon après partial update, exclut self
+        if (memberRepository.hasDuplicateByKeyFields(member.getFirstName(), member.getLastName(), member.getBirthDate(), member.getPhoneNumber(), member.getDistrict().getId(), member.getTribute().getId(), member.getStatus(), id)) {
+            throw new IllegalArgumentException("Membre avec ces informations existe déjà");
+        }
+
+        Members updated = memberRepository.save(member);
+        log.info("Mise à jour partielle du membre ID {} réussie", id);
+        return updated;
+    }
+
+    // DELETE
+    @Transactional
+    public void deleteMember(String id) {
+        Members member = getMemberById(id);
+        log.info("Suppression du membre ID : {}", id);
+        memberRepository.delete(member);
+    }
+
+    // DELETE ALL
+    @Transactional
+    public void deleteAllMembers() {
+        memberRepository.deleteAll();
+    }
+}

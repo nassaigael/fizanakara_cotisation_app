@@ -42,7 +42,7 @@ public class MemberService {
     @Transactional
     public Members createMember(MemberDto dto) {
         if (memberRepository.hasDuplicateByKeyFields(dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), null)) {  // null pour create
-            throw new IllegalArgumentException("Membre avec ces informations existe déjà");
+            throw new IllegalArgumentException("A member with the same name already exists");
         }
 
         District district = districtRepository.findById(dto.getDistrictId())

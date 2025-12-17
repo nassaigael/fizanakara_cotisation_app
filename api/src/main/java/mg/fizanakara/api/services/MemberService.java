@@ -73,7 +73,7 @@ public class MemberService {
     // UPDATE BY ID
     @Transactional
     public Members updateMember(String id, MemberDto dto) {
-        log.info("Update service - ID : {}, DTO champs fournis : firstName={}, lastName={}, birthDate={}, gender={}",
+        log.info("Update service - ID : {}, DTO on require : firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("ID ne peut pas être null ou vide");

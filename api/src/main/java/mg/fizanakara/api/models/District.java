@@ -39,7 +39,6 @@ public class District {
     @Version
     private Long version;
 
-    // Relation : One district to many members (for location-based contributions)
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore  // ← AJOUT : Évite lazy loading en JSON (évite "no session" errors)
     private List<Members> members = new ArrayList<>();

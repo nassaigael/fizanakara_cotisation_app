@@ -51,4 +51,11 @@ public class TributeService {
         tribute.setName(dto.getName());
         return tributeRepository.save(tribute);
     }
+
+    // DELETE
+    @Transactional
+    public void deleteTribute(Long id){
+        Tribute tribute = getTributeByID(id);
+        tributeRepository.delete(tribute);
+    }
 }

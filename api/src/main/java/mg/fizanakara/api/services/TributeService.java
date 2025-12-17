@@ -14,4 +14,8 @@ import java.util.List;
 public class TributeService {
     private final TributeRepository tributeRepository;
 
+    // GET ALL
+    public List<Tribute> getAllTributes(){
+        return tributeRepository.findAll();
+    }
 }

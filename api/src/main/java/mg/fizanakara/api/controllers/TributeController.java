@@ -6,6 +6,8 @@ import mg.fizanakara.api.services.DistrictService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admins/tributes")
 @RequiredArgsConstructor

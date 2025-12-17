@@ -33,7 +33,7 @@ public class DistrictService {
         if (districtRepository.existsByName(dto.getName())) {
             throw new IllegalArgumentException("District avec nom '" + dto.getName() + "' existe déjà");
         }
-        log.info("Création du district : {}", dto.getName());
+        log.info("Creating District : {}", dto.getName());
         District district = District.builder()
                 .name(dto.getName())
                 .build();

@@ -10,4 +10,14 @@ import java.time.LocalDate;
 
 @Data
 public class MemberResponseDto {
+    private String id;
+    private String firstName;
+    private String lastName;
+    private LocalDate birthDate;
+    private String phoneNumber;
+    private Tribute tribute;
+    private District district;
+    private Gender gender;
+    private LocalDate createdAt;
+    private MemberStatus status;
 }

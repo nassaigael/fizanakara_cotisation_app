@@ -41,7 +41,6 @@ public class MemberService {
     // CREATE
     @Transactional
     public Members createMember(MemberDto dto) {
-        // Check doublon
         if (memberRepository.hasDuplicateByKeyFields(dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), null)) {  // null pour create
             throw new IllegalArgumentException("Membre avec ces informations existe déjà");
         }

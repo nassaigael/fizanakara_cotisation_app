@@ -18,4 +18,11 @@ public class TributeService {
     public List<Tribute> getAllTributes(){
         return tributeRepository.findAll();
     }
+
+    // GET BY ID
+    public Optional<Tribute> getByID(Long id){
+        return Optional.ofNullable(tributeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tribute not found")));
+    }
+
+    
 }

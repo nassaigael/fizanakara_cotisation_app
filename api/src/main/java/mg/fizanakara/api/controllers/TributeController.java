@@ -64,4 +64,12 @@ public class TributeController {
         tributeService.deleteTribute(id);
         return ResponseEntity.ok(Map.of("message", "Tribute deleted", "success", true));
     }
+
+    // DELETE ALL
+    @DeleteMapping("/delete-all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> deleteAllTributes() {
+        log.info("Suppression all districts)");
+        return tributeService.deleteAllTributes();
+    }
 }

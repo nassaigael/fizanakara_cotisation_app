@@ -42,7 +42,7 @@ public class DistrictController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<District> createDistrict(@RequestBody @Validated DistrictDto dto) {
-        log.info("Création du district : {}", dto.getName());
+        log.info("Created district : {}", dto.getName());
         District created = districtService.createDistrict(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

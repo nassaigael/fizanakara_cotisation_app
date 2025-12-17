@@ -36,7 +36,7 @@ public class District {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @Version  // ← AJOUT : Optimistic locking pour CRUD concurrent
+    @Version
     private Long version;
 
     // Relation : One district to many members (for location-based contributions)

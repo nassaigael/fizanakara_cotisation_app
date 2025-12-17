@@ -64,4 +64,12 @@ public class DistrictController {
         districtService.deleteDistrict(id);
         return ResponseEntity.ok(Map.of("message", "District deleted", "success", true));
     }
+
+    // DELETE ALL
+    @DeleteMapping("/delete-all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> deleteAllDistricts() {
+        log.info("Suppression all districts)");
+        return districtService.deleteAllDistricts();
+    }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tributes")
-@EntityListeners(AuditingEntityListener.class)  // Pour auditing (createdAt auto)
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @AllArgsConstructor

@@ -29,7 +29,8 @@ public class Tribute {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    // Relation : One tribute to many members (for contributions by tribute)
-    //@OneToMany(mappedBy = "tribute", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    //private List<Members> members = new ArrayList<>();
+    @OneToMany(mappedBy = "tribute", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnore
+    private List<Members> members = new ArrayList<>();
+
 }

@@ -25,7 +25,7 @@ public class TributeController {
     // GET ALL
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Tribute>> getAllTributes(){
+    public ResponseEntity<List<Tribute>> getAllTributes() {
         log.info("Recuperate all districts");
         return ResponseEntity.ok(tributeService.getAllTributes());
     }
@@ -33,7 +33,7 @@ public class TributeController {
     // GET BY ID
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Tribute> getTributeByID(@PathVariable Long id){
+    public ResponseEntity<Tribute> getTributeByID(@PathVariable Long id) {
         log.info("Recuperate district by ID {}", id);
         return ResponseEntity.ok(tributeService.getTributeByID(id));
     }
@@ -41,7 +41,7 @@ public class TributeController {
     // CREATE
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Tribute> createTribute(@RequestBody @Validated TributeDto dto){
+    public ResponseEntity<Tribute> createTribute(@RequestBody @Validated TributeDto dto) {
         log.info("Create district {}", dto.getName());
         Tribute created = tributeService.createTribute(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);

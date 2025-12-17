@@ -27,7 +27,7 @@ public class MemberService {
 
     // GET ALL
     public List<Members> getAllMembers() {
-        log.info("Récupération de tous les membres");
+        log.info("Recuperate all members");
         return memberRepository.findAll();
     }
 

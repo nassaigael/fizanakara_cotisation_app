@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mg.fizanakara.api.dto.TributeDto;
 import mg.fizanakara.api.models.Tribute;
-import mg.fizanakara.api.services.DistrictService;
+import mg.fizanakara.api.services.TributeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;

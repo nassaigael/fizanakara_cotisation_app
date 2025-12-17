@@ -20,5 +20,11 @@ public class TributeController {
     private final DistrictService districtService;
 
     //  🔒 ALL ROUTES IS PROTECTED BY ADMIN TOKEN
-
+    // GET ALL
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Tribute>> getAllTributes(){
+        log.info("Recuperate all districts");
+        return ResponseEntity.ok(tributeService.getAllTributes());
+    }
 }

@@ -46,7 +46,7 @@ public abstract class Users {
     private LocalDate createdAt;
 
     public Long getSequenceNumber() {
-        return sequenceNumber; // Accès direct au champ hérité
+        return sequenceNumber;
     }
 
     public abstract String generatedCustomId();

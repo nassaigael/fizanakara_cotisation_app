@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class TributeController {
-    private final DistrictService districtService;
+    private final TributeService tributeService;
 
     //  🔒 ALL ROUTES IS PROTECTED BY ADMIN TOKEN
     // GET ALL

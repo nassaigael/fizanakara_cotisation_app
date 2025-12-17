@@ -1,5 +1,5 @@
 package mg.fizanakara.api.models.enums;
 
-public enum MemberStatusEnum {
+public enum MemberStatus {
     Etudiant, Travailleur
 }

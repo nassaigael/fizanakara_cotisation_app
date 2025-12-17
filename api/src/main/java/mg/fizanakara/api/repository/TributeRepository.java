@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface TributeRepository extends JpaRepository<Tribute, Long> {
     Optional<Tribute> findByName(String name);
     boolean existsByName(String name);
-    Optional<District> findById(Long id);
+    Optional<Tribute> findById(Long id);
 }

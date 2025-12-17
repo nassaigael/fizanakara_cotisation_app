@@ -86,6 +86,8 @@ public class SecurityConfig {
                         .authenticated()
                         .requestMatchers("/admins/districts/**")
                         .authenticated()
+                        .requestMatchers("/admins/tributes/**")
+                        .authenticated()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)

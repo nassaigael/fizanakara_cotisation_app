@@ -23,7 +23,7 @@ public class TributeService {
     }
 
     // GET BY ID
-    public Tribute getByID(Long id){
+    public Tribute getTributeByID(Long id){
         return tributeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tribute not found"));
     }
 

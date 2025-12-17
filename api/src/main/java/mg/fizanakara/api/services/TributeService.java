@@ -23,8 +23,8 @@ public class TributeService {
     }
 
     // GET BY ID
-    public Optional<Tribute> getByID(Long id){
-        return Optional.ofNullable(tributeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tribute not found")));
+    public Tribute getByID(Long id){
+        return tributeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tribute not found"));
     }
 
     

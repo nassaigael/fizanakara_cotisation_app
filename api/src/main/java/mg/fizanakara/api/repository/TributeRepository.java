@@ -1,6 +1,7 @@
 package mg.fizanakara.api.repository;
 
 import mg.fizanakara.api.models.District;
+import mg.fizanakara.api.models.Tribute;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

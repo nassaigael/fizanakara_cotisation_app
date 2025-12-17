@@ -1,8 +1,6 @@
 package mg.fizanakara.api.services;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mg.fizanakara.api.dto.DistrictDto;

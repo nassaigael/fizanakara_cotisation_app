@@ -40,6 +40,6 @@ public class District {
     private Long version;
 
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonIgnore  // ← AJOUT : Évite lazy loading en JSON (évite "no session" errors)
+    @JsonIgnore
     private List<Members> members = new ArrayList<>();
 }

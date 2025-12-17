@@ -42,7 +42,7 @@ public class DistrictService {
         return districtRepository.save(district);
     }
 
-    // UPDATE
+    // UPDATE BY ID
     @Transactional
     public District updateDistrict(Long id, DistrictDto dto) {
         District district = getDistrictById(id);
@@ -54,7 +54,7 @@ public class DistrictService {
         return districtRepository.save(district);
     }
 
-    // DELETE
+    // DELETE BY ID
     @Transactional
     public void deleteDistrict(Long id) {
         District district = getDistrictById(id);

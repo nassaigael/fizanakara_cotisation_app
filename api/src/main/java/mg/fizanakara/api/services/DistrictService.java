@@ -47,7 +47,7 @@ public class DistrictService {
         if (!district.getName().equals(dto.getName()) && districtRepository.existsByName(dto.getName())) {
             throw new IllegalArgumentException("District of name '" + dto.getName() + "' exist");
         }
-        log.info("Mise à jour du district ID {} : {}", id, dto.getName());
+        log.info("Updating district ID {} : {}", id, dto.getName());
         district.setName(dto.getName());
         return districtRepository.save(district);
     }

@@ -70,7 +70,7 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    // UPDATE (check avec currentId pour exclure self)
+    // UPDATE BY ID
     @Transactional
     public Members updateMember(String id, MemberDto dto) {
         log.info("Update service - ID : {}, DTO champs fournis : firstName={}, lastName={}, birthDate={}, gender={}",

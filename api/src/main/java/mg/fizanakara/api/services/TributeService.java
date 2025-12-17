@@ -3,6 +3,7 @@ package mg.fizanakara.api.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mg.fizanakara.api.dto.TributeDto;
 import mg.fizanakara.api.models.Tribute;
 import mg.fizanakara.api.repository.TributeRepository;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;

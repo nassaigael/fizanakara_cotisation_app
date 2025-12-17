@@ -60,7 +60,7 @@ public class DistrictController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> deleteDistrict(@PathVariable Long id) {
-        log.info("Suppression du district ID : {}", id);
+        log.info("Deleted district ID : {}", id);
         districtService.deleteDistrict(id);
         return ResponseEntity.ok(Map.of("message", "District deleted", "success", true));
     }

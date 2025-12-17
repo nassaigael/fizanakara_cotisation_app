@@ -7,13 +7,22 @@ export const memberService = {
     const response = await api.get('/admins/members');
     return response.data;
   },
-  
-  // Utilise string car ton generatedCustomId() renvoie un String
-  delete: async (id: string): Promise<void> => {
+  create: async (data: Partial<Member>) => {
+    const response = await api.post<Member>("/members", data);
+    return response.data;
+  },
+
+  update: async (id: string, data: Partial<Member>) => {
+    const response = await api.put<Member>(`/members/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string) => {
     await api.delete(`/admins/members/${id}`);
   },
+
+  deleteMultiple: async (ids: string[]) => {
+    await api.post("/members/delete-batch", { ids });
+  },
   
-  deleteMultiple: async (ids: string[]): Promise<void> => {
-    await api.post('/admins/members/delete-batch', { ids });
-  }
 };

@@ -32,7 +32,7 @@ public class TributeController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Tribute> getTributeByID(@PathVariable Long id){
-        log.info("Recupere district by ID {}", id);
+        log.info("Recuperate district by ID {}", id);
         return ResponseEntity.ok(tributeService.getTributeByID(id));
     }
 }

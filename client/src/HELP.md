@@ -23,3 +23,5 @@ Comment ils fonctionnent ensemble
 
     Vous pouvez utiliser useReducer pour gérer la logique complexe d'un état (le reducer), puis utiliser useContext pour rendre cet état (et la fonction dispatch qui le met à jour) disponible à toute l'application.
     C'est une alternative légère à Redux pour des cas d'usage où Redux serait trop complexe, offrant une bonne gestion d'état globale sans dépendance externe
+
+0389605002

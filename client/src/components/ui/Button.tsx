@@ -10,7 +10,7 @@ const Button: React.FC<ButtonProps> = ({
   className = "",
   type = "button",
 }) => {
-  const baseStyles = "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform active:scale-95";
+  const baseStyles = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 transform active:scale-95";
   const variants: Record<string, string> =
   {
     primary: "bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-200 hover:shadow-red-300 hover:-translate-y-0.5",

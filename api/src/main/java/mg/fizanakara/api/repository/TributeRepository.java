@@ -5,8 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface TributeRepository extends JpaRepository<District, Long> {
-    Optional<District> findByName(String name);
+@Repository
+public interface TributeRepository extends JpaRepository<Tribute, Long> {
+    Optional<Tribute> findByName(String name);
     boolean existsByName(String name);
     Optional<District> findById(Long id);
 }

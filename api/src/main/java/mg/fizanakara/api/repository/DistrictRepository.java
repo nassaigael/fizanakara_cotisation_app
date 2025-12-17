@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public interface DistrictRepository extends JpaRepository<District, Long> {
     Optional<District> findByName(String name);
     boolean existsByName(String name);

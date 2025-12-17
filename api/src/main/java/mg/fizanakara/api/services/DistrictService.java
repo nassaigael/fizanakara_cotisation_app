@@ -60,4 +60,10 @@ public class DistrictService {
         districtRepository.delete(district);
     }
 
+    // DELETE ALL
+    @Transactional
+    public void deleteAllDistricts() {
+        districtRepository.deleteAll();
+    }
+
 }

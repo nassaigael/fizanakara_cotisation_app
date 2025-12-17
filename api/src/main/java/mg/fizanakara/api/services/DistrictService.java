@@ -64,6 +64,7 @@ public class DistrictService {
     @Transactional
     public ResponseEntity<Map<String, Object>> deleteAllDistricts() {
         districtRepository.deleteAll();
+        return null;
     }
 
 }

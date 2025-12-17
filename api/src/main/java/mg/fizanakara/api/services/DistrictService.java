@@ -7,6 +7,7 @@ import mg.fizanakara.api.dto.DistrictDto;
 import mg.fizanakara.api.models.District;
 import mg.fizanakara.api.repository.DistrictRepository;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -45,7 +45,7 @@ public class DistrictService {
     public District updateDistrict(Long id, DistrictDto dto) {
         District district = getDistrictById(id);
         if (!district.getName().equals(dto.getName()) && districtRepository.existsByName(dto.getName())) {
-            throw new IllegalArgumentException("District avec nom '" + dto.getName() + "' existe déjà");
+            throw new IllegalArgumentException("District of name '" + dto.getName() + "' exist");
         }
         log.info("Mise à jour du district ID {} : {}", id, dto.getName());
         district.setName(dto.getName());

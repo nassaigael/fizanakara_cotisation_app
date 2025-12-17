@@ -76,7 +76,7 @@ public class MemberService {
         log.info("Update service - ID : {}, DTO on require : firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
         if (id == null || id.trim().isEmpty()) {
-            throw new IllegalArgumentException("ID ne peut pas être null ou vide");
+            throw new IllegalArgumentException("ID does not empty or NULL");
         }
 
         Members member = memberRepository.findById(id)

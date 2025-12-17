@@ -40,5 +40,15 @@ public class TributeService {
         return tributeRepository.save(tribute);
     }
 
-    
+    // UPDATE
+    @Transactional
+    public Tribute updateTribute(Long id, TributeDto dto){
+        Tribute tribute = getTributeByID(id);
+        if(!tribute.getName().equals(dto.getName()) && tributeRepository.existsByName(dto.getName())){
+            throw new IllegalArgumentException("Tribute of name " + dto.getName() + " is exist");
+        }
+        log.info("Updating Tribute ID {} : {}", id, dto.getName());
+        tribute.setName(dto.getName());
+        return tributeRepository.save(tribute);
+    }
 }

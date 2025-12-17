@@ -64,7 +64,7 @@ public class DistrictService {
     @Transactional
     public ResponseEntity<Map<String, Object>> deleteAllDistricts() {
         districtRepository.deleteAll();
-        return null;
+        return ResponseEntity.ok(Map.of("message", "All districts deleted", "success", true));
     }
 
 }

@@ -55,4 +55,13 @@ public class TributeController {
         Tribute updated = tributeService.updateTribute(id, dto);
         return ResponseEntity.ok(updated);
     }
+
+    // DELETE BY ID
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> deleteTribute(@PathVariable Long id) {
+        log.info("Delete district by ID {}", id);
+        tributeService.deleteTribute(id);
+        return ResponseEntity.ok(Map.of("message", "Tribute deleted", "success", true));
+    }
 }

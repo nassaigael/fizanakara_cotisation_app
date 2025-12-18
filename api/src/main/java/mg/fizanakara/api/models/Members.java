@@ -20,9 +20,9 @@ import mg.fizanakara.api.models.enums.MemberStatus;
 @EqualsAndHashCode(callSuper = true)
 public class Members extends Users {
 
-    @Enumerated(EnumType.STRING)  // ← AJOUT : Stocke enum comme string en DB (ex. "ACTIVE")
-    @Column(name = "status", nullable = false)  // ← AJOUT : Nullable false pour statut obligatoire
-    private MemberStatusEnum status;  // Statut membre (ex. ACTIVE, SUSPENDED)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private MemberStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "district_id", nullable = false)

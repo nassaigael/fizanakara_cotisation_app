@@ -70,7 +70,7 @@ public class AdminsAuthController {
             Admins admin = adminsService.findByEmail(req.getEmail()).orElseThrow();
             var rt = refreshTokenService.createRefreshToken(admin);
 
-            log.info("Login réussi pour : {}", req.getEmail());
+            log.info("Login success of : {}", req.getEmail());
             return ResponseEntity.ok(Map.of(
                     "accessToken", accessToken,
                     "refreshToken", rt.getToken(),

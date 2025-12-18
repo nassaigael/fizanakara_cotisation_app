@@ -87,7 +87,7 @@ public class AdminsAuthController {
         }
     }
 
-    // DELETE admin (protégé - nécessite JWT valide)
+    // DELETE admin (admin only)
     @DeleteMapping("/amidn/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable String id) {
         try {

@@ -41,7 +41,15 @@ public class MemberService {
     // CREATE
     @Transactional
     public Members createMember(MemberDto dto) {
-        if (memberRepository.hasDuplicateByKeyFields(dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), null)) {  // null pour create
+        if (memberRepository.hasDuplicateByKeyFields(
+                dto.getFirstName(),
+                dto.getLastName(),
+                dto.getBirthDate(),
+                dto.getPhoneNumber(),
+                dto.getDistrictId(),
+                dto.getTributeId(),
+                dto.getStatus(),
+                null)) {
             throw new IllegalArgumentException("A member with the same name already exists");
         }
 

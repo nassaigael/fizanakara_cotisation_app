@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 import mg.fizanakara.api.models.enums.MemberStatus;
 
 @Entity
-@Table(name = "members", indexes = {  // Indexes pour perf sur FK
+@Table(name = "members", indexes = {
         @Index(name = "idx_members_district_id", columnList = "district_id"),
         @Index(name = "idx_members_tribute_id", columnList = "tribute_id")
 })

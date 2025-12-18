@@ -106,7 +106,7 @@ public class AdminsAuthController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage(), "success", false));
         } catch (Exception e) {
-            log.error("Erreur suppression admin {} : {}", id, e.getMessage());
+            log.error("Failed delete admin {} : {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Échec de la suppression de l'admin", "success", false));
         }

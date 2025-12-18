@@ -101,7 +101,7 @@ public class PasswordResetService {
     @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken prt = tokenRepo.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Token invalide"));
+                .orElseThrow(() -> new RuntimeException("Token invalid"));
         if (prt.getExpiryDate().isBefore(Instant.now())) {
             tokenRepo.deleteByToken(token);
             throw new RuntimeException("Token expiré");

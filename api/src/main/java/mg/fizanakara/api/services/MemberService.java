@@ -33,7 +33,7 @@ public class MemberService {
 
     // GET BY ID
     public Members getMemberById(String id) {
-        log.info("Récupération du membre avec ID : {}", id);
+        log.info("Recuperate member with ID : {}", id);
         return memberRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with ID : " + id));
     }

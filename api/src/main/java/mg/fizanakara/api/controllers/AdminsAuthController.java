@@ -92,8 +92,8 @@ public class AdminsAuthController {
         }
     }
 
-    // DELETE admin (admin only)
-    @DeleteMapping("/amidn/{id}")
+    // DELETE BY ID
+    @DeleteMapping("/admins/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable String id) {
         try {
             Admins admin = adminsService.findById(id)

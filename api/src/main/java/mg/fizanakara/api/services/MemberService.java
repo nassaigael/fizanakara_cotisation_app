@@ -115,7 +115,7 @@ public class MemberService {
         return updated;
     }
 
-    // DELETE
+    // DELETE ID
     @Transactional
     public void deleteMember(String id) {
         Members member = getMemberById(id);

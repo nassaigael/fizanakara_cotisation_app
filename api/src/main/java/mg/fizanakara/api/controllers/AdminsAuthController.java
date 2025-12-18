@@ -82,7 +82,7 @@ public class AdminsAuthController {
                     "refreshToken", rt.getToken()
             ));
         } catch (BadCredentialsException e) {
-            log.warn("Échec login pour {} : Credentials invalides", req.getEmail());
+            log.warn("Login failed for {} : Credentials invalids", req.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Email ou mot de passe incorrect", "success", false));
         } catch (Exception e) {

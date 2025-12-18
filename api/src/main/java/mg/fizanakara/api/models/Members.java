@@ -26,8 +26,8 @@ public class Members extends Users {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "district_id", nullable = false)
-    @NotNull(message = "The district is required")  // ← FIX : Message anglais pour cohérence
-    @JsonIgnore  // ← AJOUT : Évite lazy loading en JSON
+    @NotNull(message = "The district is required")
+    @JsonIgnore
     private District district;
 
     @ManyToOne(fetch = FetchType.LAZY)

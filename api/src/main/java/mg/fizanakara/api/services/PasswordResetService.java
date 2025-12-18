@@ -55,7 +55,6 @@ public class PasswordResetService {
                     return new UserNotFoundException("mail not found");
                 });
 
-        // ← FIX FINAL : Load explicite + delete pour forcer suppression
         Optional<PasswordResetToken> existingTokenOpt = tokenRepo.findByAdmin(admin);
         if (existingTokenOpt.isPresent()) {
             PasswordResetToken existingToken = existingTokenOpt.get();

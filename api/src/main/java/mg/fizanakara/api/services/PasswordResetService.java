@@ -60,9 +60,9 @@ public class PasswordResetService {
             PasswordResetToken existingToken = existingTokenOpt.get();
             tokenRepo.delete(existingToken);
             tokenRepo.flush();
-            log.debug("Ancien token de reset supprimé pour l'admin : {}", admin.getEmail());
+            log.debug("Ancien token de reset supprimé pour admin : {}", admin.getEmail());
         } else {
-            log.debug("Aucun ancien token trouvé pour l'admin : {}", admin.getEmail());
+            log.debug("Aucun ancien token trouvé pour admin : {}", admin.getEmail());
         }
 
         String token = UUID.randomUUID().toString();
@@ -81,7 +81,7 @@ public class PasswordResetService {
 
         // Format To avec nom (du DB)
         String toAddress = admin.getFirstName() + " " + admin.getLastName() + " <" + admin.getEmail() + ">";
-        
+
         String fromAddress = "Fizanakara App <ton-email@gmail.com>";
 
         SimpleMailMessage message = new SimpleMailMessage();

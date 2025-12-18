@@ -76,8 +76,7 @@ public class AdminsService {
                 .orElseThrow(() -> new AdminsException("Admin not found with email : " + email));
 
         if (req.getEmail() != null && !req.getEmail().equals(admin.getEmail()) && adminsRepository.existsByEmail(req.getEmail()))
-            throw new AdminsException("Email déjà utilisé par un autre admin");
-        }
+            throw new AdminsException("Email has exit use by other admin");
 
         int changes = 0;  // ← OPTION : Compteur pour log
 

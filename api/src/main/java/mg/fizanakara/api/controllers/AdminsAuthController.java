@@ -102,7 +102,7 @@ public class AdminsAuthController {
             log.info("Admin Deleted : {}", id);
             return ResponseEntity.ok(Map.of("message", "Admin deleted with success", "success", true));
         } catch (AdminsException e) {
-            log.warn("Suppression admin échouée : ID {} non trouvé", id);
+            log.warn("Delete admin failed : ID {} not found", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage(), "success", false));
         } catch (Exception e) {

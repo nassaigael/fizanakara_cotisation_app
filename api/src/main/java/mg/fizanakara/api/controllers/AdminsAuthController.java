@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import mg.fizanakara.api.dto.AdminResponseDto;
+import mg.fizanakara.api.dto.LoginRequestDTO;
+import mg.fizanakara.api.dto.RegisterRequestDTO;
 import mg.fizanakara.api.exceptions.AdminsException;
 import mg.fizanakara.api.models.Admins;
 import mg.fizanakara.api.dto.UpdateAdminDto;

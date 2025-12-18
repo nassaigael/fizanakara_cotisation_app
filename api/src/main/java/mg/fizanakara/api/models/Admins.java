@@ -1,4 +1,4 @@
-package mg.fizanakara.api.models;  // Adapte au package
+package mg.fizanakara.api.models;  
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

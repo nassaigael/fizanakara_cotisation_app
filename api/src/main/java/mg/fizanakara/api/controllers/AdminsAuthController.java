@@ -11,7 +11,6 @@ import mg.fizanakara.api.security.JwtUtil;
 import mg.fizanakara.api.services.AdminsService;
 import mg.fizanakara.api.services.PasswordResetService;
 import mg.fizanakara.api.services.RefreshTokenService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -81,9 +81,8 @@ public class PasswordResetService {
 
         // Format To avec nom (du DB)
         String toAddress = admin.getFirstName() + " " + admin.getLastName() + " <" + admin.getEmail() + ">";
-
-        // Format From avec nom d'app (remplace "ton-email@gmail.com" par ton vrai spring.mail.username)
-        String fromAddress = "Fizanakara App <ton-email@gmail.com>";  // ← REMPLACE ICI !
+        
+        String fromAddress = "Fizanakara App <ton-email@gmail.com>";
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromAddress);

@@ -4,7 +4,7 @@ info:
   description: "api API"
   version: "1.0.0"
 servers:
-  - url: "http://localhost:3000"
+  - url: "https://api"
 paths:
   /register:
     post:
@@ -14,7 +14,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegisterRequest"
+              $ref: "#/components/schemas/RegisterRequestDTO"
         required: true
       responses:
         "200":
@@ -31,7 +31,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LoginRequest"
+              $ref: "#/components/schemas/LoginRequestDTO"
         required: true
       responses:
         "200":
@@ -40,9 +40,9 @@ paths:
             '*/*':
               schema:
                 type: "object"
-  /amidn/{id}:
+  /admins/{id}:
     delete:
-      summary: "DELETE amidn/{id}"
+      summary: "DELETE admins/{id}"
       operationId: "deleteAdmin"
       parameters:
         - name: "id"
@@ -137,7 +137,7 @@ paths:
                 type: "object"
 components:
   schemas:
-    RegisterRequest:
+    RegisterRequestDTO:
       type: "object"
       properties:
         firstName:
@@ -165,7 +165,7 @@ components:
         password:
           type: "string"
           nullable: true
-    LoginRequest:
+    LoginRequestDTO:
       type: "object"
       properties:
         email:

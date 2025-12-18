@@ -94,7 +94,7 @@ public class AdminsService {
         }
         if (req.getGender() != null) {
             try {
-                admin.setGender(Gender.valueOf(req.getGender().toUpperCase()));  // ← FIX : Uppercase + try-catch
+                admin.setGender(Gender.valueOf(req.getGender().toUpperCase())); 
                 changes++;
             } catch (IllegalArgumentException e) {
                 throw new AdminsException("Genre invalide : " + req.getGender() + ". Utilisez MALE ou FEMALE.");

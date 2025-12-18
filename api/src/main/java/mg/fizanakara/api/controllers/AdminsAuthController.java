@@ -84,7 +84,7 @@ public class AdminsAuthController {
         } catch (BadCredentialsException e) {
             log.warn("Login failed for {} : Credentials invalids", req.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Email ou mot de passe incorrect", "success", false));
+                    .body(Map.of("error", "Email or password incorrect", "success", false));
         } catch (Exception e) {
             log.error("Erreur login pour {} : {}", req.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

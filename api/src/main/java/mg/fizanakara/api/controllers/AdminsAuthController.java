@@ -97,7 +97,7 @@ public class AdminsAuthController {
     public ResponseEntity<?> deleteAdmin(@PathVariable String id) {
         try {
             Admins admin = adminsService.findById(id)
-                    .orElseThrow(() -> new AdminsException("Admin non trouvé avec l'ID : " + id));
+                    .orElseThrow(() -> new AdminsException("Admin not found with ID : " + id));
             adminsService.deleteAdmins(admin);
             log.info("Admin supprimé : {}", id);
             return ResponseEntity.ok(Map.of("message", "Admin supprimé avec succès", "success", true));

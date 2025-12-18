@@ -94,10 +94,10 @@ public class AdminsService {
         }
         if (req.getGender() != null) {
             try {
-                admin.setGender(Gender.valueOf(req.getGender().toUpperCase())); 
+                admin.setGender(Gender.valueOf(req.getGender().toUpperCase()));
                 changes++;
             } catch (IllegalArgumentException e) {
-                throw new AdminsException("Genre invalide : " + req.getGender() + ". Utilisez MALE ou FEMALE.");
+                throw new AdminsException("Gender invalid : " + req.getGender() + ". Please use MALE or FEMALE.");
             }
         }
         if (req.getImageUrl() != null) {

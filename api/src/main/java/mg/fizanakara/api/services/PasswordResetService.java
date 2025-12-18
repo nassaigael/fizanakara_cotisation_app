@@ -1,6 +1,6 @@
 package mg.fizanakara.api.services;
 
-import jakarta.transaction.Transactional;  // Import pour @Transactional
+import jakarta.transaction.Transactional;
 import mg.fizanakara.api.exceptions.UserNotFoundException;
 import mg.fizanakara.api.models.Admins;
 import mg.fizanakara.api.models.PasswordResetToken;

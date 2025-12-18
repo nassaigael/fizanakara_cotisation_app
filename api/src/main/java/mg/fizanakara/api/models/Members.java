@@ -9,14 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import mg.fizanakara.api.models.enums.MemberStatusEnum;  // ← AJOUT : Import enum
-
-// ← AJOUT : Imports pour relations et super (assume packages corrects)
-import mg.fizanakara.api.models.District;  // Ou ton package pour District
-import mg.fizanakara.api.models.Tribute;  // Ou ton package pour Tribute
-import mg.fizanakara.api.models.Users;  // Super class
-
-import java.util.List;  // Si besoin pour collections futures
+import mg.fizanakara.api.models.enums.MemberStatus;
 
 @Entity
 @Table(name = "members", indexes = {  // Indexes pour perf sur FK

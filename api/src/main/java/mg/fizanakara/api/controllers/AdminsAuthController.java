@@ -183,22 +183,4 @@ public class AdminsAuthController {
                     .body(Map.of("error", "Échec de la mise à jour", "success", false));
         }
     }
-
-    @Data
-    static class RegisterRequest {
-        @NotBlank private String firstName;
-        @NotBlank private String lastName;
-        @NotNull private java.time.LocalDate birthDate;
-        @NotBlank private String gender;
-        @NotBlank private String imageUrl;
-        @NotBlank private String phoneNumber;
-        @NotBlank @Email private String email;
-        @NotBlank private String password;
-    }
-
-    @Data
-    static class LoginRequest {
-        @NotBlank @Email private String email;
-        @NotBlank private String password;
-    }
 }

@@ -16,7 +16,8 @@ import mg.fizanakara.api.models.enums.MemberStatus;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder  // Bien pour héritage (Users doit l'avoir aussi)
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 public class Members extends Users {
 
     @Enumerated(EnumType.STRING)  // ← AJOUT : Stocke enum comme string en DB (ex. "ACTIVE")

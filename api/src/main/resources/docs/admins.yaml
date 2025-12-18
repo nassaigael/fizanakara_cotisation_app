@@ -4,7 +4,7 @@ info:
   description: "api API"
   version: "1.0.0"
 servers:
-  - url: "https://api"
+  - url: "http://localhost:3000"
 paths:
   /register:
     post:

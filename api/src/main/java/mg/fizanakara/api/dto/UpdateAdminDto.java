@@ -14,7 +14,7 @@ public class UpdateAdminDto {
     private String imageUrl;
     private String phoneNumber;
 
-    @Email(message = "Email invalide")
+    @Email(message = "Email invalid")
     private String email;
 
     private String password;

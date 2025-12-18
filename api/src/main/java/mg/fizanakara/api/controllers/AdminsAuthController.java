@@ -74,7 +74,12 @@ public class AdminsAuthController {
             return ResponseEntity.ok(Map.of(
                     "accessToken", accessToken,
                     "refreshToken", rt.getToken(),
-                    "user", Map.of("id", admin.getId(), "email", admin.getEmail(), "firstname", admin.getFirstName())
+                    "user", Map.of(
+                            "id", admin.getId(),
+                            "email", admin.getEmail(),
+                            "firstname", admin.getFirstName(),
+                            "lastname", admin.getLastName(),
+                            "gender", admin.getGender())
             ));
         } catch (BadCredentialsException e) {
             log.warn("Échec login pour {} : Credentials invalides", req.getEmail());

@@ -52,7 +52,7 @@ public class AdminsAuthController {
                 .build();
 
         Admins saved = adminsService.register(admin);
-        log.info("Nouvel admin enregistré : {}", saved.getEmail());
+        log.info("New admin saved : {}", saved.getEmail());
         return ResponseEntity.ok(new AdminResponseDto(saved));
     }
 

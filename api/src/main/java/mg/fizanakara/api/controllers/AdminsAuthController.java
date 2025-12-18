@@ -77,7 +77,9 @@ public class AdminsAuthController {
                             "email", admin.getEmail(),
                             "firstname", admin.getFirstName(),
                             "lastname", admin.getLastName(),
-                            "gender", admin.getGender())
+                            "gender", admin.getGender()),
+                    "accessToken", accessToken,
+                    "refreshToken", rt.getToken()
             ));
         } catch (BadCredentialsException e) {
             log.warn("Échec login pour {} : Credentials invalides", req.getEmail());

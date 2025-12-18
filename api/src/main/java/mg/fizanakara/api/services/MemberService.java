@@ -75,7 +75,7 @@ public class MemberService {
     public Members updateMember(String id, MemberDto dto) {
         log.info("Update service - ID : {}, DTO on require : firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
-        if (id == null || id.trim().isEmpty()) {
+        if (id == null || id.trim().isEmpty())
             throw new IllegalArgumentException("ID does not empty or NULL");
 
         Members member = memberRepository.findById(id)

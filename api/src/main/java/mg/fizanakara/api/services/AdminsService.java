@@ -80,7 +80,6 @@ public class AdminsService {
 
         int changes = 0;
 
-        // Merge des champs (partial update)
         if (req.getFirstName() != null) {
             admin.setFirstName(req.getFirstName());
             changes++;

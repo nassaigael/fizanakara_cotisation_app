@@ -77,7 +77,6 @@ public class MemberService {
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("ID does not empty or NULL");
-        }
 
         Members member = memberRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member not find with ID : " + id));

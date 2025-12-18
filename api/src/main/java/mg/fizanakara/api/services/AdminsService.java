@@ -74,8 +74,7 @@ public class AdminsService {
     public AdminResponseDto updateAdmin(String email, UpdateAdminDto req) throws AdminsException {
         Admins admin = findByEmail(email)
                 .orElseThrow(() -> new AdminsException("Admin not found with email : " + email));
-
-        // Check email unique si changé
+        
         if (req.getEmail() != null && !req.getEmail().equals(admin.getEmail()) && adminsRepository.existsByEmail(req.getEmail())) {
             throw new AdminsException("Email déjà utilisé par un autre admin");
         }

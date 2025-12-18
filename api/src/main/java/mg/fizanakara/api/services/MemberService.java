@@ -111,7 +111,7 @@ public class MemberService {
         }
 
         Members updated = memberRepository.save(member);
-        log.info("Mise à jour partielle du membre ID {} réussie", id);
+        log.info("Update partial of membre ID {} success", id);
         return updated;
     }
 

@@ -95,8 +95,6 @@ public class PasswordResetService {
             log.info("E-mail de réinitialisation de mot de passe envoyé à : {}", admin.getEmail());
         } catch (Exception e) {
             log.error("Échec de l'envoi de l'e-mail de réinitialisation à {} : {}", admin.getEmail(), e.getMessage(), e);
-            // ← OPTION : Ne throw pas pour garder token (email fail, mais reset possible via lien manuel)
-            // throw new RuntimeException("Échec de l'envoi de l'e-mail de réinitialisation", e);  // Rollback total si activé
         }
     }
 

@@ -58,8 +58,8 @@ public class PasswordResetService {
         Optional<PasswordResetToken> existingTokenOpt = tokenRepo.findByAdmin(admin);
         if (existingTokenOpt.isPresent()) {
             PasswordResetToken existingToken = existingTokenOpt.get();
-            tokenRepo.delete(existingToken);  // Delete l'entité loaded (génère DELETE SQL)
-            tokenRepo.flush();  // Force flush pour commit immédiat (évite doublon au next save)
+            tokenRepo.delete(existingToken);
+            tokenRepo.flush();
             log.debug("Ancien token de reset supprimé pour l'admin : {}", admin.getEmail());
         } else {
             log.debug("Aucun ancien token trouvé pour l'admin : {}", admin.getEmail());

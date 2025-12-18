@@ -37,7 +37,7 @@ public class Members extends Users {
     private Tribute tribute;
 
     /* @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-    private Childs child;  // Gardé commenté – ajoute @JsonIgnore si activé */
+    private Childs child; */
 
     @Override
     public String generatedCustomId() {  // ← FIX : Remis protected (interne)

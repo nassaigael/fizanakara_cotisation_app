@@ -99,7 +99,7 @@ public class AdminsAuthController {
             Admins admin = adminsService.findById(id)
                     .orElseThrow(() -> new AdminsException("Admin not found with ID : " + id));
             adminsService.deleteAdmins(admin);
-            log.info("Admin supprimé : {}", id);
+            log.info("Admin Deleted : {}", id);
             return ResponseEntity.ok(Map.of("message", "Admin supprimé avec succès", "success", true));
         } catch (AdminsException e) {
             log.warn("Suppression admin échouée : ID {} non trouvé", id);

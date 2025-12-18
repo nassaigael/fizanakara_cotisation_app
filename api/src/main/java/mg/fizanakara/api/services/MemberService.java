@@ -89,7 +89,7 @@ public class MemberService {
         if (dto.getImageUrl() != null) member.setImageUrl(dto.getImageUrl());
         if (dto.getPhoneNumber() != null) {
             if (!member.getPhoneNumber().equals(dto.getPhoneNumber()) && memberRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
-                throw new IllegalArgumentException("Phone '" + dto.getPhoneNumber() + "' existe déjà");
+                throw new IllegalArgumentException("Phone '" + dto.getPhoneNumber() + "' is exist");
             }
             member.setPhoneNumber(dto.getPhoneNumber());
         }

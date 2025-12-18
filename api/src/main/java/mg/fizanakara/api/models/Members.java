@@ -40,7 +40,7 @@ public class Members extends Users {
     private Childs child; */
 
     @Override
-    public String generatedCustomId() {  // ← FIX : Remis protected (interne)
+    public String generatedCustomId() {
         return "MBR" + String.format("%08d", this.getSequenceNumber());
     }
 }

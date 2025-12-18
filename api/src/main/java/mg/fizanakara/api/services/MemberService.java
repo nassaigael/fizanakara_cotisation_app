@@ -119,7 +119,7 @@ public class MemberService {
     @Transactional
     public void deleteMember(String id) {
         Members member = getMemberById(id);
-        log.info("Suppression du membre ID : {}", id);
+        log.info("Deleted of membre ID : {}", id);
         memberRepository.delete(member);
     }
 

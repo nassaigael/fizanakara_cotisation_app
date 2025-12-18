@@ -51,8 +51,8 @@ public class PasswordResetService {
     public void createAndSendPasswordResetToken(String email) {
         Admins admin = adminsRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.warn("Tentative de réinitialisation de mot de passe pour un e-mail inexistant : {}", email);
-                    return new UserNotFoundException("... Aucun mail");
+                    log.warn("Tentative of authentification with password  not existent : {}", email);
+                    return new UserNotFoundException("mail not found");
                 });
 
         // ← FIX FINAL : Load explicite + delete pour forcer suppression

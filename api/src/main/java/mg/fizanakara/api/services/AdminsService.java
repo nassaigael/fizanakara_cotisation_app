@@ -73,7 +73,7 @@ public class AdminsService {
     @Transactional
     public AdminResponseDto updateAdmin(String email, UpdateAdminDto req) throws AdminsException {
         Admins admin = findByEmail(email)
-                .orElseThrow(() -> new AdminsException("Admin non trouvé avec l'email : " + email));
+                .orElseThrow(() -> new AdminsException("Admin not found with email : " + email));
 
         // Check email unique si changé
         if (req.getEmail() != null && !req.getEmail().equals(admin.getEmail()) && adminsRepository.existsByEmail(req.getEmail())) {

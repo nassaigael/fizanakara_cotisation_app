@@ -72,8 +72,6 @@ public class AdminsAuthController {
 
             log.info("Login success of : {}", req.getEmail());
             return ResponseEntity.ok(Map.of(
-                    "accessToken", accessToken,
-                    "refreshToken", rt.getToken(),
                     "user", Map.of(
                             "id", admin.getId(),
                             "email", admin.getEmail(),

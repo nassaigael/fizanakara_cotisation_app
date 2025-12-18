@@ -108,7 +108,6 @@ public class MemberService {
         // ← FIX : Check doublon après partial update, exclut self
         if (memberRepository.hasDuplicateByKeyFields(member.getFirstName(), member.getLastName(), member.getBirthDate(), member.getPhoneNumber(), member.getDistrict().getId(), member.getTribute().getId(), member.getStatus(), id)) {
             throw new IllegalArgumentException("Membre avec ces informations existe déjà");
-        }
 
         Members updated = memberRepository.save(member);
         log.info("Update partial of membre ID {} success", id);

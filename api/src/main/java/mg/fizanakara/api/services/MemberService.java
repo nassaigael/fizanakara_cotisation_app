@@ -88,9 +88,8 @@ public class MemberService {
         if (dto.getGender() != null) member.setGender(dto.getGender());
         if (dto.getImageUrl() != null) member.setImageUrl(dto.getImageUrl());
         if (dto.getPhoneNumber() != null) {
-            if (!member.getPhoneNumber().equals(dto.getPhoneNumber()) && memberRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
-                throw new IllegalArgumentException("Phone '" + dto.getPhoneNumber() + "' is exist");
-            }
+            if (!member.getPhoneNumber().equals(dto.getPhoneNumber()) && memberRepository.existsByPhoneNumber(dto.getPhoneNumber()))
+                throw new IllegalArgumentException("Phone '" + dto.getPhoneNumber() + "' existe déjà");
             member.setPhoneNumber(dto.getPhoneNumber());
         }
         if (dto.getStatus() != null) member.setStatus(dto.getStatus());

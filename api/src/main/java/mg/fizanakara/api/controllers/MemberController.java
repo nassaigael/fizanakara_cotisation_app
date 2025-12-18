@@ -1,5 +1,24 @@
 package mg.fizanakara.api.controllers;
 
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import mg.fizanakara.api.dto.MemberDto;
+import mg.fizanakara.api.models.Members;
+import mg.fizanakara.api.services.MemberService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/admins/members")
+@RequiredArgsConstructor
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
 

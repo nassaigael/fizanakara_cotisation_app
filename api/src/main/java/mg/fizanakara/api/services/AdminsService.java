@@ -123,7 +123,7 @@ public class AdminsService {
         }
 
         Admins updated = adminsRepository.save(admin);
-        log.info("Admin {} mis à jour : {} champs changés", email, changes);  // ← AJOUT : Log pour debug
+        log.info("Admin {} mis à jour : {} champs changés", email, changes);
 
         return new AdminResponseDto(updated);  // ← FIX : Unifié nom DTO
     }

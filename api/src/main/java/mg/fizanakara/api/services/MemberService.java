@@ -123,7 +123,7 @@ public class MemberService {
             throw new IllegalArgumentException("Membre avec ces informations existe déjà");
 
         Members updated = memberRepository.save(member);
-        log.info("Update partial of membre ID {} success", id);
+        log.info("Update partial of member ID {} success", id);
         return updated;
     }
 

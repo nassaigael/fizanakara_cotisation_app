@@ -78,7 +78,7 @@ public class AdminsService {
         if (req.getEmail() != null && !req.getEmail().equals(admin.getEmail()) && adminsRepository.existsByEmail(req.getEmail()))
             throw new AdminsException("Email has exit use by other admin");
 
-        int changes = 0;  // ← OPTION : Compteur pour log
+        int changes = 0;
 
         // Merge des champs (partial update)
         if (req.getFirstName() != null) {

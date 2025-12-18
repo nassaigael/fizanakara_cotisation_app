@@ -105,7 +105,7 @@ public class MemberService {
             member.setTribute(tribute);
         }
 
-        // ← FIX : Check doublon après partial update, exclut self
+        // CHECK DOUBLE AFTER PARTIAL UPDATE
         if (memberRepository.hasDuplicateByKeyFields(member.getFirstName(),
                 member.getLastName(),
                 member.getBirthDate(),

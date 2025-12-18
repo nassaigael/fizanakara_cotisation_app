@@ -117,7 +117,6 @@ public class AdminsService {
             changes++;
         }
 
-        // Update verified si fourni (optionnel, pour admin only)
         if (req.getVerified() != null) {
             admin.setVerified(req.getVerified());
             changes++;

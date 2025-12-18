@@ -1,5 +1,10 @@
 package mg.fizanakara.api.dto;
 
+import lombok.Data;
+
+import java.time.LocalDate;
+
+@Data
 public class UpdateMemberDto {
     private String firstName;
     private String lastName;

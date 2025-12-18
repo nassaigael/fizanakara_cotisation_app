@@ -191,7 +191,7 @@ public class AdminsAuthController {
         @NotBlank private String firstName;
         @NotBlank private String lastName;
         @NotNull private java.time.LocalDate birthDate;
-        @NotBlank private String gender; // adapt to your Gender enum serialization
+        @NotBlank private String gender;
         @NotBlank private String imageUrl;
         @NotBlank private String phoneNumber;
         @NotBlank @Email private String email;

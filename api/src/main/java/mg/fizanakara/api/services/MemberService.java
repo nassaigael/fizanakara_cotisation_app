@@ -96,7 +96,7 @@ public class MemberService {
         if (dto.getStatus() != null) member.setStatus(dto.getStatus());
         if (dto.getDistrictId() != null) {
             District district = districtRepository.findById(dto.getDistrictId())
-                    .orElseThrow(() -> new IllegalArgumentException("District ID invalide"));
+                    .orElseThrow(() -> new IllegalArgumentException("District ID invalid"));
             member.setDistrict(district);
         }
         if (dto.getTributeId() != null) {

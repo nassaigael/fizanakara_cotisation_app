@@ -113,7 +113,7 @@ public class AdminsService {
             changes++;
         }
         if (req.getPassword() != null) {
-            admin.setPassword(passwordEncoder.encode(req.getPassword()));  // Re-encode si changé
+            admin.setPassword(passwordEncoder.encode(req.getPassword()));
             changes++;
         }
 

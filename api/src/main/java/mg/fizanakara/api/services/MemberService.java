@@ -101,7 +101,7 @@ public class MemberService {
         }
         if (dto.getTributeId() != null) {
             Tribute tribute = tributeRepository.findById(dto.getTributeId())
-                    .orElseThrow(() -> new IllegalArgumentException("Tribute ID invalide"));
+                    .orElseThrow(() -> new IllegalArgumentException("Tribute ID invalid"));
             member.setTribute(tribute);
         }
 

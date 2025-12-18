@@ -1,7 +1,32 @@
 package mg.fizanakara.api.controllers;
 
 public class MemberController {
-}
+    private final MemberService memberService;
+
+    // GET ALL
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Members>> getAllMembers() {
+        log.info("Recupearte all members");
+        return ResponseEntity.ok(memberService.getAllMembers());
+    }
+
+    // GET BY ID
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Members> getMemberById(@PathVariable @NotNull String id) {
+        log.debug("Recuperate of member ID : {}", id);
+        return ResponseEntity.ok(memberService.getMemberById(id));
+    }
+
+    // CREATE
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Members> createMember(@RequestBody @Validated MemberDto dto) {
+        log.info("Create member of : {} {}", dto.getFirstName(), dto.getLastName());
+        Members created = memberService.createMember(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
 
     // UPDATE BY ID
     @PutMapping("/{id}")

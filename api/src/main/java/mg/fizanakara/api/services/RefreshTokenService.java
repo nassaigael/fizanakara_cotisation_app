@@ -13,8 +13,7 @@ import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
-    private RefreshTokenRepository refreshTokenRepository;
-    private AdminsRepository adminsRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final long refreshTokenDurationMs;
 
     public RefreshTokenService(

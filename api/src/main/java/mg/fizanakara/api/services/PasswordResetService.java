@@ -1,4 +1,4 @@
-package mg.fizanakara.api.services;  // Adapte au package
+package mg.fizanakara.api.services;
 
 import jakarta.transaction.Transactional;  // Import pour @Transactional
 import mg.fizanakara.api.exceptions.UserNotFoundException;

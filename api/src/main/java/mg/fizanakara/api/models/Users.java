@@ -45,9 +45,5 @@ public abstract class Users {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDate createdAt;
 
-    public Long getSequenceNumber() {
-        return sequenceNumber;
-    }
-
     public abstract String generatedCustomId();
 }

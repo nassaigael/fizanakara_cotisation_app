@@ -37,7 +37,7 @@ public class Members extends Users {
     private Tribute tribute;
 
     /* @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-    private Childs child; */
+    private Children child; */
 
     @Override
     public String generatedCustomId() {

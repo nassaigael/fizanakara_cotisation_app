@@ -48,7 +48,7 @@ public class MemberService {
         District district = districtRepository.findById(dto.getDistrictId())
                 .orElseThrow(() -> new IllegalArgumentException("District ID invalide : " + dto.getDistrictId()));
         Tribute tribute = tributeRepository.findById(dto.getTributeId())
-                .orElseThrow(() -> new IllegalArgumentException("Tribute ID invalide : " + dto.getTributeId()));
+                .orElseThrow(() -> new IllegalArgumentException("Tribute ID invalid : " + dto.getTributeId()));
 
         log.info("Creation of member : {} {}", dto.getFirstName(), dto.getLastName());
         Members member = Members.builder()

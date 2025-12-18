@@ -33,7 +33,7 @@ public class Members extends Users {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tribute_id", nullable = false)
     @NotNull(message = "The tribute is required")
-    @JsonIgnore  // ← AJOUT : Évite lazy loading
+    @JsonIgnore
     private Tribute tribute;
 
     /* @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)

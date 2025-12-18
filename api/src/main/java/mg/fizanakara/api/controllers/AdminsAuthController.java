@@ -88,7 +88,7 @@ public class AdminsAuthController {
         } catch (Exception e) {
             log.error("Error login for {} : {}", req.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Échec d'authentification", "success", false));
+                    .body(Map.of("error", "Failed authentication", "success", false));
         }
     }
 

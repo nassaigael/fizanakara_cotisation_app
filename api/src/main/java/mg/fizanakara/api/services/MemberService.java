@@ -120,7 +120,7 @@ public class MemberService {
                 member.getTribute().getId(),
                 member.getStatus(),
                 id))
-            throw new IllegalArgumentException("Membre avec ces informations existe déjà");
+            throw new IllegalArgumentException("Member with this information's exist");
 
         Members updated = memberRepository.save(member);
         log.info("Update partial of member ID {} success", id);

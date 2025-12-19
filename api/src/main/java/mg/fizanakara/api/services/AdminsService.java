@@ -31,7 +31,7 @@ public class AdminsService {
             throw new AdminsException("Email Already Exists");
 
         // GENERATE SEQUENCE & ID BEFORE SAVE
-        Long nextSeq = sequenceService.getNextSequence("admins_seq");
+        Long nextSeq = sequenceService.getNextSequence("admin_seq");
         admin.setSequenceNumber(nextSeq);
         admin.setId(admin.generatedCustomId());
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));

@@ -41,24 +41,24 @@ public class MemberService {
     // CREATE
     @Transactional
     public Members createMember(MemberDto dto) {
-        if (memberRepository.hasDuplicateByKeyFields(
-                dto.getFirstName(),
-                dto.getLastName(),
-                dto.getBirthDate(),
-                dto.getPhoneNumber(),
-                dto.getDistrictId(),
-                dto.getTributeId(),
-                dto.getStatus(),
-                null)) {
-            throw new IllegalArgumentException("A member with the same name already exists");
+        log.info("Checking duplicate for firstName='{}', lastName='{}', birthDate='{}', phone='{}', districtId={}, tributeId={}, status={}",
+                dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus());
+
+        boolean hasDuplicate = memberRepository.hasDuplicateByKeyFields(
+                dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(),
+                dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), null);
+        log.info("Duplicate check result: {}", hasDuplicate);
+
+        if (hasDuplicate) {
+            throw new IllegalArgumentException("A member with the same details already exists");
         }
 
         District district = districtRepository.findById(dto.getDistrictId())
-                .orElseThrow(() -> new IllegalArgumentException("District ID invalid : " + dto.getDistrictId()));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid District ID: " + dto.getDistrictId()));
         Tribute tribute = tributeRepository.findById(dto.getTributeId())
-                .orElseThrow(() -> new IllegalArgumentException("Tribute ID invalid : " + dto.getTributeId()));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Tribute ID: " + dto.getTributeId()));
 
-        log.info("Creation of member : {} {}", dto.getFirstName(), dto.getLastName());
+        log.info("Creating member: {} {}", dto.getFirstName(), dto.getLastName());
         Members member = Members.builder()
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
@@ -77,7 +77,6 @@ public class MemberService {
         member.setId(member.generatedCustomId());
         return memberRepository.save(member);
     }
-
     // UPDATE BY ID
     @Transactional
     public Members updateMember(String id, MemberDto dto) {

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class SequenceInitializer {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;  // <- Injecte JdbcTemplate (dispo via spring-boot-starter-jdbc)
+    private JdbcTemplate jdbcTemplate;
 
     @PostConstruct
     public void initializeSequences() {

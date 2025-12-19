@@ -57,7 +57,7 @@ public class ChildrenService {
         boolean hasDuplicate = childrenRepository.hasDuplicateByKeyFields(
                 dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(),
                 dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), dto.getMemberId(), null);
-        log.info("Duplicate check result: {}", hasDuplicate);
+        log.info("Cross-table duplicate check result: {}", hasDuplicate);
 
         if (hasDuplicate) {
             throw new IllegalArgumentException("Child with these details already exists for this member");

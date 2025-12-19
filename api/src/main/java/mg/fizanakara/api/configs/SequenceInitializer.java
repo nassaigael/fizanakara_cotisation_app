@@ -1,25 +1,22 @@
 package mg.fizanakara.api.configs;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SequenceInitializer {
-    @PersistenceContext
-    private EntityManager entityManager;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;  // <- Injecte JdbcTemplate (dispo via spring-boot-starter-jdbc)
 
     @PostConstruct
-    @Transactional
-
     public void initializeSequences() {
-        entityManager.createNativeQuery(
-                "CREATE SEQUENCE IF NOT EXISTS admin_seq START WITH 1 INCREMENT BY 1"
-        ).executeUpdate();
+        // Création de la séquence admin_seq (commence à 1, incrément de 1)
+        jdbcTemplate.execute("CREATE SEQUENCE IF NOT EXISTS admin_seq START WITH 1 INCREMENT BY 1");
 
-        entityManager.createNativeQuery(
-                "CREATE SEQUENCE IF NOT EXISTS mbr_seq START WITH 1 INCREMENT BY 1"
-        ).executeUpdate();
+        // Création de la séquence mbr_seq (commence à 1, incrément de 1)
+        jdbcTemplate.execute("CREATE SEQUENCE IF NOT EXISTS mbr_seq START WITH 1 INCREMENT BY 1");
     }
 }

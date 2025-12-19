@@ -51,7 +51,15 @@ public class ChildrenService {
     // CREATE
     @Transactional
     public Children createChild(ChildrenCreateDto dto) {
-        if (childrenRepository.hasDuplicateByKeyFields(dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), dto.getMemberId(), null)) {
+        log.info("Checking duplicate for firstName='{}', lastName='{}', birthDate='{}', phone='{}', districtId={}, tributeId={}, status={}, memberId={}",
+                dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), dto.getMemberId());
+
+        boolean hasDuplicate = childrenRepository.hasDuplicateByKeyFields(
+                dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(),
+                dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), dto.getMemberId(), null);
+        log.info("Duplicate check result: {}", hasDuplicate);
+
+        if (hasDuplicate) {
             throw new IllegalArgumentException("Child with these details already exists for this member");
         }
 

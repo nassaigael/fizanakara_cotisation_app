@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/admins/children")  // Admin namespace, all protected by ADMIN token
+@RequestMapping("/admins/children")
 @RequiredArgsConstructor
 @Slf4j
 public class ChildrenController {
     private final ChildrenService childrenService;
 
-    // GET ALL (admin only)
+    // GET ALL
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Children>> getAllChildren() {
@@ -30,7 +30,7 @@ public class ChildrenController {
         return ResponseEntity.ok(childrenService.getAllChildren());
     }
 
-    // GET BY ID (admin only)
+    // GET BY ID
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Children> getChildById(@PathVariable String id) {
@@ -38,7 +38,7 @@ public class ChildrenController {
         return ResponseEntity.ok(childrenService.getChildById(id));
     }
 
-    // GET BY MEMBER ID (parent – admin only)
+    // GET BY MEMBER ID
     @GetMapping("/member/{memberId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Children>> getChildrenByMemberId(@PathVariable String memberId) {
@@ -46,7 +46,7 @@ public class ChildrenController {
         return ResponseEntity.ok(childrenService.getChildrenByMemberId(memberId));
     }
 
-    // CREATE (all fields required – admin only)
+    // CREATE
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Children> createChild(@RequestBody @Validated ChildrenCreateDto dto) {
@@ -55,7 +55,7 @@ public class ChildrenController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // UPDATE partial (optional fields – admin only)
+    // UPDATE
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Children> updateChild(@PathVariable String id, @RequestBody ChildrenUpdateDto dto) {

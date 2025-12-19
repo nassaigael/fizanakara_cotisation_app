@@ -90,7 +90,6 @@ public class ChildrenService {
         child.setId(child.generatedCustomId());
         return childrenRepository.save(child);
     }
-
     // UPDATE partial (optional fields)
     @Transactional
     public Children updateChild(String id, ChildrenUpdateDto dto) {

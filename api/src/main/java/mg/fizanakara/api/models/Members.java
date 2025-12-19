@@ -36,8 +36,8 @@ public class Members extends Users {
     @JsonIgnore
     private Tribute tribute;
 
-    /* @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-    private Children child; */
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    private Children child;
 
     @Override
     public String generatedCustomId() {

@@ -19,7 +19,7 @@ public interface MemberRepository extends JpaRepository<Members, String> {
 
     List<Members> findByFirstNameAndLastName(String firstName, String lastName);
 
-    @Query("SELECT COUNT(m) > 0 FROM Members m WHERE m.firstName = :firstName AND m.lastName = :lastName AND m.birthDate = :birthDate AND m.phoneNumber = :phoneNumber AND m.district.id = :districtId AND m.tribute.id = :tributeId AND m.status = :status AND m.id != :currentId")
+    @Query("SELECT COUNT(m) > 0 FROM Members m WHERE m.firstName = :firstName AND m.lastName = :lastName AND m.birthDate = :birthDate AND m.phoneNumber = :phoneNumber AND m.district.id = :districtId AND m.tribute.id = :tributeId AND m.status = :status AND (:currentId IS NULL OR m.id != :currentId)")
     boolean hasDuplicateByKeyFields(@Param("firstName") String firstName,
                                     @Param("lastName") String lastName,
                                     @Param("birthDate") LocalDate birthDate,

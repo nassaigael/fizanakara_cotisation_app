@@ -71,7 +71,7 @@ public class MemberService {
                 .tribute(tribute)
                 .build();
 
-        Long nextSeq = sequenceService.getNextSequence("users_sequence");
+        Long nextSeq = sequenceService.getNextSequence("mbr_seq");
         member.setCreatedAt(LocalDate.now());
         member.setSequenceNumber(nextSeq);
         member.setId(member.generatedCustomId());

@@ -60,7 +60,7 @@ public class ChildrenService {
         log.info("Cross-table duplicate check result: {}", hasDuplicate);
 
         if (hasDuplicate) {
-            throw new IllegalArgumentException("Child with these details already exists for this member");
+            throw new IllegalArgumentException("Child with these details already exists (in members or children) for this member");
         }
 
         District district = districtRepository.findById(dto.getDistrictId())

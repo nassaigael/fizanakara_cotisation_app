@@ -13,7 +13,6 @@ public class SequenceInitializer {
 
     @PostConstruct
     public void initializeSequences() {
-        // Création de la séquence admin_seq (commence à 1, incrément de 1)
         jdbcTemplate.execute("CREATE SEQUENCE IF NOT EXISTS admin_seq START WITH 1 INCREMENT BY 1");
 
         // Création de la séquence mbr_seq (commence à 1, incrément de 1)

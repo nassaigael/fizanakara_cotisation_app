@@ -90,6 +90,8 @@ public class SecurityConfig {
                         .authenticated()
                         .requestMatchers("/admins/members/**")
                         .authenticated()
+                        .requestMatchers("/admins/children/")
+                        .authenticated()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)

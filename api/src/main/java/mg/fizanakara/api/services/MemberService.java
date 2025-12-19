@@ -50,7 +50,7 @@ public class MemberService {
         log.info("Duplicate check result: {}", hasDuplicate);
 
         if (hasDuplicate) {
-            throw new IllegalArgumentException("A member with the same details already exists");
+            throw new IllegalArgumentException("A member with these details already exists (in members or children)");
         }
 
         District district = districtRepository.findById(dto.getDistrictId())

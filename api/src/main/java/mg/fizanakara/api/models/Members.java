@@ -7,6 +7,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import mg.fizanakara.api.models.enums.MemberStatus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "members", indexes = {
         @Index(name = "idx_members_district_id", columnList = "district_id"),

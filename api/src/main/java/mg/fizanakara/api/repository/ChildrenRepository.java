@@ -21,7 +21,8 @@ public interface ChildrenRepository extends JpaRepository<Children, String> {
 
     List<Children> findByMemberId(String memberId);
 
-    @Query("SELECT COUNT(c) > 0 FROM Children c WHERE c.firstName = :firstName AND c.lastName = :lastName AND c.birthDate = :birthDate AND c.phoneNumber = :phoneNumber AND c.district.id = :districtId AND c.tribute.id = :tributeId AND c.status = :status AND c.member.id = :memberId AND c.id != :currentId")
+    @Query("SELECT (SELECT COUNT(c) FROM Children c WHERE c.firstName = :firstName AND c.lastName = :lastName AND c.birthDate = :birthDate AND c.phoneNumber = :phoneNumber AND c.district.id = :districtId AND c.tribute.id = :tributeId AND c.status = :status AND c.member.id = :memberId AND (:currentId IS NULL OR c.id != :currentId)) + " +
+            "(SELECT COUNT(m) FROM Members m WHERE m.firstName = :firstName AND m.lastName = :lastName AND m.birthDate = :birthDate AND m.phoneNumber = :phoneNumber AND m.district.id = :districtId AND m.tribute.id = :tributeId AND m.status = :status AND (:currentId IS NULL OR m.id != :currentId)) > 0")
     boolean hasDuplicateByKeyFields(@Param("firstName") String firstName,
                                     @Param("lastName") String lastName,
                                     @Param("birthDate") LocalDate birthDate,

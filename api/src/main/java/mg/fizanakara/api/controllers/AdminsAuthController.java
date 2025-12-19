@@ -59,7 +59,7 @@ public class AdminsAuthController {
     public ResponseEntity<?> login(@RequestBody @Validated LoginRequestDTO req) {
         try {
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
+                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
             );
 
             SecurityContextHolder.getContext().setAuthentication(auth);

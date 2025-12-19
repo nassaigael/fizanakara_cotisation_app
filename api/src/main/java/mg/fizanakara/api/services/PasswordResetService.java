@@ -1,6 +1,6 @@
-package mg.fizanakara.api.services;  // Adapte au package
+package mg.fizanakara.api.services;
 
-import jakarta.transaction.Transactional;  // Import pour @Transactional
+import jakarta.transaction.Transactional;
 import mg.fizanakara.api.exceptions.UserNotFoundException;
 import mg.fizanakara.api.models.Admins;
 import mg.fizanakara.api.models.PasswordResetToken;
@@ -51,19 +51,18 @@ public class PasswordResetService {
     public void createAndSendPasswordResetToken(String email) {
         Admins admin = adminsRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.warn("Tentative de réinitialisation de mot de passe pour un e-mail inexistant : {}", email);
-                    return new UserNotFoundException("... Aucun mail");
+                    log.warn("Tentative of authentification with password  not existent : {}", email);
+                    return new UserNotFoundException("mail not found");
                 });
 
-        // ← FIX FINAL : Load explicite + delete pour forcer suppression
         Optional<PasswordResetToken> existingTokenOpt = tokenRepo.findByAdmin(admin);
         if (existingTokenOpt.isPresent()) {
             PasswordResetToken existingToken = existingTokenOpt.get();
-            tokenRepo.delete(existingToken);  // Delete l'entité loaded (génère DELETE SQL)
-            tokenRepo.flush();  // Force flush pour commit immédiat (évite doublon au next save)
-            log.debug("Ancien token de reset supprimé pour l'admin : {}", admin.getEmail());
+            tokenRepo.delete(existingToken);
+            tokenRepo.flush();
+            log.debug("Ancien token de reset supprimé pour admin : {}", admin.getEmail());
         } else {
-            log.debug("Aucun ancien token trouvé pour l'admin : {}", admin.getEmail());
+            log.debug("Aucun ancien token trouvé pour admin : {}", admin.getEmail());
         }
 
         String token = UUID.randomUUID().toString();
@@ -83,8 +82,7 @@ public class PasswordResetService {
         // Format To avec nom (du DB)
         String toAddress = admin.getFirstName() + " " + admin.getLastName() + " <" + admin.getEmail() + ">";
 
-        // Format From avec nom d'app (remplace "ton-email@gmail.com" par ton vrai spring.mail.username)
-        String fromAddress = "Fizanakara App <ton-email@gmail.com>";  // ← REMPLACE ICI !
+        String fromAddress = "Fizanakara App <ton-email@gmail.com>";
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromAddress);
@@ -97,15 +95,13 @@ public class PasswordResetService {
             log.info("E-mail de réinitialisation de mot de passe envoyé à : {}", admin.getEmail());
         } catch (Exception e) {
             log.error("Échec de l'envoi de l'e-mail de réinitialisation à {} : {}", admin.getEmail(), e.getMessage(), e);
-            // ← OPTION : Ne throw pas pour garder token (email fail, mais reset possible via lien manuel)
-            // throw new RuntimeException("Échec de l'envoi de l'e-mail de réinitialisation", e);  // Rollback total si activé
         }
     }
 
     @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken prt = tokenRepo.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Token invalide"));
+                .orElseThrow(() -> new RuntimeException("Token invalid"));
         if (prt.getExpiryDate().isBefore(Instant.now())) {
             tokenRepo.deleteByToken(token);
             throw new RuntimeException("Token expiré");

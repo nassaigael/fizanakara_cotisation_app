@@ -32,7 +32,4 @@ public class AdminResponseDto {
         this.verified = admin.isVerified();
         this.createdAt = admin.getCreatedAt();
     }
-
-    public AdminResponseDto(String id, String email, String firstName, String lastName, boolean verified) {
-    }
 }

@@ -14,7 +14,7 @@ public class UserPrePersisteListener {
     @PrePersist
     public void prePersistUsers(Users user) {
         if (user.getSequenceNumber() == null) {
-            user.setSequenceNumber(sequenceService.getNextSequence("users_sequence"));
+            user.setSequenceNumber(sequenceService.getNextSequence("mbr_seq"));
         }
         if (user.getId() == null) {
             user.setId(user.generatedCustomId());

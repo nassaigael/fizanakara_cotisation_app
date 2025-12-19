@@ -1,11 +1,10 @@
-package mg.fizanakara.api.models;  // Adapte au package
+package mg.fizanakara.api.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import mg.fizanakara.api.models.RefreshToken;  // Import pour la liste
 import java.util.ArrayList;
 import java.util.List;
 

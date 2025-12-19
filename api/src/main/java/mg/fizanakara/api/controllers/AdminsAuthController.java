@@ -1,9 +1,8 @@
 package mg.fizanakara.api.controllers;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import mg.fizanakara.api.dto.AdminResponseDto;
+import mg.fizanakara.api.dto.LoginRequestDTO;
+import mg.fizanakara.api.dto.RegisterRequestDTO;
 import mg.fizanakara.api.exceptions.AdminsException;
 import mg.fizanakara.api.models.Admins;
 import mg.fizanakara.api.dto.UpdateAdminDto;
@@ -12,7 +11,6 @@ import mg.fizanakara.api.security.JwtUtil;
 import mg.fizanakara.api.services.AdminsService;
 import mg.fizanakara.api.services.PasswordResetService;
 import mg.fizanakara.api.services.RefreshTokenService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-//@RequestMapping("/api/admins")
 @RequiredArgsConstructor
 @Slf4j
 public class AdminsAuthController {
@@ -40,7 +37,7 @@ public class AdminsAuthController {
 
     // REGISTER (public)
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Validated RegisterRequest req) throws AdminsException {
+    public ResponseEntity<?> register(@RequestBody @Validated RegisterRequestDTO req) throws AdminsException {
         Admins admin = Admins.builder()
                 .firstName(req.getFirstName())
                 .lastName(req.getLastName())
@@ -53,13 +50,13 @@ public class AdminsAuthController {
                 .build();
 
         Admins saved = adminsService.register(admin);
-        log.info("Nouvel admin enregistré : {}", saved.getEmail());
+        log.info("New admin saved : {}", saved.getEmail());
         return ResponseEntity.ok(new AdminResponseDto(saved));
     }
 
     // LOGIN (public)
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Validated LoginRequest req) {
+    public ResponseEntity<?> login(@RequestBody @Validated LoginRequestDTO req) {
         try {
             Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
@@ -71,44 +68,49 @@ public class AdminsAuthController {
             Admins admin = adminsService.findByEmail(req.getEmail()).orElseThrow();
             var rt = refreshTokenService.createRefreshToken(admin);
 
-            log.info("Login réussi pour : {}", req.getEmail());
+            log.info("Login success of : {}", req.getEmail());
             return ResponseEntity.ok(Map.of(
+                    "user", Map.of(
+                            "id", admin.getId(),
+                            "email", admin.getEmail(),
+                            "firstname", admin.getFirstName(),
+                            "lastname", admin.getLastName(),
+                            "gender", admin.getGender()),
                     "accessToken", accessToken,
-                    "refreshToken", rt.getToken(),
-                    "user", Map.of("id", admin.getId(), "email", admin.getEmail(), "firstname", admin.getFirstName())
+                    "refreshToken", rt.getToken()
             ));
         } catch (BadCredentialsException e) {
-            log.warn("Échec login pour {} : Credentials invalides", req.getEmail());
+            log.warn("Login failed for {} : Credentials invalids", req.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Email ou mot de passe incorrect", "success", false));
+                    .body(Map.of("error", "Email or password incorrect", "success", false));
         } catch (Exception e) {
-            log.error("Erreur login pour {} : {}", req.getEmail(), e.getMessage());
+            log.error("Error login for {} : {}", req.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Échec d'authentification", "success", false));
+                    .body(Map.of("error", "Failed authentication", "success", false));
         }
     }
 
-    // DELETE admin (protégé - nécessite JWT valide)
-    @DeleteMapping("/amidn/{id}")
+    // DELETE BY ID
+    @DeleteMapping("/admins/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable String id) {
         try {
             Admins admin = adminsService.findById(id)
-                    .orElseThrow(() -> new AdminsException("Admin non trouvé avec l'ID : " + id));
+                    .orElseThrow(() -> new AdminsException("Admin not found with ID : " + id));
             adminsService.deleteAdmins(admin);
-            log.info("Admin supprimé : {}", id);
-            return ResponseEntity.ok(Map.of("message", "Admin supprimé avec succès", "success", true));
+            log.info("Admin Deleted : {}", id);
+            return ResponseEntity.ok(Map.of("message", "Admin deleted with success", "success", true));
         } catch (AdminsException e) {
-            log.warn("Suppression admin échouée : ID {} non trouvé", id);
+            log.warn("Delete admin failed : ID {} not found", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage(), "success", false));
         } catch (Exception e) {
-            log.error("Erreur suppression admin {} : {}", id, e.getMessage());
+            log.error("Failed delete admin {} : {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Échec de la suppression de l'admin", "success", false));
+                    .body(Map.of("error", "Failed of delete admin", "success", false));
         }
     }
 
-    // Refresh token
+    // REFRESH TOKEN
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> body) {
         String token = body.get("refreshToken");
@@ -119,84 +121,62 @@ public class AdminsAuthController {
         }
 
         String accessToken = jwtUtil.generateAccessToken(stored.getAdmin().getEmail());
-        log.debug("Refresh token réussi pour : {}", stored.getAdmin().getEmail());
+        log.debug("Refresh token success for : {}", stored.getAdmin().getEmail());
         return ResponseEntity.ok(Map.of("accessToken", accessToken));
     }
 
-    // Forgot password (public) - sends email if exists
+    // FORGOT PASSWORD
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
         String email = body.get("email");
-        log.info("Demande reset password pour : {}", email);
-        // This will throw if no account; you may prefer to swallow exception and always return generic message
+        log.info("Demand reset password for : {}", email);
         passwordResetService.createAndSendPasswordResetToken(email);
         return ResponseEntity.ok("Password reset email sent if the account exists.");
     }
 
-    // Reset password (public)
+    // RESET PASSWORD
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
         String token = body.get("token");
         String newPassword = body.get("newPassword");
         passwordResetService.resetPassword(token, newPassword);
-        log.info("Password reset réussi pour token : {}", token.substring(0, 8) + "...");
+        log.info("Password reset with success for token : {}", token.substring(0, 8) + "...");
         return ResponseEntity.ok("Password reset successfully.");
     }
 
-    // Protected route example: Get current user
     @GetMapping("/admins/me")
     public ResponseEntity<?> me(Authentication authentication) {
         if (authentication == null) return ResponseEntity.status(401).body("Unauthorized");
         String email = authentication.getName();
         Admins admin = adminsService.findByEmail(email).orElseThrow();
-        log.debug("Profil récupéré pour : {}", email);
-        //admin.setPassword(null);  // ← RETIRÉ : Plus besoin avec DTO
+        log.debug("Profile recuperate for : {}", email);
         return ResponseEntity.ok(new AdminResponseDto(admin));
     }
 
-    // Update profil (protégé, self-update via JWT)
+    // UPDATE
     @PatchMapping("/admins/me")
     public ResponseEntity<?> updateMe(@RequestBody @Validated UpdateAdminDto req, Authentication authentication) {
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Non authentifié", "success", false));
+                    .body(Map.of("error", "Not authentify", "success", false));
         }
         String email = authentication.getName();
         try {
-            // ← FIX : Service retourne DTO, type changé pour matcher
-            AdminResponseDto updated = adminsService.updateAdmin(email, req);  // Unifié nom DTO
-            log.info("Update profil réussi pour : {}", email);
+            AdminResponseDto updated = adminsService.updateAdmin(email, req);
+            log.info("Update profile success for : {}", email);
             return ResponseEntity.ok(Map.of(
-                    "message", "Profil mis à jour avec succès",
+                    "message", "Profile updated with success",
                     "success", true,
-                    "user", updated  // DTO direct
+                    "user", updated
             ));
         } catch (AdminsException e) {
-            log.warn("Update profil échoué pour {} : {}", email, e.getMessage());
+            log.warn("Update profile failed for {} : {}", email, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", e.getMessage(), "success", false));
         } catch (Exception e) {
-            log.error("Erreur update profil pour {} : {}", email, e.getMessage());
+            log.error("Error of update profile {} : {}", email, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Échec de la mise à jour", "success", false));
+                    .body(Map.of("error", "Failed update", "success", false));
         }
-    }
-
-    @Data
-    static class RegisterRequest {
-        @NotBlank private String firstName;
-        @NotBlank private String lastName;
-        @NotNull private java.time.LocalDate birthDate;
-        @NotBlank private String gender; // adapt to your Gender enum serialization
-        @NotBlank private String imageUrl;
-        @NotBlank private String phoneNumber;
-        @NotBlank @Email private String email;
-        @NotBlank private String password;
-    }
-
-    @Data
-    static class LoginRequest {
-        @NotBlank @Email private String email;
-        @NotBlank private String password;
     }
 }

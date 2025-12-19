@@ -33,7 +33,7 @@ public class DistrictService {
     @Transactional
     public District createDistrict(DistrictDto dto) {
         if (districtRepository.existsByName(dto.getName())) {
-            throw new IllegalArgumentException("District avec nom '" + dto.getName() + "' existe déjà");
+            throw new IllegalArgumentException("District with name '" + dto.getName() + "' has exist");
         }
         log.info("Creating District : {}", dto.getName());
         District district = District.builder()

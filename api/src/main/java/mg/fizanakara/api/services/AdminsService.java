@@ -31,7 +31,7 @@ public class AdminsService {
             throw new AdminsException("Email Already Exists");
 
         // GENERATE SEQUENCE & ID BEFORE SAVE
-        Long nextSeq = sequenceService.getNextSequence("admins_seq");
+        Long nextSeq = sequenceService.getNextSequence("admin_seq");
         admin.setSequenceNumber(nextSeq);
         admin.setId(admin.generatedCustomId());
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
@@ -73,16 +73,13 @@ public class AdminsService {
     @Transactional
     public AdminResponseDto updateAdmin(String email, UpdateAdminDto req) throws AdminsException {
         Admins admin = findByEmail(email)
-                .orElseThrow(() -> new AdminsException("Admin non trouvé avec l'email : " + email));
+                .orElseThrow(() -> new AdminsException("Admin not found with email : " + email));
 
-        // Check email unique si changé
-        if (req.getEmail() != null && !req.getEmail().equals(admin.getEmail()) && adminsRepository.existsByEmail(req.getEmail())) {
-            throw new AdminsException("Email déjà utilisé par un autre admin");
-        }
+        if (req.getEmail() != null && !req.getEmail().equals(admin.getEmail()) && adminsRepository.existsByEmail(req.getEmail()))
+            throw new AdminsException("Email has exit use by other admin");
 
-        int changes = 0;  // ← OPTION : Compteur pour log
+        int changes = 0;
 
-        // Merge des champs (partial update)
         if (req.getFirstName() != null) {
             admin.setFirstName(req.getFirstName());
             changes++;
@@ -97,10 +94,10 @@ public class AdminsService {
         }
         if (req.getGender() != null) {
             try {
-                admin.setGender(Gender.valueOf(req.getGender().toUpperCase()));  // ← FIX : Uppercase + try-catch
+                admin.setGender(Gender.valueOf(req.getGender().toUpperCase()));
                 changes++;
             } catch (IllegalArgumentException e) {
-                throw new AdminsException("Genre invalide : " + req.getGender() + ". Utilisez MALE ou FEMALE.");
+                throw new AdminsException("Gender invalid : " + req.getGender() + ". Please use MALE or FEMALE.");
             }
         }
         if (req.getImageUrl() != null) {
@@ -116,19 +113,18 @@ public class AdminsService {
             changes++;
         }
         if (req.getPassword() != null) {
-            admin.setPassword(passwordEncoder.encode(req.getPassword()));  // Re-encode si changé
+            admin.setPassword(passwordEncoder.encode(req.getPassword()));
             changes++;
         }
 
-        // Update verified si fourni (optionnel, pour admin only)
         if (req.getVerified() != null) {
             admin.setVerified(req.getVerified());
             changes++;
         }
 
         Admins updated = adminsRepository.save(admin);
-        log.info("Admin {} mis à jour : {} champs changés", email, changes);  // ← AJOUT : Log pour debug
+        log.info("Admin {} mis à jour : {} champs changés", email, changes);
 
-        return new AdminResponseDto(updated);  // ← FIX : Unifié nom DTO
+        return new AdminResponseDto(updated);
     }
 }

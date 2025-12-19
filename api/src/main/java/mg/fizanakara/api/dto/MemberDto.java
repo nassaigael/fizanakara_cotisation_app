@@ -1,23 +1,20 @@
 package mg.fizanakara.api.dto;
 
-import jakarta.validation.constraints.Email;
 import lombok.Data;
+import mg.fizanakara.api.models.enums.Gender;
+import mg.fizanakara.api.models.enums.MemberStatus;
+
 import java.time.LocalDate;
 
 @Data
-public class UpdateAdminDto {
+public class MemberDto {
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
-    private String gender;
-
+    private Gender gender;
     private String imageUrl;
     private String phoneNumber;
-
-    @Email(message = "Email invalid")
-    private String email;
-
-    private String password;
-
-    private Boolean verified;
+    private MemberStatus status;
+    private Long districtId;
+    private Long tributeId;
 }

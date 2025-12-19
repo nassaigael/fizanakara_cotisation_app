@@ -11,6 +11,8 @@ public class SequenceInitializer {
     private EntityManager entityManager;
 
     @PostConstruct
+    @Transactional
+
     public void initializeSequences() {
         entityManager.createNativeQuery(
                 "CREATE SEQUENCE IF NOT EXISTS admin_seq START WITH 1 INCREMENT BY 1"

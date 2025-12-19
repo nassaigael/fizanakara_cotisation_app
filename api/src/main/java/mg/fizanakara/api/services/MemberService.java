@@ -47,7 +47,7 @@ public class MemberService {
         boolean hasDuplicate = memberRepository.hasDuplicateByKeyFields(
                 dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(),
                 dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), null);
-        log.info("Duplicate check result: {}", hasDuplicate);
+        log.info("Cross-table duplicate check result: {}", hasDuplicate);
 
         if (hasDuplicate) {
             throw new IllegalArgumentException("A member with these details already exists (in members or children)");

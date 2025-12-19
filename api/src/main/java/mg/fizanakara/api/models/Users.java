@@ -32,7 +32,8 @@ public abstract class Users {
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
-    @Column(name = "gender", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender", nullable = false, length= 10)
     private Gender gender;
 
     @Column(name = "image_url", nullable = false, length = 250)

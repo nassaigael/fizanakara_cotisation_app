@@ -1,17 +1,48 @@
 @import "tailwindcss";
 
-:root
+@font-face 
 {
- --primary-color-red:#FF4B4B;
- --second-color-red:#D33131;
- --text-color-one:#AFB4BE;
- --text-color-white:#ffffff;
- --text-color-hover:#4a5565;
- --text-color-three:#364153;
- --text-gray-color-first:#101828;
- --bg-color-white:#F7F7F7;
- --bg-color-white-two:#FFF5F5;
- --border-color-white:#E5E5E5;
- --border-color-red:#D33131;
- --border-color-top:#DCDCDC;
+    font-family: 'Montserrat';
+    src: url('../assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+}
+
+@font-face 
+{
+    font-family: 'Montserrat';
+    src: url('../assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
+}
+
+@theme
+{
+    --font-sans: "Montserrat", ui-sans-serif, system-ui;
+  
+    --color-brand-primary: #FF4B4B;
+    --color-brand-primary-dark: #D33131;
+    --color-brand-border: #E5E5E5;
+    --color-brand-border-dark: #DCDCDC;
+    --color-brand-bg: #F7F7F7;
+    --color-brand-text: #4B4B4B;
+    --color-brand-muted: #AFB4BE;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base 
+{
+  .dark 
+  {
+    --color-brand-bg: #131F24;
+    --color-brand-border: #37464F;
+    --color-brand-border-dark: #202F36;
+    --color-brand-text: #F1F1F1;
+  }
+
+  body 
+  {
+    background-color: var(--color-brand-bg);
+    color: var(--color-brand-text);
+    font-family: var(--font-sans);
+    transition: background-color 0.3s, color 0.3s;
+    @apply antialiased;
+  }
 }

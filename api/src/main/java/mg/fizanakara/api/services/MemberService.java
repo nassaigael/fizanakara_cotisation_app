@@ -34,7 +34,7 @@ public class MemberService {
     // GET BY ID
     public Members getMemberById(String id) {
         log.info("Recuperate member with ID : {}", id);
-        return memberRepository.findById(id)
+        Members member = memberRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with ID : " + id));
         return mapToResponseDto(member);
     }

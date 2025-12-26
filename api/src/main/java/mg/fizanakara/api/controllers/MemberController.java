@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mg.fizanakara.api.dto.MemberDto;
-import mg.fizanakara.api.models.Members;
+import mg.fizanakara.api.dto.MemberResponseDto;
 import mg.fizanakara.api.services.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

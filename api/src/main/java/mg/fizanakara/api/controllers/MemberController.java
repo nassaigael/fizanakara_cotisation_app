@@ -43,8 +43,7 @@ public class MemberController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MemberResponseDto> createMember(@RequestBody @Validated MemberDto dto) {  // ← FIX : DTO
         log.info("Create member of : {} {}", dto.getFirstName(), dto.getLastName());
-        Members created = memberService.createMember(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.createMember(dto));
     }
 
     // UPDATE BY ID

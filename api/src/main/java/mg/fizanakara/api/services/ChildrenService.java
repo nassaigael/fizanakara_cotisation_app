@@ -52,7 +52,8 @@ public class ChildrenService {
     }
 
     // GET BY MEMBER ID
-    public List<Children> getChildrenByMemberId(String memberId) {
+    @Transactional(readOnly = true)
+    public List<ChildrenResponseDto> getChildrenByMemberId(String memberId) {
         log.info("Retrieving children for member ID: {}", memberId);
         return childrenRepository.findByMemberId(memberId);
     }

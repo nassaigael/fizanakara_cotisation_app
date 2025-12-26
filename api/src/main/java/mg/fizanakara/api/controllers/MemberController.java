@@ -52,8 +52,7 @@ public class MemberController {
     public ResponseEntity<MemberResponseDto> updateMember(@PathVariable String id, @RequestBody MemberDto dto) {  // ← FIX : DTO
         log.info("Update service - ID : {}, DTO on require : firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
-        Members updated = memberService.updateMember(id, dto);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(memberService.updateMember(id, dto));
     }
 
     // DELETE BY ID

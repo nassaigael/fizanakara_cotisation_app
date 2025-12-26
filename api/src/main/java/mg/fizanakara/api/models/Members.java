@@ -36,7 +36,7 @@ public class Members extends Users {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tribute_id", nullable = false)
     @NotNull(message = "The tribute is required")
-    @JsonIgnore
+    @JsonManagedReference
     private Tribute tribute;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

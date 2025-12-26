@@ -25,8 +25,8 @@ public class MemberController {
     // GET ALL
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Members>> getAllMembers() {
-        log.info("Recupearte all members");
+    public ResponseEntity<List<MemberResponseDto>> getAllMembers() {
+        log.info("Recuperate all members");
         return ResponseEntity.ok(memberService.getAllMembers());
     }
 

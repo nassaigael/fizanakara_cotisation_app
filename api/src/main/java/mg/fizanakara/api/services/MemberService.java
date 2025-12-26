@@ -79,7 +79,7 @@ public class MemberService {
     }
     // UPDATE BY ID
     @Transactional
-    public Members updateMember(String id, MemberDto dto) {
+    public MemberResponseDto updateMember(String id, MemberDto dto) {
         log.info("Update service - ID : {}, DTO on require : firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
         if (id == null || id.trim().isEmpty())

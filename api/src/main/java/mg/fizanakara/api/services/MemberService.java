@@ -26,7 +26,7 @@ public class MemberService {
     private final SequenceService sequenceService;
 
     // GET ALL
-    public List<Members> getAllMembers() {
+    public List<MemberResponseDto> getAllMembers() {
         log.info("Recuperate all members");
         List<Members> members = memberRepository.findAll();
         return members.stream()

@@ -102,7 +102,9 @@ public class ChildrenService {
         child.setCreatedAt(LocalDate.now());
         child.setSequenceNumber(nextSeq);
         child.setId(child.generatedCustomId());
-        return childrenRepository.save(child);
+
+        Children saved = childrenRepository.save(child);
+        return  mapToResponseDto(saved);
     }
     // UPDATE partial (optional fields)
     @Transactional

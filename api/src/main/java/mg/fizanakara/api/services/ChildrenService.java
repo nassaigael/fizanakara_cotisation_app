@@ -153,7 +153,7 @@ public class ChildrenService {
 
         Children updated = childrenRepository.save(child);
         log.info("Partial update for child ID {} successful", id);
-        return updated;
+        return mapToResponseDto(updated);
     }
 
     // DELETE

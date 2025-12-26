@@ -27,6 +27,7 @@ public class MemberService {
     private final SequenceService sequenceService;
 
     // GET ALL
+    @Transactional(readOnly = true)
     public List<MemberResponseDto> getAllMembers() {
         log.info("Recuperate all members");
         List<Members> members = memberRepository.findAll();

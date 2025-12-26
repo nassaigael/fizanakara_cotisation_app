@@ -48,6 +48,7 @@ public class ChildrenService {
         log.info("Retrieving child with ID: {}", id);
         Children child  = childrenRepository.findById(id)
                 .orElseThrow(() -> new ChildrenNotFoundException("Child not found with ID: " + id));
+        return mapToResponseDto(child);
     }
 
     // GET BY MEMBER ID

@@ -33,6 +33,6 @@ public class Tribute {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "tribute", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonIgnore
+    @JsonBackReference
     private List<Members> members = new ArrayList<>();
 }

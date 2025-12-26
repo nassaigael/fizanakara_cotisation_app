@@ -30,13 +30,13 @@ public class Members extends Users {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "district_id", nullable = false)
     @NotNull(message = "The district is required")
-    @JsonManagedReference
+    @JsonIgnore
     private District district;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tribute_id", nullable = false)
     @NotNull(message = "The tribute is required")
-    @JsonManagedReference
+    @JsonIgnore
     private Tribute tribute;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

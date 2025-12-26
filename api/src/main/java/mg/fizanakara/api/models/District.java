@@ -1,6 +1,6 @@
 package mg.fizanakara.api.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;  // ← AJOUT : Pour ignorer en JSON
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -40,6 +40,6 @@ public class District {
     private Long version;
 
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonBackReference
+    @JsonIgnore
     private List<Members> members = new ArrayList<>();
 }

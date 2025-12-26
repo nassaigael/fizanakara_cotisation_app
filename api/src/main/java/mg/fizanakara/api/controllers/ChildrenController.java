@@ -33,7 +33,7 @@ public class ChildrenController {
     // GET BY ID
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Children> getChildById(@PathVariable String id) {
+    public ResponseEntity<ChildrenResponseDto> getChildById(@PathVariable String id) {
         log.debug("Retrieving child by ID: {}", id);
         return ResponseEntity.ok(childrenService.getChildById(id));
     }

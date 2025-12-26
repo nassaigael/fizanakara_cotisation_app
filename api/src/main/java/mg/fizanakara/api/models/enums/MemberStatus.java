@@ -1,5 +1,5 @@
 package mg.fizanakara.api.models.enums;
 
 public enum MemberStatus {
-    Etudiant, Travailleur
+    WORKER, STUDENT
 }

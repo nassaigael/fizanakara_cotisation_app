@@ -40,6 +40,6 @@ public class District {
     private Long version;
 
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonIgnore
+    @JsonBackReference
     private List<Members> members = new ArrayList<>();
 }

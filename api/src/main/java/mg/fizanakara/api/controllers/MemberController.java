@@ -49,8 +49,8 @@ public class MemberController {
     // UPDATE BY ID
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Members> updateMember(@PathVariable String id, @RequestBody MemberDto dto) {
-        log.info("PUT partial - ID : {}, champs fournis : firstName={}, lastName={}, birthDate={}, gender={}",
+    public ResponseEntity<MemberResponseDto> updateMember(@PathVariable String id, @RequestBody MemberDto dto) {  // ← FIX : DTO
+        log.info("Update service - ID : {}, DTO on require : firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
         Members updated = memberService.updateMember(id, dto);
         return ResponseEntity.ok(updated);

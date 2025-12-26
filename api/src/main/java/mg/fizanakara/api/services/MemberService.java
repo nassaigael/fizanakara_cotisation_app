@@ -123,7 +123,7 @@ public class MemberService {
 
         Members updated = memberRepository.save(member);
         log.info("Update partial of member ID {} success", id);
-        return updated;
+        return mapToResponseDto(updated);
     }
 
     private Members findEntityById(String id) {

@@ -77,6 +77,7 @@ public class MemberService {
         member.setId(member.generatedCustomId());
         return memberRepository.save(member);
     }
+
     // UPDATE BY ID
     @Transactional
     public MemberResponseDto updateMember(String id, MemberDto dto) {

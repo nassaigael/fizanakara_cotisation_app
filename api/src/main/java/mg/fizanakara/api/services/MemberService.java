@@ -75,7 +75,9 @@ public class MemberService {
         member.setCreatedAt(LocalDate.now());
         member.setSequenceNumber(nextSeq);
         member.setId(member.generatedCustomId());
-        return memberRepository.save(member);
+
+        Members saved = memberRepository.save(member);
+        return mapToResponseDto(saved);
     }
 
     // UPDATE BY ID

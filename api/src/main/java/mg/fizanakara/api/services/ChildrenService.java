@@ -64,7 +64,7 @@ public class ChildrenService {
 
     // CREATE
     @Transactional
-    public Children createChild(ChildrenCreateDto dto) {
+    public ChildrenResponseDto createChild(ChildrenCreateDto dto) {
         log.info("Checking duplicate for firstName='{}', lastName='{}', birthDate='{}', phone='{}', districtId={}, tributeId={}, status={}, memberId={}",
                 dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), dto.getMemberId());
 

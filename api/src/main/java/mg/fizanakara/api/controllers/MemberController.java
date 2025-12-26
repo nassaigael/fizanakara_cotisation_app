@@ -33,7 +33,7 @@ public class MemberController {
     // GET BY ID
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Members> getMemberById(@PathVariable @NotNull String id) {
+    public ResponseEntity<MemberResponseDto> getMemberById(@PathVariable @NotNull String id) {
         log.debug("Recuperate of member ID : {}", id);
         return ResponseEntity.ok(memberService.getMemberById(id));
     }

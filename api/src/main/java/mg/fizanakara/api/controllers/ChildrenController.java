@@ -64,7 +64,7 @@ public class ChildrenController {
         return ResponseEntity.ok(updated);
     }
 
-    // DELETE (admin only)
+    // DELETE
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> deleteChild(@PathVariable String id) {

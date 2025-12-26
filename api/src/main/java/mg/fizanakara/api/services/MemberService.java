@@ -134,7 +134,7 @@ public class MemberService {
     // DELETE BY ID
     @Transactional
     public void deleteMember(String id) {
-        Members member = getMemberById(id);
+        Members member = findEntityById(id);
         log.info("Deleted of member ID : {}", id);
         memberRepository.delete(member);
     }

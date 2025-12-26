@@ -55,7 +55,11 @@ public class ChildrenService {
     @Transactional(readOnly = true)
     public List<ChildrenResponseDto> getChildrenByMemberId(String memberId) {
         log.info("Retrieving children for member ID: {}", memberId);
-        return childrenRepository.findByMemberId(memberId);
+        List<Children> children = childrenRepository.findByMemberId(memberId);
+        return children
+                .stream()
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
     }
 
     // CREATE

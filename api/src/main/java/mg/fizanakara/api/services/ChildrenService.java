@@ -32,7 +32,8 @@ public class ChildrenService {
     private final SequenceService sequenceService;
 
     // GET ALL
-    public List<Children> getAllChildren() {
+    @Transactional(readOnly = true)
+    public List<ChildrenResponseDto> getAllChildren() {
         log.info("Retrieving all children");
         return childrenRepository.findAll();
     }

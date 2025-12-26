@@ -25,7 +25,7 @@ public class ChildrenController {
     // GET ALL
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Children>> getAllChildren() {
+    public ResponseEntity<List<ChildrenResponseDto>> getAllChildren() {
         log.info("Retrieving all children");
         return ResponseEntity.ok(childrenService.getAllChildren());
     }

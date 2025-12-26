@@ -35,7 +35,11 @@ public class ChildrenService {
     @Transactional(readOnly = true)
     public List<ChildrenResponseDto> getAllChildren() {
         log.info("Retrieving all children");
-        return childrenRepository.findAll();
+        List<Children> children = childrenRepository.findAll();
+        return children
+                .stream()
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
     }
 
     // GET BY ID

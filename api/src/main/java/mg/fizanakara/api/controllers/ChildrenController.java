@@ -57,7 +57,7 @@ public class ChildrenController {
     // UPDATE
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Children> updateChild(@PathVariable String id, @RequestBody ChildrenUpdateDto dto) {
+    public ResponseEntity<ChildrenResponseDto> updateChild(@PathVariable String id, @RequestBody ChildrenUpdateDto dto) {  // ← MODIFIÉ : DTO
         log.info("Partial update for child - ID: {}, provided fields: firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
         Children updated = childrenService.updateChild(id, dto);

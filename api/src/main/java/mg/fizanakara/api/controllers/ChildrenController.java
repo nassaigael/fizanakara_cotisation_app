@@ -49,7 +49,7 @@ public class ChildrenController {
     // CREATE
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Children> createChild(@RequestBody @Validated ChildrenCreateDto dto) {
+    public ResponseEntity<ChildrenResponseDto> createChild(@RequestBody @Validated ChildrenCreateDto dto) {  // ← MODIFIÉ : DTO
         log.info("Creating child: {} {}", dto.getFirstName(), dto.getLastName());
         Children created = childrenService.createChild(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);

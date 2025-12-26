@@ -126,7 +126,12 @@ public class MemberService {
         return updated;
     }
 
-    // DELETE ID
+    private Members findEntityById(String id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with ID : " + id));
+    }
+
+    // DELETE BY ID
     @Transactional
     public void deleteMember(String id) {
         Members member = getMemberById(id);

@@ -41,7 +41,7 @@ public class MemberController {
     // CREATE
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Members> createMember(@RequestBody @Validated MemberDto dto) {
+    public ResponseEntity<MemberResponseDto> createMember(@RequestBody @Validated MemberDto dto) {  // ← FIX : DTO
         log.info("Create member of : {} {}", dto.getFirstName(), dto.getLastName());
         Members created = memberService.createMember(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);

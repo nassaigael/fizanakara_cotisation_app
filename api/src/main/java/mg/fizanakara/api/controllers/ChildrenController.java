@@ -51,8 +51,7 @@ public class ChildrenController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ChildrenResponseDto> createChild(@RequestBody @Validated ChildrenCreateDto dto) {  // ← MODIFIÉ : DTO
         log.info("Creating child: {} {}", dto.getFirstName(), dto.getLastName());
-        Children created = childrenService.createChild(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(childrenService.createChild(dto));
     }
 
     // UPDATE

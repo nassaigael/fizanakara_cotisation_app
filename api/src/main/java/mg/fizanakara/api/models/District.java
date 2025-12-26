@@ -1,6 +1,6 @@
 package mg.fizanakara.api.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;  // ← AJOUT : Pour ignorer en JSON
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

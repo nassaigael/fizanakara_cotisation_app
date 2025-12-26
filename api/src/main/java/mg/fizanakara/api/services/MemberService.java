@@ -32,7 +32,7 @@ public class MemberService {
     }
 
     // GET BY ID
-    public Members getMemberById(String id) {
+    public MemberResponseDto getMemberById(String id) {
         log.info("Recuperate member with ID : {}", id);
         Members member = memberRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with ID : " + id));

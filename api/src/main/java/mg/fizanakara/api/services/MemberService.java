@@ -28,7 +28,9 @@ public class MemberService {
     // GET ALL
     public List<Members> getAllMembers() {
         log.info("Recuperate all members");
-        return memberRepository.findAll();
+        List<Members> members = memberRepository.findAll();
+        return members.stream()
+                .map(this::mapToResponseDto).toList();
     }
 
     // GET BY ID

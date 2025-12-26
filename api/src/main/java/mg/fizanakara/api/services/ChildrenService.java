@@ -46,7 +46,7 @@ public class ChildrenService {
     @Transactional(readOnly = true)
     public ChildrenResponseDto getChildById(String id) {
         log.info("Retrieving child with ID: {}", id);
-        return childrenRepository.findById(id)
+        Children child  = childrenRepository.findById(id)
                 .orElseThrow(() -> new ChildrenNotFoundException("Child not found with ID: " + id));
     }
 

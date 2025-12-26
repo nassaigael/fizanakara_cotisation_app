@@ -144,4 +144,26 @@ public class MemberService {
     public void deleteAllMembers() {
         memberRepository.deleteAll();
     }
+
+    // PRIVATE METHODE FOR MAPPING DTO
+    private MemberResponseDto mapToResponseDto(Members member) {
+        MemberResponseDto dto = new MemberResponseDto();
+        dto.setId(member.getId());
+        dto.setFirstName(member.getFirstName());
+        dto.setLastName(member.getLastName());
+        dto.setBirthDate(member.getBirthDate());
+        dto.setGender(member.getGender());
+        dto.setImageUrl(member.getImageUrl());
+        dto.setPhoneNumber(member.getPhoneNumber());
+        dto.setCreatedAt(member.getCreatedAt());
+        dto.setSequenceNumber(member.getSequenceNumber());
+        dto.setStatus(member.getStatus());
+
+        dto.setDistrictId(member.getDistrict().getId());
+        dto.setDistrictName(member.getDistrict().getName());
+        dto.setTributeId(member.getTribute().getId());
+        dto.setTributeName(member.getTribute().getName());
+
+        return dto;
+    }
 }

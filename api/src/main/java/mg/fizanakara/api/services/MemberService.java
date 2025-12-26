@@ -36,6 +36,7 @@ public class MemberService {
     }
 
     // GET BY ID
+    @Transactional(readOnly = true)
     public MemberResponseDto getMemberById(String id) {
         log.info("Recuperate member with ID : {}", id);
         Members member = memberRepository.findById(id)

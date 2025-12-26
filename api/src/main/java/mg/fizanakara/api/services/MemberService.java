@@ -40,7 +40,7 @@ public class MemberService {
 
     // CREATE
     @Transactional
-    public Members createMember(MemberDto dto) {
+    public MemberResponseDto createMember(MemberDto dto) {
         log.info("Checking duplicate for firstName='{}', lastName='{}', birthDate='{}', phone='{}', districtId={}, tributeId={}, status={}",
                 dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus());
 

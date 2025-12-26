@@ -109,7 +109,7 @@ public class ChildrenService {
 
     // UPDATE partial (optional fields)
     @Transactional
-    public Children updateChild(String id, ChildrenUpdateDto dto) {
+    public ChildrenResponseDto updateChild(String id, ChildrenUpdateDto dto) {
         log.info("Partial update for child - ID: {}, provided fields: firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
         if (id == null || id.trim().isEmpty()) {

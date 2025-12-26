@@ -163,4 +163,34 @@ public class ChildrenService {
         log.info("Deleting child with ID: {}", id);
         childrenRepository.delete(child);
     }
+
+    private Children findEntityById(String id) {
+        return childrenRepository.findById(id)
+                .orElseThrow(() -> new ChildrenNotFoundException("Child not found with ID: " + id));
+    }
+
+    // PRIVATE METHODE FOR MAPPING DTO
+    private ChildrenResponseDto mapToResponseDto(Children child) {
+        ChildrenResponseDto dto = new ChildrenResponseDto();
+        dto.setId(child.getId());
+        dto.setFirstName(child.getFirstName());
+        dto.setLastName(child.getLastName());
+        dto.setBirthDate(child.getBirthDate());
+        dto.setGender(child.getGender());
+        dto.setImageUrl(child.getImageUrl());
+        dto.setPhoneNumber(child.getPhoneNumber());
+        dto.setCreatedAt(child.getCreatedAt());
+        dto.setSequenceNumber(child.getSequenceNumber());
+        dto.setStatus(child.getStatus());
+
+        dto.setDistrictId(child.getDistrict().getId());
+        dto.setDistrictName(child.getDistrict().getName());
+        dto.setTributeId(child.getTribute().getId());
+        dto.setTributeName(child.getTribute().getName());
+        dto.setMemberId(child.getMember().getId());
+        dto.setMemberFirstName(child.getMember().getFirstName());
+        dto.setMemberLastName(child.getMember().getLastName());
+
+        return dto;
+    }
 }

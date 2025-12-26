@@ -60,8 +60,7 @@ public class ChildrenController {
     public ResponseEntity<ChildrenResponseDto> updateChild(@PathVariable String id, @RequestBody ChildrenUpdateDto dto) {  // ← MODIFIÉ : DTO
         log.info("Partial update for child - ID: {}, provided fields: firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
-        Children updated = childrenService.updateChild(id, dto);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(childrenService.updateChild(id, dto));
     }
 
     // DELETE

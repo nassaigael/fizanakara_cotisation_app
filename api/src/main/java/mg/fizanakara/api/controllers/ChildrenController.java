@@ -41,7 +41,7 @@ public class ChildrenController {
     // GET BY MEMBER ID
     @GetMapping("/member/{memberId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Children>> getChildrenByMemberId(@PathVariable String memberId) {
+    public ResponseEntity<List<ChildrenResponseDto>> getChildrenByMemberId(@PathVariable String memberId) {
         log.debug("Retrieving children for member ID: {}", memberId);
         return ResponseEntity.ok(childrenService.getChildrenByMemberId(memberId));
     }

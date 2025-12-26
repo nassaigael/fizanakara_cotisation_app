@@ -159,7 +159,7 @@ public class ChildrenService {
     // DELETE
     @Transactional
     public void deleteChild(String id) {
-        Children child = getChildById(id);
+        Children child = findEntityById(id);
         log.info("Deleting child with ID: {}", id);
         childrenRepository.delete(child);
     }

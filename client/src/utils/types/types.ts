@@ -47,6 +47,7 @@ export interface ButtonProps {
   // Ajoute "secondary" ici
   variant?: "primary" | "secondary" | "ghost" | "danger"; 
   isActive?: boolean;
+  disabled: boolean;
 }
 
 export interface Admin {

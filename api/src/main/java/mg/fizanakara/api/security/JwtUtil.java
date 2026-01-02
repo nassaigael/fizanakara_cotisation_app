@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -34,9 +33,9 @@ public class JwtUtil {
             Date now = new Date();
             Date expiry = new Date(now.getTime() + accessTokenExpirationMs);
             return Jwts.builder()
-                    .setSubject(subject)
-                    .setIssuedAt(now)
-                    .setExpiration(expiry)
+                    .subject(subject)   // ✅ Changé : setSubject -> subject
+                    .issuedAt(now)      // ✅ Changé : setIssuedAt -> issuedAt
+                    .expiration(expiry) // ✅ Changé : setExpiration -> expiration
                     .signWith(getSigningKey(), Jwts.SIG.HS512)
                     .compact();
         } catch (Exception e) {
@@ -45,7 +44,6 @@ public class JwtUtil {
         }
     }
 
-    // Override with UserDetails to include roles (optional)
     public String generateAccessToken(UserDetails userDetails) {
         try {
             Date now = new Date();
@@ -54,11 +52,12 @@ public class JwtUtil {
             claims.put("roles", userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList()));
+
             return Jwts.builder()
-                    .setClaims(claims)
-                    .setSubject(userDetails.getUsername())
-                    .setIssuedAt(now)
-                    .setExpiration(expiry)
+                    .claims(claims)     // ✅ Changé : setClaims -> claims
+                    .subject(userDetails.getUsername())
+                    .issuedAt(now)
+                    .expiration(expiry)
                     .signWith(getSigningKey(), Jwts.SIG.HS512)
                     .compact();
         } catch (Exception e) {
@@ -72,9 +71,9 @@ public class JwtUtil {
             Date now = new Date();
             Date expiry = new Date(now.getTime() + refreshTokenExpirationMs);
             return Jwts.builder()
-                    .setSubject(subject)
-                    .setIssuedAt(now)
-                    .setExpiration(expiry)
+                    .subject(subject)
+                    .issuedAt(now)
+                    .expiration(expiry)
                     .signWith(getSigningKey(), Jwts.SIG.HS512)
                     .compact();
         } catch (Exception e) {
@@ -102,19 +101,19 @@ public class JwtUtil {
 
     public String getSubject(String token) {
         try {
-            Claims claims = Jwts.parser()
+            return Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(token)
-                    .getPayload();
-            return claims.getSubject();
+                    .getPayload()
+                    .getSubject();
         } catch (JwtException ex) {
             log.warn("Erreur extraction subject du token : {}", ex.getMessage());
             return null;
         }
     }
 
-//     Extract roles if in claims
+    @SuppressWarnings("unchecked") // ✅ AJOUT : Pour supprimer l'alerte de cast
     public List<String> getRoles(String token) {
         try {
             Claims claims = Jwts.parser()
@@ -122,7 +121,8 @@ public class JwtUtil {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-            return (List<String>) claims.get("roles");
+            Object roles = claims.get("roles");
+            return roles instanceof List ? (List<String>) roles : List.of();
         } catch (JwtException ex) {
             return List.of();
         }

@@ -5,7 +5,7 @@ export type Gender = "MALE" | "FEMALE";
 export type CotisationStatus = "Payé" | "En cours";
 export type Status = 'Etudiant' | 'Travailleur';
 
-// --- NOUVELLES INTERFACES POUR LES OBJETS BACKEND ---
+// --- INTERFACES BACKEND ---
 export interface District {
   id: number;
   name: string;
@@ -44,14 +44,13 @@ export interface ButtonProps {
   className?: string;
   type?: "button" | "submit";
   to?: string;
-  // Ajoute "secondary" ici
   variant?: "primary" | "secondary" | "ghost" | "danger"; 
   isActive?: boolean;
-  disabled: boolean;
+  disabled?: boolean; // ✅ CORRIGÉ : Ajout du "?" pour le rendre optionnel
 }
-
+// 1. Modifie d'abord l'interface Admin pour accepter les deux types d'ID
 export interface Admin {
-  id?: string;
+  id?: string | number; // Ajout de "number" ici pour la compatibilité
   sequenceNumber?: number;
   email: string;
   firstName: string;
@@ -64,17 +63,17 @@ export interface Admin {
 }
 
 /**
- * Interface Member corrigée
- * district/tribute = Objets reçus du Backend (Affichage)
- * districtId/tributeId = IDs envoyés au Backend (Formulaire)
+ * 2. L'interface Member peut maintenant hériter sans conflit
  */
 export interface Member extends Partial<Admin> {
+  id: string | number; // Désormais compatible avec Admin
   status: Status;
   district?: District; 
   tribute?: Tribute;
   districtId?: number; 
   tributeId?: number;  
   cotisationStatus?: CotisationStatus;
+  payments?: PaymentHistory[]; 
 }
 
 export interface AuthContextType {
@@ -95,19 +94,16 @@ export interface AuthResponse {
 export type PaymentMethod = "Liquide" | "MVola" | "Orange Money" | "Airtel Money" | "Virement";
 
 export interface PaymentHistory {
-  id: string;
+  id: string | number;
   amount: number;
   date: string;
-  method: PaymentMethod;
-  reference?: string; // Utile pour le Mobile Money
+  method?: PaymentMethod;
+  reference?: string; 
 }
 
-export interface Cotisation {
-  id: string;
-  memberId: string;
-  year: number;
-  totalAmount: number;     // Montant total dû pour l'année
-  amountPaid: number;      // Somme des paiements effectués
-  status: "Payé" | "En cours";
-  history: PaymentHistory[];
-}
+
+
+export type MemberFormInput = Omit<Member, 'id' | 'district' | 'tribute'> & {
+    districtName: string;
+    tributeName: string;
+};

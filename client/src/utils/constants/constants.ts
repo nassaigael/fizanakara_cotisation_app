@@ -22,6 +22,25 @@ export const SITUATIONS = [
 export const GITHUB_BASE_URL = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/";
 export const DEFAULT_AVATAR = "https://ui-avatars.com/api/?name=Admin&background=FF4B4B&color=fff";
 
+/**
+ * Construit l'URL de l'image en utilisant GitHub comme CDN.
+ * @param imagePath - Le nom du fichier stocké en BDD (ex: "avatar.png")
+ * @param nameForAvatar - Nom à utiliser pour l'avatar de secours
+ */
+export const getImageUrl = (imagePath: string | null | undefined, nameForAvatar?: string): string => {
+  if (!imagePath || imagePath.trim() === "") {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nameForAvatar || 'Admin')}&background=FF4B4B&color=fff&bold=true`;
+  }
+
+  // Si c'est déjà une URL complète (ex: gravatar ou autre), on la garde
+  if (imagePath.startsWith('http')) {
+    return imagePath;
+  }
+
+  // Sinon, on préfixe avec ton dépôt GitHub
+  return `${GITHUB_BASE_URL}${imagePath}`;
+};
+
 // --- STRUCTURE DE NAVIGATION ---
 export const PROFILE_MENU = [
     { label: "Mon Profil", path: "profiles", icon: AiOutlineUser },

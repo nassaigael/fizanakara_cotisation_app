@@ -37,8 +37,7 @@ export const useMemberLogic = () => {
 
   const filteredMembers = useMemo(() => {
     return members.filter(m => {
-      const fullName = `${m.firstName} ${m.lastName}`.toLowerCase();
-      const matchesSearch = !search || fullName.includes(search.toLowerCase());
+      const matchesSearch = !search || `${m.firstName} ${m.lastName}`.toLowerCase().includes(search.toLowerCase());
       const matchesSex = !filterSex || m.gender === filterSex;
       const matchesDistrict = !filterDistrict || m.district?.name === filterDistrict;
       const matchesTribe = !filterTribe || m.tribute?.name === filterTribe;
@@ -59,6 +58,11 @@ export const useMemberLogic = () => {
       await Promise.all(ids.map(id => memberService.delete(id)));
       setMembers(p => p.filter(m => !ids.includes(String(m.id))));
       setSelectedMembers([]);
+    },
+    fullResetAction: async () => {
+      const success = await memberService.clearAllData();
+      if (success) { setMembers([]); setSelectedMembers([]); }
+      return success;
     },
     refreshMembers: fetchMembers
   };

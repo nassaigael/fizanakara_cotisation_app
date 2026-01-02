@@ -23,12 +23,17 @@ const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = (
     };
   }, [isOpen, onClose]);
 
-  // ✅ CORRECTION : Utilise getImageUrl pour centraliser la logique GitHub
+  // Gestion de l'image avec fallback
   const avatarUrl = useMemo(() => {
     return getImageUrl(member?.imageUrl, member?.firstName);
   }, [member?.imageUrl, member?.firstName]);
 
   if (!isOpen || !member) return null;
+
+  // Formatage de la date (ex: 12 juin 2005)
+  const formattedDate = member.birthDate 
+    ? new Date(member.birthDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+    : 'Non renseignée';
 
   const content = (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
@@ -56,13 +61,12 @@ const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = (
                 className="w-full h-full object-cover"
                 alt={`${member.firstName} avatar`}
                 onError={(e) => { 
-                    // Fallback si l'image GitHub est introuvable (404)
                     e.currentTarget.src = `https://ui-avatars.com/api/?name=${member.firstName}&background=FF4B4B&color=fff`;
                 }}
               />
             </div>
             <span className={`px-4 py-2 rounded-xl text-[10px] ${THEME.font.black} bg-brand-primary/10 text-brand-primary border-2 border-brand-primary border-b-4 uppercase`}>
-              {member.status || "MEMBRE ACTIF"}
+              {member.status || "MEMBRE"}
             </span>
           </div>
 
@@ -76,13 +80,32 @@ const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = (
             </p>
           </div>
 
-          {/* Grille d'informations */}
+          {/* Grille d'informations corrigée selon le MemberDto */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6 border-t-2 border-brand-border">
             <InfoItem icon={<AiOutlinePhone />} label="Téléphone" value={member.phoneNumber} />
-            <InfoItem icon={<AiOutlineEnvironment />} label="Quartier / District" value={member.district?.name} />
-            <InfoItem icon={<AiOutlineTeam />} label="Genre" value={member.gender === 'MALE' ? 'Masculin' : 'Féminin'} />
-            <InfoItem icon={<AiOutlineCalendar />} label="Date de Naissance" value={member.birthDate} />
-            <InfoItem icon={<AiOutlineTeam />} label="Tribu" value={member.tribute?.name} />
+            
+            {/* Si districtName n'existe pas encore dans le DTO, on affiche l'ID */}
+            <InfoItem 
+                icon={<AiOutlineEnvironment />} 
+                label="Quartier / District" 
+                value={member.districtName || (member.districtId ? `District N°${member.districtId}` : 'Non renseigné')} 
+            />
+            
+            <InfoItem 
+                icon={<AiOutlineTeam />} 
+                label="Genre" 
+                value={member.gender === 'MALE' ? 'Masculin' : 'Féminin'} 
+            />
+            
+            <InfoItem icon={<AiOutlineCalendar />} label="Date de Naissance" value={formattedDate} />
+            
+            {/* Si tributeName n'existe pas encore dans le DTO, on affiche l'ID */}
+            <InfoItem 
+                icon={<AiOutlineTeam />} 
+                label="Tribu" 
+                value={member.tributeName || (member.tributeId ? `Tribu N°${member.tributeId}` : 'Non renseignée')} 
+            />
+            
             <InfoItem icon={<AiOutlineIdcard />} label="Situation" value={member.status} />
           </div>
         </div>
@@ -102,7 +125,6 @@ const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = (
   return createPortal(content, document.body);
 };
 
-// Composant Interne InfoItem (inchangé mais typé proprement)
 const InfoItem = memo(({ icon, label, value }: { icon: React.ReactElement, label: string, value: any }) => (
   <div className="flex items-center gap-4 group">
     <div className="w-10 h-10 flex items-center justify-center bg-brand-bg border-2 border-brand-border border-b-4 border-b-brand-border-dark text-brand-primary rounded-2xl shrink-0 group-hover:scale-110 transition-transform">

@@ -23,20 +23,14 @@ public class Admins extends Users {
     @Column(nullable = false, length = 250)
     private String password;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean verified = false;
 
-    // CASCADE DELETE ADMIN ON REFRESH TOKEN
     @OneToMany(mappedBy = "admin", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<RefreshToken> refreshTokens = new ArrayList<>();
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-    public boolean isVerified() { return verified; }
-    public void setVerified(boolean verified) { this.verified = verified; }
 
     @Override
     public String generatedCustomId() {

@@ -73,26 +73,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/login",
-                                "/register",
-                                "/forgot-password",
-                                "/reset-password"
-                        ).permitAll()
-                        .requestMatchers("/admins/me")
-                        .authenticated()
-                        .requestMatchers("/admins/districts/**")
-                        .authenticated()
-                        .requestMatchers("/admins/tributes/**")
-                        .authenticated()
-                        .requestMatchers("/admins/members/**")
-                        .authenticated()
-                        .requestMatchers("/admins/children/")
-                        .authenticated()
-                        .anyRequest().authenticated()
+            // 1. ACTIVE LE CORS ICI !
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) 
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/login",
+                    "/register",
+                    "/forgot-password",
+                    "/reset-password"
+                ).permitAll()
+                .requestMatchers("/admins/me")
+                .authenticated()
+                .requestMatchers("/admins/districts/**")
+                .authenticated()
+                .requestMatchers("/admins/tributes/**")
+                .authenticated()
+                .requestMatchers("/admins/members/**")
+                .authenticated()
+                .requestMatchers("/admins/children/")
+                .authenticated()
+                .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable);

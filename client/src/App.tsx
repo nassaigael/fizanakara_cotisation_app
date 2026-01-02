@@ -7,10 +7,7 @@ import Member from './pages/Member';
 import MainLayout from './components/layout/MainLayout'; 
 import ForgotPassword from './pages/ForgotPassword';
 
-/**
- * ProtectedRoute - Gardien de sécurité.
- * Empêche l'accès aux pages admin si aucun jeton n'est présent.
- */
+
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, loading } = useAuth();
   
@@ -30,12 +27,10 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* ROUTES PUBLIQUES (Auth) */}
           <Route path="/" element={<Login />} />
           <Route path='/forgot-password' element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ForgotPassword />} />
 
-          {/* ROUTES PRIVÉES (Admin) */}
           <Route 
             path="/admin" 
             element={

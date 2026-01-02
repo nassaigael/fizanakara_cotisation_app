@@ -12,7 +12,7 @@ import Alert from "../components/ui/Alert";
 import Popup from "../components/ui/Popup";
 import MemberFormalModal from "../components/ui/MemberFormModal";
 import { memberService } from "../services/memberService";
-import { DEFAULT_AVATAR } from "../utils/constants/constants";
+import { getImageUrl } from "../utils/constants/constants";
 import type { Member as MemberType, Tribute, District } from "../utils/types/types";
 
 const Member: React.FC = () => {
@@ -24,46 +24,57 @@ const Member: React.FC = () => {
         handleSelect, handleSelectAll, deleteAction, refreshMembers, fullResetAction 
     } = useMemberLogic();
 
-    const [filters, setFilters] = useState<{tribes: Tribute[], districts: District[]}>({ tribes: [], districts: [] });
+    const [filters, setFilters] = useState<{tributes: Tribute[], districts: District[]}>({ tributes: [], districts: [] });
     const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
     const [showHiddenReset, setShowHiddenReset] = useState(false);
     
-    // États pour les Modales
     const [modals, setModals] = useState<{
         form: boolean, 
         edit: MemberType | null, 
         view: MemberType | null,
-        payment: MemberType | null // Nouvelle modale paiement
+        payment: MemberType | null
     }>({ form: false, edit: null, view: null, payment: null });
 
     const [alertConfig, setAlertConfig] = useState<any>({ isOpen: false });
 
     const loadFilterData = useCallback(async () => {
         try {
-            const [tData, dData] = await Promise.all([memberService.getTribes(), memberService.getDistricts()]);
+            const [tData, dData] = await Promise.all([
+                memberService.getTributes(), 
+                memberService.getDistricts()
+            ]);
             const unique = (arr: any[]) => arr.filter((v, i, a) => a.findIndex(t => t.name === v.name) === i);
-            setFilters({ tribes: unique(tData), districts: unique(dData) });
-        } catch (err) { console.error(err); }
+            setFilters({ tributes: unique(tData), districts: unique(dData) });
+        } catch (err) { 
+            console.error("Erreur chargement filtres:", err); 
+        }
     }, []);
 
     useEffect(() => { loadFilterData(); }, [loadFilterData, members]);
 
-    // Calcul du reste à payer pour un membre
-    const getFinancials = (member: any) => {
-        const payé = member.payments?.reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
-        const reste = Math.max(0, COTISATION_FIXE - payé);
-        return { payé, reste };
+    // ✅ TYPAGE : Calcul financier sécurisé
+    const getFinancials = (member: MemberType) => {
+        const paye = member.payments?.reduce((acc, p) => acc + p.amount, 0) || 0;
+        const reste = Math.max(0, COTISATION_FIXE - paye);
+        return { paye, reste };
     };
 
     const triggerAlert = (title: string, message: string, onConfirm: () => void) => {
-        setAlertConfig({ isOpen: true, title, message, variant: "danger", onConfirm: () => { onConfirm(); setAlertConfig({isOpen: false}); } });
+        setAlertConfig({ 
+            isOpen: true, title, message, variant: "danger", 
+            onConfirm: () => { onConfirm(); setAlertConfig({isOpen: false}); } 
+        });
     };
 
-    if (loading) return <div className="p-10 text-center font-black text-brand-muted uppercase tracking-widest animate-pulse">Synchronisation...</div>;
+    if (loading) return (
+        <div className="p-10 text-center font-black text-brand-muted uppercase tracking-widest animate-pulse">
+            Synchronisation avec le Backend...
+        </div>
+    );
 
     return (
         <div className="p-8 space-y-6 animate-in fade-in duration-500">
-            {/* Header */}
+            {/* --- HEADER --- */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div onClick={() => setShowHiddenReset(!showHiddenReset)} className="cursor-pointer select-none">
                     <h1 className={`text-3xl ${THEME.font.black} text-brand-text uppercase`}>Annuaire & Caisse</h1>
@@ -71,7 +82,7 @@ const Member: React.FC = () => {
                 </div>
                 <div className="flex gap-2">
                     {showHiddenReset && (
-                        <Button onClick={() => triggerAlert("RÉINITIALISATION", "Vider toute la base ?", fullResetAction)} variant="secondary" className="h-12 px-4 border-red-500 text-red-500 bg-red-50 hover:bg-red-100">
+                        <Button onClick={() => triggerAlert("RÉINITIALISATION", "Vider toute la base ?", fullResetAction)} variant="secondary" className="h-12 px-4 border-red-500 text-red-500 bg-red-50">
                             <AiOutlineSetting size={20} />
                         </Button>
                     )}
@@ -81,34 +92,45 @@ const Member: React.FC = () => {
                 </div>
             </div>
 
-            {/* Search & Filters */}
+            {/* --- RECHERCHE ET FILTRES --- */}
             <div className="flex gap-4">
                 <div className="relative flex-1 group">
                     <AiOutlineSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" size={20}/>
-                    <input type="text" placeholder="Chercher un nom ou téléphone..." value={search} className={THEME.input + " pl-12"} onChange={(e) => setSearch(e.target.value)} />
+                    <input 
+                        type="text" 
+                        placeholder="Chercher un nom ou téléphone..." 
+                        value={search} 
+                        className={THEME.input + " pl-12"} 
+                        onChange={(e) => setSearch(e.target.value)} 
+                    />
                 </div>
-                <button onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)} className={`flex items-center gap-2 px-6 py-4 rounded-2xl ${THEME.font.black} text-[11px] border-2 border-b-4 transition-all ${isFilterPanelOpen ? 'bg-brand-text text-white' : 'bg-white text-brand-muted border-brand-border'}`}>
+                <button 
+                    onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)} 
+                    className={`flex items-center gap-2 px-6 py-4 rounded-2xl ${THEME.font.black} text-[11px] border-2 border-b-4 transition-all ${isFilterPanelOpen ? 'bg-brand-text text-white' : 'bg-white text-brand-muted border-brand-border'}`}
+                >
                     <AiOutlineFilter size={20} /> FILTRES
                 </button>
             </div>
 
-            {/* Filters Panel */}
+            {/* --- PANNEAU DE FILTRES --- */}
             {isFilterPanelOpen && (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-brand-bg rounded-3xl border-2 border-brand-border shadow-inner animate-in slide-in-from-top-2">
                     <FilterSelect label="Genre" value={filterSex} onChange={setFilterSex} options={[{l:'Homme', v:'MALE'}, {l:'Femme', v:'FEMALE'}]} />
                     <FilterSelect label="Quartier" value={filterDistrict} onChange={setFilterDistrict} options={filters.districts.map(d => ({l:d.name, v:d.name}))} />
-                    <FilterSelect label="Tribu" value={filterTribe} onChange={setFilterTribe} options={filters.tribes.map(t => ({l:t.name, v:t.name}))} />
+                    <FilterSelect label="Tribu" value={filterTribe} onChange={setFilterTribe} options={filters.tributes.map(t => ({l:t.name, v:t.name}))} />
                     <FilterSelect label="État Caisse" value={filterCotisation} onChange={setFilterCotisation} options={[{l:'À jour', v:'Payé'}, {l:'En retard', v:'En cours'}]} />
                 </div>
             )}
 
-            {/* Table */}
+            {/* --- TABLEAU DES MEMBRES --- */}
             <div className={`${THEME.card} bg-white overflow-hidden border-2 border-brand-border shadow-sm`}>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-brand-bg border-b-2 border-brand-border">
                             <tr className={`text-[10px] ${THEME.font.black} text-brand-muted uppercase tracking-widest`}>
-                                <th className="p-5 w-14 text-center"><input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} className="w-5 h-5 accent-brand-primary cursor-pointer" /></th>
+                                <th className="p-5 w-14 text-center">
+                                    <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} className="w-5 h-5 accent-brand-primary cursor-pointer" />
+                                </th>
                                 <th className="p-5">Membre</th>
                                 <th className="p-5">Localisation</th>
                                 <th className="p-5">Situation Caisse (Ar)</th>
@@ -117,14 +139,21 @@ const Member: React.FC = () => {
                         </thead>
                         <tbody className="divide-y-2 divide-brand-bg">
                             {members.map(member => {
-                                const { payé, reste } = getFinancials(member);
+                                const { paye, reste } = getFinancials(member);
                                 return (
                                     <tr key={member.id} className="group hover:bg-brand-primary/5 transition-colors">
-                                        <td className="p-5 text-center"><input type="checkbox" checked={selectedMembers.includes(String(member.id))} onChange={() => handleSelect(String(member.id))} className="w-5 h-5 accent-brand-primary cursor-pointer" /></td>
+                                        <td className="p-5 text-center">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={selectedMembers.includes(String(member.id))} 
+                                                onChange={() => handleSelect(String(member.id))} 
+                                                className="w-5 h-5 accent-brand-primary cursor-pointer" 
+                                            />
+                                        </td>
                                         <td className="p-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="relative w-12 h-12 rounded-xl border-2 border-brand-border overflow-hidden shrink-0">
-                                                    <img src={member.imageUrl || DEFAULT_AVATAR} className="w-full h-full object-cover" alt=""/>
+                                                    <img src={getImageUrl(member.imageUrl, member.firstName)} className="w-full h-full object-cover" alt=""/>
                                                     <div className="absolute bottom-0 inset-x-0 bg-brand-text/60 text-[7px] text-white text-center py-0.5 font-black uppercase">MBR</div>
                                                 </div>
                                                 <div className="flex flex-col">
@@ -143,7 +172,7 @@ const Member: React.FC = () => {
                                             <div className="flex flex-col gap-1">
                                                 <div className="flex justify-between items-center w-32">
                                                     <span className="text-[9px] font-black text-green-600 uppercase">Payé:</span>
-                                                    <span className="text-[10px] font-black">{payé.toLocaleString()}</span>
+                                                    <span className="text-[10px] font-black">{paye.toLocaleString()}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center w-32 p-1 bg-red-50 rounded-lg border border-red-100">
                                                     <span className="text-[9px] font-black text-red-500 uppercase italic">Reste:</span>
@@ -153,7 +182,6 @@ const Member: React.FC = () => {
                                         </td>
                                         <td className="p-5 text-right px-10">
                                             <div className="flex justify-end gap-2">
-                                                {/* BOUTON PAIEMENT */}
                                                 <ActionButton 
                                                     icon={<AiOutlineDollarCircle/>} 
                                                     onClick={() => setModals({...modals, payment: member})} 
@@ -173,12 +201,11 @@ const Member: React.FC = () => {
                 </div>
             </div>
 
-            {/* MODALES */}
+            {/* --- MODALES --- */}
             <MemberFormalModal isOpen={modals.form} onClose={() => setModals({...modals, form: false})} memberToEdit={modals.edit} onSuccess={refreshMembers} />
             <Alert {...alertConfig} onClose={() => setAlertConfig({...alertConfig, isOpen: false})} />
             {modals.view && <Popup isOpen={true} member={modals.view} onClose={() => setModals({...modals, view: null})} />}
             
-            {/* Modal de Paiement Rapide */}
             {modals.payment && (
                 <PaymentModal 
                     member={modals.payment} 
@@ -190,8 +217,14 @@ const Member: React.FC = () => {
     );
 };
 
-// --- COMPOSANT INTERNE : MODAL DE PAIEMENT ---
-const PaymentModal = ({ member, onClose, onSuccess }: any) => {
+// --- COMPOSANT : MODAL DE PAIEMENT TYPÉ ---
+interface PaymentModalProps {
+    member: MemberType;
+    onClose: () => void;
+    onSuccess: () => void;
+}
+
+const PaymentModal: React.FC<PaymentModalProps> = ({ member, onClose, onSuccess }) => {
     const [amount, setAmount] = useState<number>(0);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -199,19 +232,18 @@ const PaymentModal = ({ member, onClose, onSuccess }: any) => {
         if (amount <= 0) return alert("Entrez un montant valide");
         setIsSaving(true);
         try {
-            // Appel API à créer dans ton service : memberService.addPayment
+            // ✅ Utilise la méthode update existante pour ajouter un paiement
             await memberService.update(member.id, {
                 ...member,
                 newPayment: { 
                     amount, 
-                    date: new Date().toISOString(),
-                    year: new Date().getFullYear()
+                    date: new Date().toISOString()
                 }
             });
             onSuccess();
             onClose();
         } catch (err) {
-            console.error(err);
+            console.error("Erreur de paiement:", err);
         } finally {
             setIsSaving(false);
         }
@@ -219,7 +251,7 @@ const PaymentModal = ({ member, onClose, onSuccess }: any) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-text/40 backdrop-blur-sm p-4">
-            <div className="bg-white w-full max-w-md rounded-[2.5rem] border-2 border-b-8 border-brand-border p-8 animate-in zoom-in-95 duration-200">
+            <div className="bg-white w-full max-w-md rounded-[2.5rem] border-2 border-b-8 border-brand-border p-8 animate-in zoom-in-95 duration-200 shadow-2xl">
                 <div className="flex items-center gap-4 mb-6">
                     <div className="p-4 bg-green-100 text-green-600 rounded-2xl border-2 border-green-200"><AiOutlineDollarCircle size={32}/></div>
                     <div>
@@ -256,19 +288,30 @@ const PaymentModal = ({ member, onClose, onSuccess }: any) => {
     );
 };
 
-// Composants utilitaires identiques
+// --- COMPOSANTS INTERNES UTILITAIRES ---
 const FilterSelect = ({ label, value, onChange, options }: any) => (
     <div className="space-y-1">
         <label className={`block text-[10px] ${THEME.font.black} text-brand-muted uppercase ml-1`}>{label}</label>
-        <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-white border-2 border-brand-border p-2.5 rounded-xl font-bold text-sm outline-none focus:border-brand-primary shadow-sm appearance-none cursor-pointer">
-            <option value="">Tous</option>
-            {options.map((o: any) => <option key={o.v} value={o.v}>{o.l}</option>)}
-        </select>
+        <div className="relative">
+            <select 
+                value={value} 
+                onChange={(e) => onChange(e.target.value)} 
+                className="w-full bg-white border-2 border-brand-border p-2.5 rounded-xl font-bold text-sm outline-none focus:border-brand-primary shadow-sm appearance-none cursor-pointer"
+            >
+                <option value="">Tous</option>
+                {options.map((o: any) => <option key={o.v} value={o.v}>{o.l}</option>)}
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-brand-muted opacity-50">▼</div>
+        </div>
     </div>
 );
 
 const ActionButton = ({ icon, onClick, color = "hover:text-brand-primary", title }: any) => (
-    <button title={title} onClick={onClick} className={`p-2.5 border-2 border-b-4 border-brand-border rounded-xl transition-all active:translate-y-0.5 active:border-b-2 bg-white ${color}`}>
+    <button 
+        title={title} 
+        onClick={onClick} 
+        className={`p-2.5 border-2 border-b-4 border-brand-border rounded-xl transition-all active:translate-y-0.5 active:border-b-2 bg-white ${color}`}
+    >
         {React.cloneElement(icon, { size: 18 })}
     </button>
 );

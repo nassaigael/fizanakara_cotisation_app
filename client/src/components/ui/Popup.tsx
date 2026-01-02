@@ -5,14 +5,10 @@ import {
   AiOutlineCalendar, AiOutlineTeam, AiOutlineIdcard 
 } from "react-icons/ai";
 import { THEME } from '../../styles/theme';
+import { getImageUrl } from '../../utils/constants/constants';
 
-/**
- * MemberDetailsPopup - Affiche les informations complètes d'un membre.
- * Utilise un Portal pour s'afficher au-dessus de la Sidebar et Navbar.
- */
 const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = ({ isOpen, member, onClose }) => {
   
-  // Bloquer le scroll et gérer la touche Echap
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -27,28 +23,25 @@ const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = (
     };
   }, [isOpen, onClose]);
 
-  // Reconstruction de l'image mémorisée
+  // ✅ CORRECTION : Utilise getImageUrl pour centraliser la logique GitHub
   const avatarUrl = useMemo(() => {
-    if (!member?.imageUrl) return `https://ui-avatars.com/api/?name=${member?.firstName}&background=FF4B4B&color=fff`;
-    if (member.imageUrl.startsWith('http')) return member.imageUrl;
-    return `https://lh3.googleusercontent.com/d/$$${member.imageUrl}`;
+    return getImageUrl(member?.imageUrl, member?.firstName);
   }, [member?.imageUrl, member?.firstName]);
 
   if (!isOpen || !member) return null;
 
   const content = (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
       <div 
-        className={`w-full max-w-2xl ${THEME.card} bg-white dark:bg-brand-bg overflow-hidden animate-in zoom-in duration-300 shadow-2xl`}
-        onClick={(e) => e.stopPropagation()} // Empêche la fermeture en cliquant sur la carte
+        className={`w-full max-w-2xl ${THEME.card} bg-white dark:bg-brand-bg overflow-hidden animate-in zoom-in duration-300 shadow-2xl relative`}
+        onClick={(e) => e.stopPropagation()}
       >
         
         {/* Header Coloré */}
         <div className="relative h-20 bg-brand-primary border-b-4 border-brand-primary-dark">
           <button 
             onClick={onClose} 
-            className="absolute top-4 right-4 p-2 bg-black/10 hover:bg-black/20 rounded-xl text-white transition-all active:scale-90"
-            title="Fermer"
+            className="absolute top-4 right-4 p-2 bg-black/10 hover:bg-black/20 rounded-xl text-white transition-all active:scale-90 z-10"
           >
             <AiOutlineClose size={20} />
           </button>
@@ -61,8 +54,11 @@ const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = (
               <img 
                 src={avatarUrl} 
                 className="w-full h-full object-cover"
-                alt="member avatar"
-                onError={(e) => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${member.firstName}&background=FF4B4B&color=fff` }}
+                alt={`${member.firstName} avatar`}
+                onError={(e) => { 
+                    // Fallback si l'image GitHub est introuvable (404)
+                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${member.firstName}&background=FF4B4B&color=fff`;
+                }}
               />
             </div>
             <span className={`px-4 py-2 rounded-xl text-[10px] ${THEME.font.black} bg-brand-primary/10 text-brand-primary border-2 border-brand-primary border-b-4 uppercase`}>
@@ -70,29 +66,32 @@ const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = (
             </span>
           </div>
 
-          <h2 className={`text-2xl ${THEME.font.black} text-brand-text mb-1 tracking-tight`}>
+          <h2 className={`text-2xl ${THEME.font.black} text-brand-text mb-1 tracking-tight uppercase`}>
             {member.firstName} {member.lastName}
           </h2>
-          <p className={`text-brand-primary ${THEME.font.black} text-[10px] flex items-center gap-2 mb-6 uppercase tracking-widest`}>
-            <AiOutlineIdcard size={16}/> ID MATRICULE : {member.id}
-          </p>
+          
+          <div className="flex items-center gap-2 mb-6">
+            <p className={`text-brand-primary ${THEME.font.black} text-[10px] flex items-center gap-2 uppercase tracking-widest`}>
+                <AiOutlineIdcard size={16}/> ID MATRICULE : {member.id}
+            </p>
+          </div>
 
           {/* Grille d'informations */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6 border-t-2 border-brand-border">
             <InfoItem icon={<AiOutlinePhone />} label="Téléphone" value={member.phoneNumber} />
             <InfoItem icon={<AiOutlineEnvironment />} label="Quartier / District" value={member.district?.name} />
-            <InfoItem icon={<AiOutlineTeam />} label="Genre" value={member.gender} />
+            <InfoItem icon={<AiOutlineTeam />} label="Genre" value={member.gender === 'MALE' ? 'Masculin' : 'Féminin'} />
             <InfoItem icon={<AiOutlineCalendar />} label="Date de Naissance" value={member.birthDate} />
             <InfoItem icon={<AiOutlineTeam />} label="Tribu" value={member.tribute?.name} />
-            <InfoItem icon={<AiOutlineIdcard />} label="État des Cotisations" value={member.cotisationStatus} />
+            <InfoItem icon={<AiOutlineIdcard />} label="Situation" value={member.status} />
           </div>
         </div>
 
         <div className="bg-brand-bg px-10 py-6 flex justify-end border-t-2 border-brand-border gap-4">
-            <button onClick={onClose} className={`${THEME.buttonSecondary} px-8 py-3 rounded-2xl text-[11px]`}>
+            <button onClick={onClose} className="px-8 py-3 rounded-2xl border-2 border-brand-border font-black text-[11px] uppercase hover:bg-white transition-all">
                 Retour
             </button>
-            <button onClick={onClose} className={`${THEME.buttonPrimary} px-10 py-3 rounded-2xl text-[11px]`}>
+            <button onClick={onClose} className="px-10 py-3 rounded-2xl bg-brand-primary border-2 border-brand-primary-dark border-b-4 text-white font-black text-[11px] uppercase hover:brightness-105 active:border-b-0 active:translate-y-1 transition-all">
                 Modifier le profil
             </button>
         </div>
@@ -103,11 +102,11 @@ const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = (
   return createPortal(content, document.body);
 };
 
-// Composant Interne InfoItem
-const InfoItem = memo(({ icon, label, value }: { icon: any, label: string, value: any }) => (
+// Composant Interne InfoItem (inchangé mais typé proprement)
+const InfoItem = memo(({ icon, label, value }: { icon: React.ReactElement, label: string, value: any }) => (
   <div className="flex items-center gap-4 group">
     <div className="w-10 h-10 flex items-center justify-center bg-brand-bg border-2 border-brand-border border-b-4 border-b-brand-border-dark text-brand-primary rounded-2xl shrink-0 group-hover:scale-110 transition-transform">
-      {React.cloneElement(icon, { size: 20 })}
+      {React.cloneElement(icon)}
     </div>
     <div className="overflow-hidden">
       <p className={`text-[9px] ${THEME.font.black} text-brand-muted leading-none mb-1 uppercase tracking-tighter`}>{label}</p>

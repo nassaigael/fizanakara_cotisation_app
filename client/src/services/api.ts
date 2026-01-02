@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-
 const api = axios.create({
-  baseURL: '/api', // Correspond au proxy Vite vers ton Backend Java (ex: http://localhost:8080/api)
+  // ✅ CORRECTION : On retire '/api' car les contrôleurs de ton ami ne l'utilisent pas
+  baseURL: 'http://localhost:8080', 
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // Sécurité : annule la requête après 10s si le serveur ne répond pas
+  timeout: 10000,
 });
 
 // INTERCEPTEUR DE REQUÊTE : Injection du Token
@@ -21,29 +21,42 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// INTERCEPTEUR DE RÉPONSE : Gestion centralisée des erreurs (401)
+// INTERCEPTEUR DE RÉPONSE
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // Si le token est expiré ou invalide
-    if (error.response?.status === 401) {
-      const url = error.config?.url || "";
-      
-      // On évite de déconnecter si une requête mineure (chargement de listes) échoue
-      const skipRedirect = url.includes('districts') || url.includes('tributes');
+  async (error) => {
+    const originalRequest = error.config;
 
-      if (!skipRedirect) {
-        console.warn("Session expirée, redirection vers la page de connexion...");
-        localStorage.removeItem('token');
-        localStorage.removeItem('admin');
-        // Redirection brutale mais nécessaire pour vider tous les caches/states
-        window.location.href = '/'; 
+    // Gestion de l'expiration du token (401)
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      const refreshToken = localStorage.getItem('refreshToken'); // Ton ami a prévu ça !
+      
+      if (refreshToken) {
+        try {
+          // Appel au endpoint /refresh de ton ami
+          const res = await axios.post('http://localhost:8080/refresh', { refreshToken });
+          const { accessToken } = res.data;
+
+          localStorage.setItem('token', accessToken);
+          api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+          
+          return api(originalRequest);
+        } catch (refreshError) {
+          // Si le refresh token est aussi expiré
+          localStorage.clear();
+          window.location.href = '/';
+        }
+      } else {
+        localStorage.clear();
+        window.location.href = '/';
       }
     }
     
-    // Gestion des erreurs réseau
+    // Message d'erreur clair si le serveur Spring Boot est éteint
     if (!error.response) {
-      console.error("Erreur Réseau : Le serveur Java est-il démarré ?");
+      alert("Le serveur Backend n'est pas démarré (Port 8080)");
     }
 
     return Promise.reject(error);

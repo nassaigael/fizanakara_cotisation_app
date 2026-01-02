@@ -11,7 +11,6 @@ import Button from './Button';
 import { useMemberForm } from '../../hooks/useMemberForm';
 import type { Member } from '../../utils/types/types';
 
-// Lien vers le dépôt de ton ami (centralisé)
 const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/ton-ami/son-repo/main/";
 
 interface Props {
@@ -21,17 +20,13 @@ interface Props {
   onSuccess: () => void;
 }
 
-/**
- * MemberFormModal - Formulaire de création/édition de membre.
- * Gère la validation et la prévisualisation dynamique des images GitHub.
- */
+
 const MemberFormModal: React.FC<Props> = ({ isOpen, onClose, memberToEdit, onSuccess }) => {
   const { formData, handleChange, handleSubmit, loading } = useMemberForm(
     () => { onSuccess(); onClose(); }, 
     memberToEdit
   );
 
-  // Calcul mémorisé de l'aperçu pour éviter les calculs de string à chaque frappe
   const previewUrl = useMemo(() => {
     if (!formData.imageUrl) return null;
     return formData.imageUrl.startsWith('http') 
@@ -44,18 +39,16 @@ const MemberFormModal: React.FC<Props> = ({ isOpen, onClose, memberToEdit, onSuc
   const selectStyle = `w-full p-4 bg-brand-bg border-2 border-brand-border border-t-brand-border-dark rounded-2xl font-bold text-brand-text outline-none focus:border-brand-primary focus:border-t-brand-primary-dark transition-all appearance-none cursor-pointer text-sm`;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-110 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
         className={`bg-white ${THEME.card} w-full max-w-3xl max-h-[95vh] overflow-y-auto p-8 relative shadow-2xl animate-in zoom-in-95 duration-300`}
         onClick={(e) => e.stopPropagation()}
       >
         
-        {/* Bouton de fermeture discret */}
         <button onClick={onClose} className="absolute top-6 right-6 text-brand-muted hover:text-brand-primary transition-colors p-2 hover:bg-brand-bg rounded-xl">
           <AiOutlineClose size={24} />
         </button>
 
-        {/* Header avec badge visuel */}
         <div className="flex items-center gap-5 mb-10">
           <div className="p-4 bg-brand-primary/10 text-brand-primary rounded-2xl border-2 border-b-4 border-brand-primary shrink-0">
             <AiOutlineUser size={30} />
@@ -72,7 +65,6 @@ const MemberFormModal: React.FC<Props> = ({ isOpen, onClose, memberToEdit, onSuc
 
         <form onSubmit={handleSubmit} className="space-y-8">
           
-          {/* IDENTITÉ */}
           <div className="space-y-4">
             <h3 className={`text-[11px] ${THEME.font.black} text-brand-primary uppercase tracking-widest border-b-2 border-brand-bg pb-2`}>
                 Identité Civile
@@ -83,19 +75,16 @@ const MemberFormModal: React.FC<Props> = ({ isOpen, onClose, memberToEdit, onSuc
             </div>
           </div>
 
-          {/* CONTACTS */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input label="Email professionnel" name="email" type="email" icon={<AiOutlineMail/>} value={formData.email} onChange={handleChange} placeholder="exemple@mail.com" />
             <Input label="Téléphone" name="phoneNumber" icon={<AiOutlinePhone/>} value={formData.phoneNumber} onChange={handleChange} placeholder="034 00 000 00" />
           </div>
 
-          {/* LOCALISATION (Saisie stylisée) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-brand-bg rounded-3xl border-2 border-brand-border">
             <Input label="Quartier / District" name="districtName" icon={<AiOutlineEnvironment/>} value={formData.districtName} onChange={handleChange} placeholder="Localisation..." />
             <Input label="Tribu / Origine" name="tributeName" icon={<AiOutlineTeam/>} value={formData.tributeName} onChange={handleChange} placeholder="Appartenance..." />
           </div>
 
-          {/* DÉTAILS TECHNIQUES */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             <Input label="Date de naissance" name="birthDate" type="date" icon={<AiOutlineCalendar/>} value={formData.birthDate} onChange={handleChange} />
             
@@ -122,7 +111,6 @@ const MemberFormModal: React.FC<Props> = ({ isOpen, onClose, memberToEdit, onSuc
             </div>
           </div>
 
-          {/* PHOTO GITHUB */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center bg-brand-primary/5 p-6 rounded-3xl border-2 border-brand-primary/10 border-dashed">
             <div className="md:col-span-3">
               <Input 
@@ -155,7 +143,6 @@ const MemberFormModal: React.FC<Props> = ({ isOpen, onClose, memberToEdit, onSuc
             </div>
           </div>
 
-          {/* ACTIONS */}
           <div className="pt-6 flex gap-4">
             <Button 
                 type="button" 
@@ -168,7 +155,7 @@ const MemberFormModal: React.FC<Props> = ({ isOpen, onClose, memberToEdit, onSuc
             <Button 
                 type="submit" 
                 disabled={loading} 
-                className="flex-[2] py-4"
+                className="flex-2 py-4"
             >
               <AiOutlineSave className="mr-2" size={20} />
               {loading ? 'Synchronisation...' : memberToEdit ? 'Mettre à jour' : 'Inscrire le membre'}

@@ -3,8 +3,8 @@ package mg.fizanakara.api.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mg.fizanakara.api.dto.ChildrenCreateDto;
+import mg.fizanakara.api.dto.ChildrenResponseDto;
 import mg.fizanakara.api.dto.ChildrenUpdateDto;
-import mg.fizanakara.api.models.Children;
 import mg.fizanakara.api.services.ChildrenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ public class ChildrenController {
     // GET ALL
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Children>> getAllChildren() {
+    public ResponseEntity<List<ChildrenResponseDto>> getAllChildren() {
         log.info("Retrieving all children");
         return ResponseEntity.ok(childrenService.getAllChildren());
     }
@@ -33,7 +33,7 @@ public class ChildrenController {
     // GET BY ID
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Children> getChildById(@PathVariable String id) {
+    public ResponseEntity<ChildrenResponseDto> getChildById(@PathVariable String id) {
         log.debug("Retrieving child by ID: {}", id);
         return ResponseEntity.ok(childrenService.getChildById(id));
     }
@@ -41,7 +41,7 @@ public class ChildrenController {
     // GET BY MEMBER ID
     @GetMapping("/member/{memberId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Children>> getChildrenByMemberId(@PathVariable String memberId) {
+    public ResponseEntity<List<ChildrenResponseDto>> getChildrenByMemberId(@PathVariable String memberId) {
         log.debug("Retrieving children for member ID: {}", memberId);
         return ResponseEntity.ok(childrenService.getChildrenByMemberId(memberId));
     }
@@ -49,23 +49,21 @@ public class ChildrenController {
     // CREATE
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Children> createChild(@RequestBody @Validated ChildrenCreateDto dto) {
+    public ResponseEntity<ChildrenResponseDto> createChild(@RequestBody @Validated ChildrenCreateDto dto) {  // ← MODIFIÉ : DTO
         log.info("Creating child: {} {}", dto.getFirstName(), dto.getLastName());
-        Children created = childrenService.createChild(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(childrenService.createChild(dto));
     }
 
     // UPDATE
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Children> updateChild(@PathVariable String id, @RequestBody ChildrenUpdateDto dto) {
+    public ResponseEntity<ChildrenResponseDto> updateChild(@PathVariable String id, @RequestBody ChildrenUpdateDto dto) {  // ← MODIFIÉ : DTO
         log.info("Partial update for child - ID: {}, provided fields: firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
-        Children updated = childrenService.updateChild(id, dto);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(childrenService.updateChild(id, dto));
     }
 
-    // DELETE (admin only)
+    // DELETE
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> deleteChild(@PathVariable String id) {

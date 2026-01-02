@@ -3,6 +3,7 @@ package mg.fizanakara.api.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mg.fizanakara.api.dto.MemberDto;
+import mg.fizanakara.api.dto.MemberResponseDto;
 import mg.fizanakara.api.exceptions.MemberNotFoundException;
 import mg.fizanakara.api.models.District;
 import mg.fizanakara.api.models.Members;
@@ -26,21 +27,26 @@ public class MemberService {
     private final SequenceService sequenceService;
 
     // GET ALL
-    public List<Members> getAllMembers() {
+    @Transactional(readOnly = true)
+    public List<MemberResponseDto> getAllMembers() {
         log.info("Recuperate all members");
-        return memberRepository.findAll();
+        List<Members> members = memberRepository.findAll();
+        return members.stream()
+                .map(this::mapToResponseDto).toList();
     }
 
     // GET BY ID
-    public Members getMemberById(String id) {
+    @Transactional(readOnly = true)
+    public MemberResponseDto getMemberById(String id) {
         log.info("Recuperate member with ID : {}", id);
-        return memberRepository.findById(id)
+        Members member = memberRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with ID : " + id));
+        return mapToResponseDto(member);
     }
 
     // CREATE
     @Transactional
-    public Members createMember(MemberDto dto) {
+    public MemberResponseDto createMember(MemberDto dto) {
         log.info("Checking duplicate for firstName='{}', lastName='{}', birthDate='{}', phone='{}', districtId={}, tributeId={}, status={}",
                 dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus());
 
@@ -75,11 +81,14 @@ public class MemberService {
         member.setCreatedAt(LocalDate.now());
         member.setSequenceNumber(nextSeq);
         member.setId(member.generatedCustomId());
-        return memberRepository.save(member);
+
+        Members saved = memberRepository.save(member);
+        return mapToResponseDto(saved);
     }
+
     // UPDATE BY ID
     @Transactional
-    public Members updateMember(String id, MemberDto dto) {
+    public MemberResponseDto updateMember(String id, MemberDto dto) {
         log.info("Update service - ID : {}, DTO on require : firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
         if (id == null || id.trim().isEmpty())
@@ -123,13 +132,18 @@ public class MemberService {
 
         Members updated = memberRepository.save(member);
         log.info("Update partial of member ID {} success", id);
-        return updated;
+        return mapToResponseDto(updated);
     }
 
-    // DELETE ID
+    private Members findEntityById(String id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("Member not found with ID : " + id));
+    }
+
+    // DELETE BY ID
     @Transactional
     public void deleteMember(String id) {
-        Members member = getMemberById(id);
+        Members member = findEntityById(id);
         log.info("Deleted of member ID : {}", id);
         memberRepository.delete(member);
     }
@@ -138,5 +152,27 @@ public class MemberService {
     @Transactional
     public void deleteAllMembers() {
         memberRepository.deleteAll();
+    }
+
+    // PRIVATE METHODE FOR MAPPING DTO
+    private MemberResponseDto mapToResponseDto(Members member) {
+        MemberResponseDto dto = new MemberResponseDto();
+        dto.setId(member.getId());
+        dto.setFirstName(member.getFirstName());
+        dto.setLastName(member.getLastName());
+        dto.setBirthDate(member.getBirthDate());
+        dto.setGender(member.getGender());
+        dto.setImageUrl(member.getImageUrl());
+        dto.setPhoneNumber(member.getPhoneNumber());
+        dto.setCreatedAt(member.getCreatedAt());
+        dto.setSequenceNumber(member.getSequenceNumber());
+        dto.setStatus(member.getStatus());
+
+        dto.setDistrictId(member.getDistrict().getId());
+        dto.setDistrictName(member.getDistrict().getName());
+        dto.setTributeId(member.getTribute().getId());
+        dto.setTributeName(member.getTribute().getName());
+
+        return dto;
     }
 }

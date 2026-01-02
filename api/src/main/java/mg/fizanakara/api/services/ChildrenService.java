@@ -3,6 +3,7 @@ package mg.fizanakara.api.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mg.fizanakara.api.dto.ChildrenCreateDto;
+import mg.fizanakara.api.dto.ChildrenResponseDto;
 import mg.fizanakara.api.dto.ChildrenUpdateDto;
 import mg.fizanakara.api.exceptions.ChildrenNotFoundException;
 import mg.fizanakara.api.models.Children;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,27 +32,39 @@ public class ChildrenService {
     private final SequenceService sequenceService;
 
     // GET ALL
-    public List<Children> getAllChildren() {
+    @Transactional(readOnly = true)
+    public List<ChildrenResponseDto> getAllChildren() {
         log.info("Retrieving all children");
-        return childrenRepository.findAll();
+        List<Children> children = childrenRepository.findAll();
+        return children
+                .stream()
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
     }
 
     // GET BY ID
-    public Children getChildById(String id) {
+    @Transactional(readOnly = true)
+    public ChildrenResponseDto getChildById(String id) {
         log.info("Retrieving child with ID: {}", id);
-        return childrenRepository.findById(id)
+        Children child  = childrenRepository.findById(id)
                 .orElseThrow(() -> new ChildrenNotFoundException("Child not found with ID: " + id));
+        return mapToResponseDto(child);
     }
 
     // GET BY MEMBER ID
-    public List<Children> getChildrenByMemberId(String memberId) {
+    @Transactional(readOnly = true)
+    public List<ChildrenResponseDto> getChildrenByMemberId(String memberId) {
         log.info("Retrieving children for member ID: {}", memberId);
-        return childrenRepository.findByMemberId(memberId);
+        List<Children> children = childrenRepository.findByMemberId(memberId);
+        return children
+                .stream()
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
     }
 
     // CREATE
     @Transactional
-    public Children createChild(ChildrenCreateDto dto) {
+    public ChildrenResponseDto createChild(ChildrenCreateDto dto) {
         log.info("Checking duplicate for firstName='{}', lastName='{}', birthDate='{}', phone='{}', districtId={}, tributeId={}, status={}, memberId={}",
                 dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getPhoneNumber(), dto.getDistrictId(), dto.getTributeId(), dto.getStatus(), dto.getMemberId());
 
@@ -88,11 +102,14 @@ public class ChildrenService {
         child.setCreatedAt(LocalDate.now());
         child.setSequenceNumber(nextSeq);
         child.setId(child.generatedCustomId());
-        return childrenRepository.save(child);
+
+        Children saved = childrenRepository.save(child);
+        return  mapToResponseDto(saved);
     }
+
     // UPDATE partial (optional fields)
     @Transactional
-    public Children updateChild(String id, ChildrenUpdateDto dto) {
+    public ChildrenResponseDto updateChild(String id, ChildrenUpdateDto dto) {
         log.info("Partial update for child - ID: {}, provided fields: firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
         if (id == null || id.trim().isEmpty()) {
@@ -136,14 +153,44 @@ public class ChildrenService {
 
         Children updated = childrenRepository.save(child);
         log.info("Partial update for child ID {} successful", id);
-        return updated;
+        return mapToResponseDto(updated);
     }
 
     // DELETE
     @Transactional
     public void deleteChild(String id) {
-        Children child = getChildById(id);
+        Children child = findEntityById(id);
         log.info("Deleting child with ID: {}", id);
         childrenRepository.delete(child);
+    }
+
+    private Children findEntityById(String id) {
+        return childrenRepository.findById(id)
+                .orElseThrow(() -> new ChildrenNotFoundException("Child not found with ID: " + id));
+    }
+
+    // PRIVATE METHODE FOR MAPPING DTO
+    private ChildrenResponseDto mapToResponseDto(Children child) {
+        ChildrenResponseDto dto = new ChildrenResponseDto();
+        dto.setId(child.getId());
+        dto.setFirstName(child.getFirstName());
+        dto.setLastName(child.getLastName());
+        dto.setBirthDate(child.getBirthDate());
+        dto.setGender(child.getGender());
+        dto.setImageUrl(child.getImageUrl());
+        dto.setPhoneNumber(child.getPhoneNumber());
+        dto.setCreatedAt(child.getCreatedAt());
+        dto.setSequenceNumber(child.getSequenceNumber());
+        dto.setStatus(child.getStatus());
+
+        dto.setDistrictId(child.getDistrict().getId());
+        dto.setDistrictName(child.getDistrict().getName());
+        dto.setTributeId(child.getTribute().getId());
+        dto.setTributeName(child.getTribute().getName());
+        dto.setMemberId(child.getMember().getId());
+        dto.setMemberFirstName(child.getMember().getFirstName());
+        dto.setMemberLastName(child.getMember().getLastName());
+
+        return dto;
     }
 }

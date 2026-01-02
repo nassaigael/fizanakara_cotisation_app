@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mg.fizanakara.api.dto.MemberDto;
-import mg.fizanakara.api.models.Members;
+import mg.fizanakara.api.dto.MemberResponseDto;
 import mg.fizanakara.api.services.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +25,15 @@ public class MemberController {
     // GET ALL
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Members>> getAllMembers() {
-        log.info("Recupearte all members");
+    public ResponseEntity<List<MemberResponseDto>> getAllMembers() {
+        log.info("Recuperate all members");
         return ResponseEntity.ok(memberService.getAllMembers());
     }
 
     // GET BY ID
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Members> getMemberById(@PathVariable @NotNull String id) {
+    public ResponseEntity<MemberResponseDto> getMemberById(@PathVariable @NotNull String id) {
         log.debug("Recuperate of member ID : {}", id);
         return ResponseEntity.ok(memberService.getMemberById(id));
     }
@@ -41,20 +41,18 @@ public class MemberController {
     // CREATE
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Members> createMember(@RequestBody @Validated MemberDto dto) {
+    public ResponseEntity<MemberResponseDto> createMember(@RequestBody @Validated MemberDto dto) {  // ← FIX : DTO
         log.info("Create member of : {} {}", dto.getFirstName(), dto.getLastName());
-        Members created = memberService.createMember(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.createMember(dto));
     }
 
     // UPDATE BY ID
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Members> updateMember(@PathVariable String id, @RequestBody MemberDto dto) {
-        log.info("PUT partial - ID : {}, champs fournis : firstName={}, lastName={}, birthDate={}, gender={}",
+    public ResponseEntity<MemberResponseDto> updateMember(@PathVariable String id, @RequestBody MemberDto dto) {  // ← FIX : DTO
+        log.info("Update service - ID : {}, DTO on require : firstName={}, lastName={}, birthDate={}, gender={}",
                 id, dto.getFirstName(), dto.getLastName(), dto.getBirthDate(), dto.getGender());
-        Members updated = memberService.updateMember(id, dto);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(memberService.updateMember(id, dto));
     }
 
     // DELETE BY ID

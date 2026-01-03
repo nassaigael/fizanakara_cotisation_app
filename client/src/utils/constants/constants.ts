@@ -10,7 +10,7 @@ import {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // --- DONNÉES MÉTIER (Synchronisées avec le Backend Java) ---
-export const COTISATION_STATUSES = ["Payé", "En cours", "En attente", "Impayé"] as const;
+export const COTISATION_STATUSES = ["Payé", "En cours"] as const;
 
 export const SITUATIONS = [
     { label: "Étudiant", value: "ETUDIANT" },
@@ -18,37 +18,47 @@ export const SITUATIONS = [
     { label: "Enfant", value: "ENFANT" }
 ] as const;
 
-// --- ASSETS & MÉDIAS ---
-export const GITHUB_BASE_URL = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/";
-export const DEFAULT_AVATAR = "https://ui-avatars.com/api/?name=Admin&background=FF4B4B&color=fff";
+// --- ASSETS & MÉDIAS ---: Donc le repos doivent être public donc tous le monde peut acceder et le modifier. c'est pas bon::: Solution à trouver
+export const GITHUB_BASE_URL_ADMIN = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/admin"// tous les photos des admin doivent être dans ce repos de format 4x4
+export const GITHUB_BASE_URL_MEMBER = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/membre"; // tous les photos des membres doivent être dans ce repos de format 4x4 ;
+export const GITHUB_BASE_URL_ASSETS_IMAGES = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/assets/images";// utiliser cette liens pour stocker tous les images utiliser sauf les deux categories dans l'application
+export const GITHUB_BASE_URL_ASSETS_VIDEO = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/assets/videos";// utiliser cette liens pour stocker tous les vidéo utiliser dans l'application
 
+export const DEFAULT_AVATAR = "https://ui-avatars.com/api/?name=Admin&background=FF4B4B&color=fff";
+  
 /**
- * Construit l'URL de l'image en utilisant GitHub comme CDN.
- * @param imagePath - Le nom du fichier stocké en BDD (ex: "avatar.png")
- * @param nameForAvatar - Nom à utiliser pour l'avatar de secours
+ * Construit l'URL de l'image selon la catégorie.
+ * @param category - 'admin' | 'member' | 'assets'
  */
-export const getImageUrl = (imagePath: string | null | undefined, nameForAvatar?: string): string => {
+export const getImageUrl = (
+  imagePath: string | null | undefined, 
+  nameForAvatar?: string,
+  category: 'admin' | 'member' | 'assets' = 'member'
+): string => {
   if (!imagePath || imagePath.trim() === "") {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(nameForAvatar || 'Admin')}&background=FF4B4B&color=fff&bold=true`;
   }
 
-  // Si c'est déjà une URL complète (ex: gravatar ou autre), on la garde
-  if (imagePath.startsWith('http')) {
-    return imagePath;
-  }
+  if (imagePath.startsWith('http')) return imagePath;
 
-  // Sinon, on préfixe avec ton dépôt GitHub
-  return `${GITHUB_BASE_URL}${imagePath}`;
+  const baseUrls = {
+    admin: GITHUB_BASE_URL_ADMIN,
+    member: GITHUB_BASE_URL_MEMBER,
+    assets: GITHUB_BASE_URL_ASSETS_IMAGES
+  };
+
+  return `${baseUrls[category]}/${imagePath}`;
 };
 
 // --- STRUCTURE DE NAVIGATION ---
 export const PROFILE_MENU = [
     { label: "Mon Profil", path: "profiles", icon: AiOutlineUser },
     { label: "Paramètres", path: "settings", icon: AiOutlineSetting },
-    { label: "Messages", path: "messages", icon: AiOutlineMessage },
+    { label: "Messages", path: "messages", icon: AiOutlineMessage },// fonctionnalité à rajouter pour effectuer l'envoye multiple des messages à tous les membre en un seul fois
     { label: "Déconnexion", path: "/", icon: AiOutlineLogout, isDestructive: true },
 ];
 
+// chifrer les trafic entre tous ces liens
 export const sidebarLinks = [
   { title: "Tableau de bord", path: "/admin/dashboard", icon: AiOutlineDashboard },
   { title: "Membres", path: "/admin/member", icon: AiOutlineUsergroupAdd },

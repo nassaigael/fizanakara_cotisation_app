@@ -1,69 +1,100 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
-import type { Member } from "../utils/types/types";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { memberService } from "../services/memberService";
-import { GITHUB_BASE_URL, DEFAULT_AVATAR } from "../utils/constants/constants";
+import { toast } from "react-hot-toast";
+import type { Member } from "../utils/types/types";
 
 export const useMemberLogic = () => {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-  
-  // États des filtres
-  const [search, setSearch] = useState("");
-  const [filterSex, setFilterSex] = useState("");
-  const [filterDistrict, setFilterDistrict] = useState("");
-  const [filterTribe, setFilterTribe] = useState(""); 
-  const [filterCotisation, setFilterCotisation] = useState("");
+    const [members, setMembers] = useState<Member[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+    
+    // États des filtres
+    const [search, setSearch] = useState("");
+    const [filterSex, setFilterSex] = useState("");
+    const [filterDistrict, setFilterDistrict] = useState("");
+    const [filterTribe, setFilterTribe] = useState("");
+    const [filterCotisation, setFilterCotisation] = useState("");
 
-  const fetchMembers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await memberService.getAll();
-      const formattedData = data.map((m: Member) => ({
-        ...m,
-        imageUrl: m.imageUrl 
-          ? (m.imageUrl.startsWith('http') ? m.imageUrl : `${GITHUB_BASE_URL}${m.imageUrl}`)
-          : DEFAULT_AVATAR
-      }));
-      setMembers(formattedData);
-    } catch (err) {
-      console.error("Erreur de synchronisation.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    // --- SYNCHRONISATION ---
+    const refreshMembers = useCallback(async () => {
+        setLoading(true);
+        try {
+            const data = await memberService.getAll();
+            setMembers(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error("Erreur sync:", err);
+            toast.error("Échec de la synchronisation avec le serveur");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-  useEffect(() => { fetchMembers(); }, [fetchMembers]);
+    useEffect(() => { refreshMembers(); }, [refreshMembers]);
 
-  const filteredMembers = useMemo(() => {
-    return members.filter(m => {
-      const matchesSearch = !search || `${m.firstName} ${m.lastName}`.toLowerCase().includes(search.toLowerCase());
-      const matchesSex = !filterSex || m.gender === filterSex;
-      const matchesDistrict = !filterDistrict || m.district?.name === filterDistrict;
-      const matchesTribe = !filterTribe || m.tribute?.name === filterTribe;
-      const matchesCotisation = !filterCotisation || m.cotisationStatus === filterCotisation;
+    // --- LOGIQUE DE FILTRAGE (Mémoïsée) ---
+    const filteredMembers = useMemo(() => {
+        return members.filter(m => {
+            const matchSearch = !search || 
+                `${m.firstName} ${m.lastName} ${m.phoneNumber}`
+                .toLowerCase().includes(search.toLowerCase());
+            
+            const matchSex = !filterSex || m.gender === filterSex;
+            const matchDistrict = !filterDistrict || m.district?.name === filterDistrict;
+            const matchTribe = !filterTribe || m.tribute?.name === filterTribe;
+            const matchCotisation = !filterCotisation || m.cotisationStatus === filterCotisation;
 
-      return matchesSearch && matchesSex && matchesDistrict && matchesTribe && matchesCotisation;
-    });
-  }, [members, search, filterSex, filterDistrict, filterTribe, filterCotisation]);
+            return matchSearch && matchSex && matchDistrict && matchTribe && matchCotisation;
+        });
+    }, [members, search, filterSex, filterDistrict, filterTribe, filterCotisation]);
 
-  return {
-    members: filteredMembers, loading, search, setSearch,
-    filterSex, setFilterSex, filterDistrict, setFilterDistrict,
-    filterTribe, setFilterTribe, filterCotisation, setFilterCotisation,
-    selectedMembers,
-    handleSelect: (id: string) => setSelectedMembers(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]),
-    handleSelectAll: (check: boolean) => setSelectedMembers(check ? filteredMembers.map(m => String(m.id)) : []),
-    deleteAction: async (ids: string[]) => {
-      await Promise.all(ids.map(id => memberService.delete(id)));
-      setMembers(p => p.filter(m => !ids.includes(String(m.id))));
-      setSelectedMembers([]);
-    },
-    fullResetAction: async () => {
-      const success = await memberService.clearAllData();
-      if (success) { setMembers([]); setSelectedMembers([]); }
-      return success;
-    },
-    refreshMembers: fetchMembers
-  };
+    // --- ACTIONS ---
+    const handleSelect = (id: string) => {
+        setSelectedMembers(prev => 
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+    const handleSelectAll = (checked: boolean) => {
+        setSelectedMembers(checked ? filteredMembers.map(m => String(m.id)) : []);
+    };
+
+    const deleteAction = async (ids: string[]) => {
+        try {
+            await Promise.all(ids.map(id => memberService.delete(id)));
+            toast.success(ids.length > 1 ? "Membres supprimés" : "Membre supprimé");
+            refreshMembers(); // Rechargement propre
+            setSelectedMembers([]);
+        } catch (err) {
+            toast.error("Erreur lors de la suppression");
+        }
+    };
+
+    const fullResetAction = async () => {
+        try {
+            const success = await memberService.clearAllData();
+            if (success) {
+                toast.success("Base de données réinitialisée");
+                setMembers([]);
+                setSelectedMembers([]);
+            }
+        } catch (err) {
+            toast.error("Erreur lors du reset");
+        }
+    };
+
+    return {
+        members: filteredMembers,
+        loading,
+        search, setSearch,
+        filterSex, setFilterSex,
+        filterDistrict, setFilterDistrict,
+        filterTribe, setFilterTribe,
+        filterCotisation, setFilterCotisation,
+        selectedMembers,
+        handleSelect,
+        handleSelectAll,
+        deleteAction,
+        fullResetAction,
+        refreshMembers
+    };
 };

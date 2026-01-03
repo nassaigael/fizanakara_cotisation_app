@@ -1,3 +1,4 @@
+// theme pour le mode sombre???
 export const THEME = {
   font: {
     black: "font-[900] uppercase tracking-widest",

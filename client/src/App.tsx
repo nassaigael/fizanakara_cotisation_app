@@ -1,12 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
+
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Member from './pages/Member'; 
-import MainLayout from './components/layout/MainLayout'; 
+import Cotisation from './pages/Cotisation';
 import ForgotPassword from './pages/ForgotPassword';
+import AdminProfile from './pages/AdminProfiles';
 
+import MainLayout from './components/layout/MainLayout'; 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, loading } = useAuth();
@@ -39,19 +42,12 @@ function App() {
               </ProtectedRoute>
             }
           >
-            {/* Redirection automatique /admin -> /admin/dashboard */}
             <Route index element={<Navigate to="dashboard" replace />} />
-            
             <Route path="dashboard" element={<Dashboard />} />
-            
-            {/* Gestion des membres (Groupée pour évolutions futures) */}
-            <Route path="member">
-              <Route index element={<Member />} />
-              {/* Tu pourras ajouter ici : <Route path=":id" element={<MemberDetails />} /> */}
-            </Route>
+            <Route path="members" element={<Member />} />
+            <Route path="cotisations" element={<Cotisation />} />
+            <Route path="profile" element={<AdminProfile />} />
           </Route>
-
-          {/* CATCH ALL : Redirige les URLs inconnues vers l'accueil */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { memberService } from "../services/memberService";
+import { toast } from "react-hot-toast"; // Utilisons toast au lieu d'alert
 import type { Member, Gender } from "../utils/types/types";
 
 export const useMemberForm = (onSuccess: () => void, initialData?: Member | null) => {
@@ -17,7 +18,7 @@ export const useMemberForm = (onSuccess: () => void, initialData?: Member | null
         lastName: initialData.lastName || "",
         phoneNumber: initialData.phoneNumber || "",
         email: initialData.email || "",
-        birthDate: initialData.birthDate || "",
+        birthDate: initialData.birthDate ? initialData.birthDate.split('T')[0] : "",
         gender: initialData.gender || "MALE",
         status: (initialData.status as any) || "Etudiant",
         imageUrl: initialData.imageUrl || "",
@@ -36,16 +37,20 @@ export const useMemberForm = (onSuccess: () => void, initialData?: Member | null
     e.preventDefault();
     setLoading(true);
     try {
-      initialData?.id 
-        ? await memberService.update(initialData.id, formData)
-        : await memberService.createWithDependencies(formData);
+      if (initialData?.id) {
+        await memberService.update(initialData.id, formData);
+        toast.success("Membre mis à jour");
+      } else {
+        await memberService.createWithDependencies(formData);
+        toast.success("Membre créé avec succès");
+      }
       onSuccess();
     } catch (err) {
-      alert("Erreur lors de l'enregistrement.");
+      toast.error("Erreur lors de l'enregistrement");
     } finally {
       setLoading(false);
     }
   };
 
-  return { formData, handleChange, handleSubmit, loading };
+  return { formData, setFormData, handleChange, handleSubmit, loading };
 };

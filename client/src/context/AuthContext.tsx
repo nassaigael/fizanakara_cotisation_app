@@ -6,7 +6,7 @@ import type { Admin, AuthContextType } from '../utils/types/types';
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // Initialisation immédiate
+  // Initialisation avec vérification de sécurité sur le localStorage
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
   const [admin, setAdmin] = useState<Admin | null>(() => {
     const savedAdmin = localStorage.getItem('admin');
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [loading, setLoading] = useState(true);
 
-  // Configuration de la sécurité Axios au démarrage
+  // Synchronisation du header Authorization d'Axios
   useEffect(() => {
     if (token) {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -30,22 +30,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, [token]);
 
-  const login = async (email: string, password: string, rememberMe: boolean) => {
+  // ✅ FONCTION DE MISE À JOUR (Pour la Navbar et le Profil)
+  const updateAdminState = (updatedAdmin: Admin) => {
+    setAdmin({ ...updatedAdmin }); // On recrée un objet pour forcer le refresh React
+    localStorage.setItem('admin', JSON.stringify(updatedAdmin));
+  };
+
+  // ✅ LOGIN COMPLET (avec Token et RefreshToken)
+ const login = async (email: string, password: string) => {
     try {
       const data = await authService.login(email, password);
       
-      // Mise à jour des états
-      setToken(data.accessToken);
-      setAdmin(data.user);
+      // ✅ ON "MAPPE" LES DONNÉES POUR CORRIGER LE BACKEND
+      const formattedUser: Admin = {
+        ...data.user,
+        // On transforme 'firstname' (backend) en 'firstName' (frontend)
+        firstName: data.user.firstName || data.user.firstName,
+        lastName: data.user.lastName || data.user.lastName,
+        // On s'assure que l'imageUrl est bien là (si le backend l'envoie enfin)
+        imageUrl: data.user.imageUrl || data.user.imageUrl || "" 
+      };
 
-      // Persistance des données
+      setToken(data.accessToken);
+      setAdmin(formattedUser);
+
       localStorage.setItem('token', data.accessToken);
-      localStorage.setItem('admin', JSON.stringify(data.user));
+      localStorage.setItem('admin', JSON.stringify(formattedUser));
       
-      // Injection immédiate dans Axios pour les appels suivants
       api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
     } catch (error) {
-      console.error("Échec de connexion au service d'authentification", error);
+      console.error("Échec de connexion", error);
       throw error;
     }
   };
@@ -54,16 +68,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return await authService.register(userData);
   }, []);
 
+  // ✅ LOGOUT COMPLET (Nettoyage total)
   const logout = useCallback(() => {
     setToken(null);
     setAdmin(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('admin');
     delete api.defaults.headers.common['Authorization'];
   }, []);
 
   return (
-    <AuthContext.Provider value={{ admin, token, login, logout, register, loading }}>
+    <AuthContext.Provider value={{ 
+        admin, 
+        token, 
+        login, 
+        logout, 
+        register, 
+        loading, 
+        updateAdminState 
+    }}>
       {!loading && children}
     </AuthContext.Provider>
   );

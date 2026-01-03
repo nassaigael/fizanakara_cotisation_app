@@ -6,40 +6,52 @@ import {
   AiOutlineUsergroupAdd, AiOutlineWallet 
 } from "react-icons/ai";
 
-// --- CONTEXTE D'AUTHENTIFICATION ---
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// --- DONNÉES MÉTIER (Synchronisées avec le Backend Java) ---
 export const COTISATION_STATUSES = ["Payé", "En cours"] as const;
 
 export const SITUATIONS = [
-    { label: "Étudiant", value: "ETUDIANT" },
-    { label: "Travailleur", value: "TRAVAILLEUR" },
-    { label: "Enfant", value: "ENFANT" }
+    { label: "Étudiant", value: "Etudiant" },
+    { label: "Travailleur", value: "Travailleur" },
+    { label: "Enfant", value: "Enfant" }
 ] as const;
 
-// --- ASSETS & MÉDIAS ---: Donc le repos doivent être public donc tous le monde peut acceder et le modifier. c'est pas bon::: Solution à trouver
-export const GITHUB_BASE_URL_ADMIN = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/admin"// tous les photos des admin doivent être dans ce repos de format 4x4
-export const GITHUB_BASE_URL_MEMBER = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/membre"; // tous les photos des membres doivent être dans ce repos de format 4x4 ;
-export const GITHUB_BASE_URL_ASSETS_IMAGES = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/assets/images";// utiliser cette liens pour stocker tous les images utiliser sauf les deux categories dans l'application
-export const GITHUB_BASE_URL_ASSETS_VIDEO = "https://raw.githubusercontent.com/mekill404/image_membre_fizankara/main/assets/videos";// utiliser cette liens pour stocker tous les vidéo utiliser dans l'application
+const GITHUB_ACCOUNT = "mekill404";
+const REPO_NAME = "image_membre_fizankara";
 
-export const DEFAULT_AVATAR = "https://ui-avatars.com/api/?name=Admin&background=FF4B4B&color=fff";
-  
-/**
- * Construit l'URL de l'image selon la catégorie.
- * @param category - 'admin' | 'member' | 'assets'
- */
+export const GITHUB_BASE_URL_ADMIN = `https://raw.githubusercontent.com/${GITHUB_ACCOUNT}/${REPO_NAME}/main/admin`;
+export const GITHUB_BASE_URL_MEMBER = `https://raw.githubusercontent.com/${GITHUB_ACCOUNT}/${REPO_NAME}/main/membre`;
+export const GITHUB_BASE_URL_ASSETS_IMAGES = `https://raw.githubusercontent.com/${GITHUB_ACCOUNT}/${REPO_NAME}/main/assets/images`;
+
 export const getImageUrl = (
   imagePath: string | null | undefined, 
   nameForAvatar?: string,
   category: 'admin' | 'member' | 'assets' = 'member'
 ): string => {
   if (!imagePath || imagePath.trim() === "") {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nameForAvatar || 'Admin')}&background=FF4B4B&color=fff&bold=true`;
+    const initials = nameForAvatar ? encodeURIComponent(nameForAvatar) : "User";
+    return `https://ui-avatars.com/api/?name=${initials}&background=FF4B4B&color=fff&bold=true`;
   }
 
   if (imagePath.startsWith('http')) return imagePath;
+
+  let cleanPath = imagePath.trim().replace(/\s+/g, '_');
+  const extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+  const hasExtension = extensions.some(ext => cleanPath.toLowerCase().endsWith(ext));
+
+  if (!hasExtension) {
+      if (cleanPath.toLowerCase().endsWith('jpeg')) cleanPath = cleanPath.replace(/jpeg$/i, '.jpeg');
+      else if (cleanPath.toLowerCase().endsWith('jpg')) cleanPath = cleanPath.replace(/jpg$/i, '.jpg');
+      else if (cleanPath.toLowerCase().endsWith('png')) cleanPath = cleanPath.replace(/png$/i, '.png');
+      else if (cleanPath.toLowerCase().endsWith('webp')) cleanPath = cleanPath.replace(/webp$/i, '.webp');
+
+      else cleanPath += '.jpg';
+  }
+
+  let finalCategory = category;
+  if (cleanPath.toLowerCase().includes('admin')) {
+      finalCategory = 'admin';
+  }
 
   const baseUrls = {
     admin: GITHUB_BASE_URL_ADMIN,
@@ -47,26 +59,22 @@ export const getImageUrl = (
     assets: GITHUB_BASE_URL_ASSETS_IMAGES
   };
 
-  return `${baseUrls[category]}/${imagePath}`;
+  return `${baseUrls[finalCategory]}/${cleanPath}`;
 };
-
-// --- STRUCTURE DE NAVIGATION ---
 export const PROFILE_MENU = [
     { label: "Mon Profil", path: "profiles", icon: AiOutlineUser },
     { label: "Paramètres", path: "settings", icon: AiOutlineSetting },
-    { label: "Messages", path: "messages", icon: AiOutlineMessage },// fonctionnalité à rajouter pour effectuer l'envoye multiple des messages à tous les membre en un seul fois
+    { label: "Messages", path: "messages", icon: AiOutlineMessage },
     { label: "Déconnexion", path: "/", icon: AiOutlineLogout, isDestructive: true },
 ];
 
-// chifrer les trafic entre tous ces liens
 export const sidebarLinks = [
   { title: "Tableau de bord", path: "/admin/dashboard", icon: AiOutlineDashboard },
-  { title: "Membres", path: "/admin/member", icon: AiOutlineUsergroupAdd },
-  { title: "Cotisations", path: "/admin/contributions", icon: AiOutlineWallet },
+  { title: "Membres", path: "/admin/members", icon: AiOutlineUsergroupAdd },
+  { title: "Cotisations", path: "/admin/cotisations", icon: AiOutlineWallet },
   { title: "Paramètres", path: "/admin/settings", icon: AiOutlineSetting },
 ] as const;
 
-// --- SYSTÈME DE VARIANTE UI (Neubrutalism Ready) ---
 export const variantStyles = {
   warning: {
     borderColor: "border-amber-500",

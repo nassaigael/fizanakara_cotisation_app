@@ -35,7 +35,7 @@ const Login: React.FC = () => {
     if (message?.type === 'success' && isRegister) setIsRegister(false);
     setMessage(null);
   };
-
+  // redondance de code: minimiser le code en gardant le design pour diminuer la taille de l'application pour qu'il ne gaspille pas trop de ressource 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden bg-brand-bg">
       
@@ -113,9 +113,10 @@ const Login: React.FC = () => {
                   onChange={(e) => setRememberMe(e.target.checked)} 
                   className="w-5 h-5 rounded-lg border-2 border-brand-border accent-brand-primary cursor-pointer" 
                 />
+                {/**Cette option marche seulement si je rafraichi a page or il devrai aussi marcher même si je ferme le navigateur. car le token doivent être stocker en local Storage */}
                 <span className="text-[10px] font-black text-brand-muted uppercase tracking-wider group-hover:text-brand-text transition-colors">Rester connecté</span>
               </label>
-              <Link to="/forgot-password" className={`text-[10px] ${THEME.font.black} text-brand-primary uppercase hover:underline underline-offset-4 tracking-wider`}>Oublié ?</Link>
+              <Link to="/forgot-password" className={`text-[10px] ${THEME.font.black} text-brand-primary uppercase hover:underline underline-offset-4 tracking-wider`}>Identifiant Oublié ?</Link>
             </div>
           )}
 
@@ -127,6 +128,7 @@ const Login: React.FC = () => {
             {loading ? "TRAITEMENT EN COURS..." : (isRegister ? "CRÉER MON COMPTE" : "ACCÉDER AU PANEL")}
           </Button>
 
+          {/**Donc il supprime automatiquement l'email envoyer?? */}
           {isRegister && (
             <button 
                 type="button" 

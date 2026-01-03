@@ -1,21 +1,16 @@
 import React from 'react';
 import { THEME } from '../../styles/theme';
-
-interface StatCardProps {
-  title: string;
-  value: string | number;
-  subValue: string;
-  icon: any;
-  color: 'red' | 'blue' | 'green' | 'yellow';
-}
+import type { StatCardProps } from '../../utils/types/types';
 
 /**
  * StatCard3D - Composant de carte statistique avec effet de profondeur.
  * Utilise des bordures asymétriques pour créer un effet 3D plat (Neubrutalism).
- */
-export const StatCard3D: React.FC<StatCardProps> = ({ title, value, subValue, icon: Icon, color }) => {
+ **/
+export const StatCard3D: React.FC<StatCardProps> = ({ title, value, subValue, icon: Icon, color }) => 
+{
   // Mapping des couleurs pour correspondre aux styles de bordures 3D
-  const colorMap = {
+  const colorMap = 
+  {
     red: "bg-red-500 border-red-700",
     blue: "bg-blue-400 border-blue-600",
     green: "bg-green-500 border-green-700",
@@ -25,11 +20,8 @@ export const StatCard3D: React.FC<StatCardProps> = ({ title, value, subValue, ic
   return (
     <div className={`
       bg-white border-2 border-b-8 border-brand-border 
-      rounded-4xl p-6 
-      transition-all duration-200 
-      hover:-translate-y-1 hover:border-b-10 
-      active:translate-y-1 active:border-b-4 
-      group cursor-default
+      rounded-4xl p-6 transition-all duration-200 hover:-translate-y-1 hover:border-b-10 
+      active:translate-y-1 active:border-b-4 group cursor-default
     `}>
       <div className="flex justify-between items-start">
         <div className="space-y-1">

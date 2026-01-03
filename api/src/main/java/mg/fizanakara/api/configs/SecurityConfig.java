@@ -60,7 +60,8 @@ public class SecurityConfig {
                 "http://localhost:8080",
                 "http://localhost:5173"
         ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // ✅ AJOUT DE "PATCH" DANS LA LISTE CI-DESSOUS
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); 
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

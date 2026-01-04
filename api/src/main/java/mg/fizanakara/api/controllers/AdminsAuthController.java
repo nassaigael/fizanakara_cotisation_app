@@ -1,11 +1,11 @@
 package mg.fizanakara.api.controllers;
 
-import mg.fizanakara.api.dto.AdminResponseDto;
-import mg.fizanakara.api.dto.LoginRequestDTO;
-import mg.fizanakara.api.dto.RegisterRequestDTO;
+import mg.fizanakara.api.dto.admins.AdminResponseDto;
+import mg.fizanakara.api.dto.admins.LoginRequestDTO;
+import mg.fizanakara.api.dto.admins.RegisterRequestDTO;
 import mg.fizanakara.api.exceptions.AdminsException;
 import mg.fizanakara.api.models.Admins;
-import mg.fizanakara.api.dto.UpdateAdminDto;
+import mg.fizanakara.api.dto.admins.UpdateAdminDto;
 import mg.fizanakara.api.models.enums.Gender;
 import mg.fizanakara.api.security.JwtUtil;
 import mg.fizanakara.api.services.AdminsService;

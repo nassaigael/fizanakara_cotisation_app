@@ -1,10 +1,10 @@
-package mg.fizanakara.api.dto;
+package mg.fizanakara.api.dto.districts;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class TributeDto {
+public class DistrictDto {
     @NotBlank
     private String name;
 }

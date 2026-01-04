@@ -1,4 +1,4 @@
-package mg.fizanakara.api.dto;
+package mg.fizanakara.api.dto.admins;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

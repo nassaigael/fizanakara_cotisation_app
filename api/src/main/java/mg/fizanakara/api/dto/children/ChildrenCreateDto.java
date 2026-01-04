@@ -1,4 +1,4 @@
-package mg.fizanakara.api.dto;
+package mg.fizanakara.api.dto.children;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

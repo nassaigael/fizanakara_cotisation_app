@@ -2,7 +2,7 @@ package mg.fizanakara.api.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mg.fizanakara.api.dto.TributeDto;
+import mg.fizanakara.api.dto.tributes.TributeDto;
 import mg.fizanakara.api.models.Tribute;
 import mg.fizanakara.api.services.TributeService;
 import org.springframework.http.HttpStatus;

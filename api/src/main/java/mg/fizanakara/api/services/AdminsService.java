@@ -1,9 +1,9 @@
 package mg.fizanakara.api.services;
 
-import mg.fizanakara.api.dto.AdminResponseDto;
+import mg.fizanakara.api.dto.admins.AdminResponseDto;
 import mg.fizanakara.api.exceptions.AdminsException;
 import mg.fizanakara.api.models.Admins;
-import mg.fizanakara.api.dto.UpdateAdminDto;
+import mg.fizanakara.api.dto.admins.UpdateAdminDto;
 import mg.fizanakara.api.models.enums.Gender;
 import mg.fizanakara.api.repository.AdminsRepository;
 import mg.fizanakara.api.repository.RefreshTokenRepository;

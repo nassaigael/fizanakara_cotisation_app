@@ -2,9 +2,9 @@ package mg.fizanakara.api.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mg.fizanakara.api.dto.ChildrenCreateDto;
-import mg.fizanakara.api.dto.ChildrenResponseDto;
-import mg.fizanakara.api.dto.ChildrenUpdateDto;
+import mg.fizanakara.api.dto.children.ChildrenCreateDto;
+import mg.fizanakara.api.dto.children.ChildrenResponseDto;
+import mg.fizanakara.api.dto.children.ChildrenUpdateDto;
 import mg.fizanakara.api.services.ChildrenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

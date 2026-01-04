@@ -2,7 +2,7 @@ package mg.fizanakara.api.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mg.fizanakara.api.dto.DistrictDto;
+import mg.fizanakara.api.dto.districts.DistrictDto;
 import mg.fizanakara.api.models.District;
 import mg.fizanakara.api.services.DistrictService;
 import org.springframework.http.HttpStatus;

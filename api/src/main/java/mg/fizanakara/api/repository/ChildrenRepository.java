@@ -33,6 +33,9 @@ public interface ChildrenRepository extends JpaRepository<Children, String> {
                                     @Param("memberId") String memberId,
                                     @Param("currentId") String currentId);
 
+    @Query("SELECT c FROM Children c WHERE :yearValue - YEAR(c.birthDate) > 18 OR (:yearValue = YEAR(c.birthDate) AND MONTH(c.birthDate) < 12 AND DAY(c.birthDate) <= 31)")
+    List<Children> findEligibleChildrenForContribution(@Param("yearValue") int yearValue);
+
     @Query("SELECT c FROM Children c WHERE c.district.id = :districtId")
     List<Children> findByDistrictId(@Param("districtId") Long districtId);
 

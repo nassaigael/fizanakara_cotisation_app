@@ -1,30 +1,29 @@
 import { useState, useEffect } from "react";
 import { memberService } from "../services/memberService";
-import type { Member } from "../utils/types/types";
+import { toast } from "react-hot-toast"; // Utilisons toast au lieu d'alert
+import type { Member, Gender } from "../utils/types/types";
 
 export const useMemberForm = (onSuccess: () => void, initialData?: Member | null) => {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<Partial<Member>>({
-    first_name: "",
-    last_name: "",
-    phone_number: "",
-    gender: "MALE",
-    status: "Étudiant",
-    birth_date: "",
-    district_id: 1,
-    tribute_id: 1,
-    cotisationStatus: "Impayé"
+  const [formData, setFormData] = useState({
+    firstName: "", lastName: "", phoneNumber: "", email: "",
+    birthDate: "", gender: "MALE" as Gender, status: "Etudiant", 
+    imageUrl: "", districtName: "", tributeName: ""
   });
 
-  // Si on reçoit des données initiales (Mode Édition), on pré-remplit le formulaire
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
-    } else {
       setFormData({
-        first_name: "", last_name: "", phone_number: "",
-        gender: "MALE", status: "Étudiant", birth_date: "",
-        district_id: 1, tribute_id: 1, cotisationStatus: "Impayé"
+        firstName: initialData.firstName || "",
+        lastName: initialData.lastName || "",
+        phoneNumber: initialData.phoneNumber || "",
+        email: initialData.email || "",
+        birthDate: initialData.birthDate ? initialData.birthDate.split('T')[0] : "",
+        gender: initialData.gender || "MALE",
+        status: (initialData.status as any) || "Etudiant",
+        imageUrl: initialData.imageUrl || "",
+        districtName: initialData.district?.name || "",
+        tributeName: initialData.tribute?.name || ""
       });
     }
   }, [initialData]);
@@ -39,15 +38,15 @@ export const useMemberForm = (onSuccess: () => void, initialData?: Member | null
     setLoading(true);
     try {
       if (initialData?.id) {
-        // Logique UPDATE
         await memberService.update(initialData.id, formData);
+        toast.success("Membre mis à jour");
       } else {
-        // Logique CREATE
-        await memberService.create(formData);
+        await memberService.createWithDependencies(formData);
+        toast.success("Membre créé avec succès");
       }
       onSuccess();
     } catch (err) {
-      alert("Erreur lors de l'enregistrement");
+      toast.error("Erreur lors de l'enregistrement");
     } finally {
       setLoading(false);
     }

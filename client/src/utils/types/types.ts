@@ -1,13 +1,69 @@
-// src/utils/types/index.ts
+export type Gender = "MALE" | "FEMALE"; 
+export type CotisationStatus = "Payé" | "En cours";
+export type Status = 'ETUDIANT' | 'TRAVAILLEUR' | 'ENFANT'; 
+export type PaymentMethod = "Liquide" | "MVola" | "Orange Money" | "Airtel Money" | "Virement";
+export type UIVariant = "success" | "warning" | "info" | "danger";
 
-import React from 'react';
+export interface UserBase {
+  id: string | number;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  gender: Gender;
+  imageUrl: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
-// --- ENUMS ---
-export type Gender = "MALE" | "FEMELLE"; 
-export type CotisationStatus = "Payé" | "En cours" | "En attente" | "Impayé";
-export type Status = 'Étudiant' | 'Travailleur';
+export interface District {
+  id: number;
+  name: string;
+}
 
-// --- INTERFACES UI ---
+export interface Tribute {
+  id: number;
+  name: string;
+}
+
+export interface Admin extends UserBase {
+  email: string; // L'email est requis pour l'admin
+  sequenceNumber?: number;
+  birthDate: string;
+  verified: boolean;
+  role?: 'ADMIN' | 'SUPER_ADMIN';
+}
+
+export type AdminResponse = Admin;
+
+export interface UpdateAdminDto extends Partial<Omit<Admin, 'id' | 'sequenceNumber' | 'createdAt'>> {
+  password?: string;
+}
+
+export interface PaymentHistory {
+  id: string | number;
+  amount: number;
+  date: string;
+  year: number;
+  method?: PaymentMethod;
+  reference?: string; 
+  status?: string;
+}
+
+export interface Member extends UserBase {
+  status: Status;
+  birthDate?: string;
+  // --- AJOUTS POUR COMPATIBILITÉ DTO ---
+  districtName?: string; 
+  tributeName?: string;
+  district?: District; 
+  tribute?: Tribute;
+  districtId?: number; 
+  tributeId?: number;  
+  cotisationStatus?: CotisationStatus;
+  payments: PaymentHistory[]; 
+}
+
+// ... Reste des interfaces (AlertProps, ButtonProps, etc. identiques à ton fichier)
 export interface AlertProps {
   isOpen: boolean;
   title: string;
@@ -15,94 +71,14 @@ export interface AlertProps {
   onClose: () => void;
   onConfirm: () => void;
   confirmText?: string;
-  cancelText?: string;
-  variant?: "success" | "warning" | "info" | "danger"; 
-}
-
-export interface InputProps {
-    label?: string;
-    placeholder?: string;
-    value: string;
-    type?: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-    icon?: React.ReactElement;
-    name?: string;
-}
-
-export interface ButtonProps {
-  children: React.ReactNode;
-  onClick?: () => void;
-  className?: string;
-  type?: "button" | "submit";
-  to?: string;
-  variant?: "primary" | "ghost" | "danger";
-  isActive?: boolean;
-}
-
-// --- DOMAINE (Respect strict des colonnes SQL / Entités Java) ---
-
-/**
- * Interface Admin : Correspond à la table "admins" et la super-classe "users"
- */
-export interface Admin {
-  id: string;
-  email: string;
-  password?: string; // Optionnel car souvent masqué par le backend
-  verified: boolean;
-  // Champs hérités de la table "users" (snake_case)
-  sequence_number: number;
-  first_name: string;
-  last_name: string;
-  birth_date: string;
-  gender: Gender;
-  image_url: string;
-  phone_number: string;
-  created_at: string;
-}
-
-/**
- * Interface Member : Correspond à la table "members"
- */
-export interface Member {
-  id: string;
-  status: Status;
-  district_id: number; // Foreign Key
-  tribute_id: number;  // Foreign Key
-  // Champs hérités de la table "users"
-  sequence_number: number;
-  first_name: string;
-  last_name: string;
-  birth_date: string;
-  gender: Gender;
-  image_url: string;
-  phone_number: string;
-  created_at: string;
-  cotisationStatus?: CotisationStatus;
-}
-
-// --- AUTHENTIFICATION ---
-
-/**
- * Doit matcher les clés de la Map renvoyée par AdminsAuthController.java
- */
-export interface AuthResponse {
-    user: Admin;          // La clé dans Map.of("user", admin)
-    accessToken: string;   // La clé dans Map.of("accessToken", token)
-    refreshToken: string;
+  variant?: UIVariant; 
 }
 
 export interface AuthContextType {
   admin: Admin | null;
   token: string | null;
-  login: (email: string, pass: string, remember: boolean) => Promise<void>;
+  loading: boolean;
+  login: (email: string, pass: string) => Promise<void>;
   logout: () => void;
-}
-// src/utils/types.ts (ou le fichier correspondant)
-
-export interface AuthContextType {
-  admin: Admin | null;
-  token: string | null;
-  loading: boolean; // <--- AJOUTE CETTE LIGNE
-  login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
-  logout: () => void;
+  updateAdminState: (updatedAdmin: Admin) => void;
 }

@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "districts")  // Table name in English
-@EntityListeners(AuditingEntityListener.class)  // Pour auditing (createdAt auto)
+@Table(name = "districts")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -41,5 +41,6 @@ public class District {
 
     @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<Members> members = new ArrayList<>();
 }

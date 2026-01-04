@@ -1,32 +1,38 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import type { ButtonProps } from "../../utils/types/types";
+import React, { memo } from 'react';
+import { Link } from 'react-router-dom';
+import type { ButtonProps } from '../../utils/types/types';
+import { THEME } from '../../styles/theme';
 
-// Ajout de disabled dans l'interface si nécessaire ou utilisation directe
-interface ExtendedButtonProps extends ButtonProps {
-    disabled?: boolean;
-}
-
-const Button: React.FC<ExtendedButtonProps> = ({
+const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
   to,
   variant = "primary",
-  isActive = false,
   className = "",
   type = "button",
   disabled = false,
 }) => {
-  const baseStyles = "inline-flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-300 transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100";
   
-  const variants: Record<string, string> = {
-    primary: "bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-200 hover:shadow-red-300 hover:-translate-y-0.5",
-    danger: "bg-red-50 text-red-600 border border-red-100 hover:bg-red-600 hover:text-white",
-    ghost: `text-gray-600 hover:bg-red-50 hover:text-red-600 ${isActive ? "bg-red-50 text-red-600 border-r-4 border-red-600 rounded-r-none" : ""}`,
+  const baseStyles = `relative flex items-center justify-center gap-3 px-6 py-3 rounded-2xl ${THEME.font.black} text-[11px] transition-all duration-100 select-none disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-y-0`;
+  
+  const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
+    primary: `
+      bg-brand-primary text-white 
+      border-b-4 border-brand-primary-dark 
+      hover:brightness-110
+      active:border-b-0 active:translate-y-1
+    `,
+    secondary: `
+      bg-white text-brand-muted 
+      border-2 border-b-4 border-brand-border 
+      hover:bg-brand-bg 
+      active:border-b-2 active:translate-y-0.5
+    `,
+    ghost: "text-brand-muted hover:text-brand-primary border-none bg-transparent active:scale-95",
+    danger: "bg-red-500 text-white border-b-4 border-red-700 hover:bg-red-600 active:border-b-0 active:translate-y-1"
   };
 
-  const selectedVariant = variants[variant] || variants.primary;
-  const finalClass = `${baseStyles} ${selectedVariant} ${className}`;
+  const finalClass = `${baseStyles} ${variants[variant] || variants.primary} ${className}`;
 
   if (to && !disabled) {
     return (
@@ -42,10 +48,11 @@ const Button: React.FC<ExtendedButtonProps> = ({
       onClick={onClick}
       className={finalClass}
       disabled={disabled}
+      aria-disabled={disabled}
     >
       {children}
     </button>
   );
 };
 
-export default Button;
+export default memo(Button);

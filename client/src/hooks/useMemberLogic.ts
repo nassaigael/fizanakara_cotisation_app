@@ -1,85 +1,86 @@
-import { useState, useMemo, useEffect } from "react";
-import type { Member } from "../utils/types/types";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { memberService } from "../services/memberService";
+import { toast } from "react-hot-toast";
+import type { Member } from "../utils/types/types";
+import { getFinancials } from "../utils/FinanceHelper";
 
 export const useMemberLogic = () => {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-  
-  const [search, setSearch] = useState("");
-  const [filterSex, setFilterSex] = useState("");
-  const [filterTribe, setFilterTribe] = useState(""); 
-  const [filterCotisation, setFilterCotisation] = useState("");
+    const [members, setMembers] = useState<Member[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+    
+    const [search, setSearch] = useState("");
+    const [filterSex, setFilterSex] = useState("");
+    const [filterDistrict, setFilterDistrict] = useState("");
+    const [filterTribe, setFilterTribe] = useState("");
+    const [filterCotisation, setFilterCotisation] = useState("");
+    const refreshMembers = useCallback(async () => {
+        try {
+            const data = await memberService.getAll();
+            setMembers(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error("Erreur sync:", err);
+            toast.error("Échec de la synchronisation");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-  useEffect(() => {
-    const fetchMembers = async () => {
-      setLoading(true);
-      try {
-        const data = await memberService.getAll();
-        setMembers(data || []); // Si pas de données, tableau vide (zéro membre)
-      } catch (err: any) {
-        console.error("Erreur de récupération des membres:", err);
-        setError("Impossible de charger les membres. Vérifiez votre connexion.");
-      } finally {
-        setLoading(false);
-      }
+    useEffect(() => { 
+        refreshMembers(); 
+    }, [refreshMembers]);
+
+    const filteredMembers = useMemo(() => {
+        return members.filter(m => {
+            const matchSearch = !search || 
+                `${m.firstName} ${m.lastName} ${m.phoneNumber}`
+                .toLowerCase().includes(search.toLowerCase());
+            const matchSex = !filterSex || m.gender === filterSex;
+            const currentDistrict = m.districtName || m.district?.name;
+            const matchDistrict = !filterDistrict || currentDistrict === filterDistrict;
+            const currentTribe = m.tributeName || m.tribute?.name;
+            const matchTribe = !filterTribe || currentTribe === filterTribe;
+            const { reste } = getFinancials(m);
+            const isPaye = reste <= 0;
+            const matchCotisation = !filterCotisation || 
+                (filterCotisation === "Payé" ? isPaye : !isPaye);
+
+            return matchSearch && matchSex && matchDistrict && matchTribe && matchCotisation;
+        });
+    }, [members, search, filterSex, filterDistrict, filterTribe, filterCotisation]);
+    const handleSelect = (id: string) => {
+        setSelectedMembers(prev => 
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
     };
-    fetchMembers();
-  }, []);
 
-  const filteredMembers = useMemo(() => {
-    return members.filter(m => {
-      // Filtrage sécurisé (au cas où des champs seraient null en DB)
-      const firstName = m.first_name || "";
-      const lastName = m.last_name || "";
-      const phone = m.phone_number || "";
-      
-      const searchStr = `${firstName} ${lastName} ${phone}`.toLowerCase();
-      const matchesSearch = searchStr.includes(search.toLowerCase());
-      const matchesSex = filterSex ? m.gender === filterSex : true;
-      const matchesCotisation = filterCotisation ? m.cotisationStatus === filterCotisation : true;
-      const matchesTribe = filterTribe ? String(m.tribute_id) === filterTribe : true;
+    const handleSelectAll = (checked: boolean) => {
+        setSelectedMembers(checked ? filteredMembers.map(m => String(m.id)) : []);
+    };
 
-      return matchesSearch && matchesSex && matchesCotisation && matchesTribe;
-    });
-  }, [members, search, filterSex, filterTribe, filterCotisation]);
+    const deleteAction = async (ids: string[]) => {
+        try {
+            await Promise.all(ids.map(id => memberService.delete(id)));
+            toast.success(ids.length > 1 ? "Membres supprimés" : "Membre supprimé");
+            await refreshMembers(); 
+            setSelectedMembers([]);
+        } catch (err) {
+            toast.error("Erreur lors de la suppression");
+        }
+    };
 
-  // Fonctions de sélection
-  const handleSelect = (id: string) => {
-    setSelectedMembers(prev => 
-      prev.includes(id) ? prev.filter(mid => mid !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = (isChecked: boolean) => {
-    setSelectedMembers(isChecked ? filteredMembers.map(m => m.id) : []);
-  };
-
-  // Action de suppression réelle
-  const deleteAction = async (ids: string[]) => {
-    try {
-        // Optionnel : Activer l'appel API si ton backend supporte le delete-batch
-        // await memberService.deleteMultiple(ids);
-        
-        // Mise à jour optimiste de l'UI
-        setMembers(prev => prev.filter(m => !ids.includes(m.id)));
-        setSelectedMembers([]);
-    } catch (err) {
-        alert("Erreur lors de la suppression sur le serveur");
-    }
-  };
-
-  return {
-    members: filteredMembers,
-    loading,
-    error,
-    search, setSearch,
-    filterSex, setFilterSex,
-    filterTribe, setFilterTribe,
-    filterCotisation, setFilterCotisation,
-    selectedMembers, handleSelect, handleSelectAll,
-    deleteAction
-  };
+    return {
+        members: filteredMembers,
+        loading,
+        search, setSearch,
+        filterSex, setFilterSex,
+        filterDistrict, setFilterDistrict,
+        filterTribe, setFilterTribe,
+        filterCotisation, setFilterCotisation,
+        selectedMembers,
+        handleSelect,
+        handleSelectAll,
+        deleteAction,
+        refreshMembers
+    };
 };

@@ -28,6 +28,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PATCH, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class AdminsAuthController {
     private final AuthenticationManager authenticationManager;
     private final AdminsService adminsService;
@@ -42,7 +43,7 @@ public class AdminsAuthController {
                 .firstName(req.getFirstName())
                 .lastName(req.getLastName())
                 .birthDate(req.getBirthDate())
-                .gender(Gender.valueOf(req.getGender()))
+                .gender(Gender.valueOf(req.getGender().toUpperCase()))
                 .imageUrl(req.getImageUrl())
                 .phoneNumber(req.getPhoneNumber())
                 .email(req.getEmail())
@@ -65,7 +66,10 @@ public class AdminsAuthController {
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             String accessToken = jwtUtil.generateAccessToken(req.getEmail());
-            Admins admin = adminsService.findByEmail(req.getEmail()).orElseThrow();
+            // ✅ Fix Null Safety: Ajout d'une gestion d'exception si non trouvé
+            Admins admin = adminsService.findByEmail(req.getEmail())
+                    .orElseThrow(() -> new AdminsException("Admin non trouvé après authentification"));
+            
             var rt = refreshTokenService.createRefreshToken(admin);
 
             log.info("Login success of : {}", req.getEmail());
@@ -114,6 +118,8 @@ public class AdminsAuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> body) {
         String token = body.get("refreshToken");
+        if (token == null) return ResponseEntity.badRequest().body("Token requis");
+
         var stored = refreshTokenService.findByToken(token);
         if (stored.getExpiryDate().isBefore(java.time.Instant.now())) {
             refreshTokenService.deleteByToken(token);
@@ -140,7 +146,7 @@ public class AdminsAuthController {
         String token = body.get("token");
         String newPassword = body.get("newPassword");
         passwordResetService.resetPassword(token, newPassword);
-        log.info("Password reset with success for token : {}", token.substring(0, 8) + "...");
+        log.info("Password reset with success for token : {}", token != null ? token.substring(0, Math.min(token.length(), 8)) + "..." : "null");
         return ResponseEntity.ok("Password reset successfully.");
     }
 
@@ -148,7 +154,9 @@ public class AdminsAuthController {
     public ResponseEntity<?> me(Authentication authentication) {
         if (authentication == null) return ResponseEntity.status(401).body("Unauthorized");
         String email = authentication.getName();
-        Admins admin = adminsService.findByEmail(email).orElseThrow();
+        // ✅ Fix Null Safety: Utilisation de findByEmail avec gestion d'erreur
+        Admins admin = adminsService.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Profil non trouvé pour : " + email));
         log.debug("Profile recuperate for : {}", email);
         return ResponseEntity.ok(new AdminResponseDto(admin));
     }

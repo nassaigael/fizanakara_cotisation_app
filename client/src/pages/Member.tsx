@@ -1,206 +1,220 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { 
-  AiOutlineSearch, AiOutlineEye, AiOutlineEdit, AiOutlineDelete,
-  AiOutlineCheckCircle, AiOutlineCloseCircle, AiOutlineClockCircle,
-  AiOutlineUnorderedList, AiOutlinePlus,
-  AiOutlineFilter,
-  AiOutlineSafetyCertificate
+  AiOutlineSearch, AiOutlineEye, AiOutlineDelete, AiOutlineEdit,
+  AiOutlinePlus, AiOutlineFilter 
 } from "react-icons/ai";
 
+import { 
+  Alert, Popup, Button, ActionButton, 
+  MemberFormModal, FilterSelect 
+} from "../components"; 
+
 import { useMemberLogic } from "../hooks/useMemberLogic";
-import Button from "../components/ui/Button";
-import Alert from "../components/ui/Alert";
-import Popup from "../components/layout/Popup";
-import { TRIBES, COTISATION_STATUSES} from "../utils/constants/constants";
-import type { CotisationStatus, Member } from "../utils/types/types";
+import { getImageUrl } from "../utils/constants/constants";
+import { getFinancials } from "../utils/FinanceHelper";
+import { THEME } from "../styles/theme";
+import type { Member as MemberType } from "../utils/types/types";
 
-// Composant Interne pour les icônes de statut
-const CotisationIcon = ({ status }: { status?: CotisationStatus }) => {
-    switch (status) {
-        case "Payé": return <AiOutlineCheckCircle size={20} className="text-green-500" />;
-        case "En cours": return <AiOutlineClockCircle size={20} className="text-yellow-500" />;
-        case "En attente": return <AiOutlineClockCircle size={20} className="text-blue-500" />;
-        case "Impayé": return <AiOutlineCloseCircle size={20} className="text-red-500" />;
-        default: return <AiOutlineClockCircle size={20} className="text-gray-300" />;
-    }
-};
-
-const MemberPage: React.FC = () => {
+const Member: React.FC = () => {
     const { 
-        members, loading, search, setSearch,
-        filterSex, setFilterSex,
-        filterTribe, setFilterTribe,
-        filterCotisation, setFilterCotisation,
-        selectedMembers, handleSelect, handleSelectAll, deleteAction
+        members, loading, search, setSearch, 
+        filterSex, setFilterSex, 
+        filterDistrict, setFilterDistrict, 
+        filterTribe, setFilterTribe, 
+        filterCotisation, setFilterCotisation, 
+        selectedMembers, handleSelect, handleSelectAll, 
+        deleteAction, refreshMembers 
     } = useMemberLogic();
 
-    const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
-    const [memberToView, setMemberToView] = useState<Member | null>(null);
-    const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [modals, setModals] = useState<{
+        form: boolean, edit: MemberType | null, view: MemberType | null
+    }>({ form: false, edit: null, view: null });
+
+    const [alert, setAlert] = useState({ isOpen: false, title: "", message: "", onConfirm: () => {} });
+    const districtOptions = useMemo(() => 
+        Array.from(new Set(members.map(m => m.districtName || m.district?.name).filter(Boolean)))
+            .map(name => ({ l: name as string, v: name as string })), 
+    [members]);
+
+    const tributeOptions = useMemo(() => 
+        Array.from(new Set(members.map(m => m.tributeName || m.tribute?.name).filter(Boolean)))
+            .map(name => ({ l: name as string, v: name as string })), 
+    [members]);
 
     if (loading) return (
-        <div className="flex h-screen items-center justify-center bg-gray-50">
-            <div className="text-center font-black text-red-500 animate-pulse text-xl uppercase tracking-widest">
-                Chargement de la base de données...
-            </div>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+            <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+            <p className="font-black text-brand-muted uppercase text-xs tracking-widest">Synchronisation...</p>
         </div>
     );
 
     return (
-        <div className="p-6 sm:p-10 bg-gray-50 min-h-screen">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 pb-4 border-b border-red-100 gap-4">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight flex items-center gap-3">
-                    <AiOutlineUnorderedList className="text-red-500" /> Annuaire Mixte
-                </h1>
-                <Button to="/admin/member/add" variant="primary">
-                    <AiOutlinePlus size={20} /> Nouveau Membre
+        <div className="p-8 space-y-6">
+            <div className="flex justify-between items-end">
+                <div>
+                    <h1 className={`text-4xl ${THEME.font.black} text-brand-text uppercase leading-none`}>Membres</h1>
+                    <p className="text-brand-muted font-bold text-[10px] uppercase mt-2 tracking-widest opacity-60">
+                        Base de données Fizanakara
+                    </p>
+                </div>
+                <Button onClick={() => setModals({...modals, form: true, edit: null})} variant="primary">
+                    <AiOutlinePlus className="mr-2" size={20}/> Nouveau Membre
                 </Button>
             </div>
 
-            {/* Actions Bar */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm mb-6 flex flex-wrap gap-4 items-center border border-gray-100">
-                <div className="relative grow min-w-[250px]">
-                    <AiOutlineSearch className="absolute left-3 top-3.5 text-gray-400" size={20}/>
-                    <input
-                        type="text"
-                        placeholder="Nom, matricule, téléphone..."
-                        value={search}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-100 rounded-xl focus:ring-2 focus:ring-red-500 outline-none bg-gray-50/50 transition"
-                        onChange={(e) => setSearch(e.target.value)}
+            <div className="flex gap-4">
+                <div className="relative flex-1">
+                    <AiOutlineSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-muted" size={20}/>
+                    <input 
+                        type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Rechercher par nom, matricule ou téléphone..." 
+                        className={THEME.input + " pl-14 h-14 rounded-2xl shadow-sm"} 
                     />
                 </div>
-
-                <button
-                    onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
-                    className={`flex items-center gap-2 py-3 px-6 rounded-xl font-bold border transition-all ${
-                        isFilterPanelOpen ? 'bg-red-600 text-white border-red-600 shadow-lg' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                <button 
+                    onClick={() => setIsFilterOpen(!isFilterOpen)} 
+                    className={`flex items-center gap-2 px-8 py-4 border-2 rounded-2xl font-black text-[10px] transition-all duration-300 ${
+                        isFilterOpen ? 'bg-brand-text text-white border-brand-text shadow-lg' : 'bg-white border-brand-border text-brand-text hover:bg-brand-bg'
                     }`}
                 >
-                    <AiOutlineFilter size={20} /> Filtres
+                    <AiOutlineFilter size={18}/> {isFilterOpen ? 'FERMER' : 'FILTRES'}
                 </button>
             </div>
-
-            {/* Filters Panel */}
-            <div className={`bg-white rounded-2xl shadow-inner transition-all duration-300 overflow-hidden ${isFilterPanelOpen ? "max-h-[500px] p-6 border mb-8" : "max-h-0 p-0"}`}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Genre</label>
-                        <div className="flex p-1 bg-gray-100 rounded-lg">
-                            {["", "MALE", "FEMELLE"].map((g) => (
-                                <button 
-                                    key={g}
-                                    onClick={() => setFilterSex(g as any)} 
-                                    className={`flex-1 py-2 rounded-md text-xs font-bold transition ${filterSex === g ? "bg-white text-red-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-                                >
-                                    {g === "" ? "Tous" : g === "MALE" ? "Hommes" : "Femmes"}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Tribu</label>
-                        <select value={filterTribe} onChange={(e) => setFilterTribe(e.target.value)} className="w-full border-gray-200 border p-2.5 rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-red-500">
-                            <option value="">Toutes les origines</option>
-                            {TRIBES.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Cotisation</label>
-                        <select value={filterCotisation} onChange={(e) => setFilterCotisation(e.target.value)} className="w-full border-gray-200 border p-2.5 rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-red-500">
-                            <option value="">Tous les statuts</option>
-                            {COTISATION_STATUSES.map(c => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                    </div>
+            {isFilterOpen && (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-white rounded-3xl border-2 border-brand-border animate-in slide-in-from-top-4 duration-300 shadow-xl">
+                    <FilterSelect label="Genre" value={filterSex} onChange={setFilterSex} options={[{l:'Homme', v:'MALE'}, {l:'Femme', v:'FEMALE'}]} />
+                    <FilterSelect label="Quartier" value={filterDistrict} onChange={setFilterDistrict} options={districtOptions} />
+                    <FilterSelect label="Tribu" value={filterTribe} onChange={setFilterTribe} options={tributeOptions} />
+                    <FilterSelect label="État Caisse" value={filterCotisation} onChange={setFilterCotisation} options={[{l:'À jour', v:'Payé'}, {l:'En retard', v:'En cours'}]} />
                 </div>
-            </div>
-
-            {/* Table Container */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-x-auto">
-                <table className="w-full text-left">
-                    <thead className="bg-gray-50 border-b border-gray-100">
-                        <tr className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                            <th className="p-5 w-12 text-center">
-                                <input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} className="accent-red-500 w-4 h-4" />
+            )}
+            {selectedMembers.length > 0 && (
+                <div className="flex items-center justify-between p-4 bg-red-50 border-2 border-red-200 rounded-2xl animate-in fade-in zoom-in-95">
+                    <div className="flex items-center gap-3">
+                        <span className="flex items-center justify-center w-8 h-8 bg-red-600 text-white rounded-full font-black text-xs shadow-md">
+                            {selectedMembers.length}
+                        </span>
+                        <p className="text-[11px] font-black text-red-700 uppercase">Sélectionnés</p>
+                    </div>
+                    <button 
+                        onClick={() => setAlert({
+                            isOpen: true, 
+                            title: "SUPPRESSION MULTIPLE", 
+                            message: `Confirmer la suppression de ${selectedMembers.length} membres ?`,
+                            onConfirm: () => deleteAction(selectedMembers)
+                        })}
+                        className="px-6 py-2 bg-red-600 text-white rounded-xl font-black text-[10px] hover:bg-red-700 transition-all shadow-md active:scale-95"
+                    >
+                        SUPPRIMER DÉFINITIVEMENT
+                    </button>
+                </div>
+            )}
+            <div className="bg-white border-2 border-brand-border rounded-[2.5rem] shadow-sm overflow-hidden">
+                <table className="w-full border-collapse">
+                    <thead className="bg-brand-bg/50 border-b-2 border-brand-border">
+                        <tr className={`text-[10px] ${THEME.font.black} text-brand-muted uppercase tracking-widest`}>
+                            <th className="p-5 w-14 text-center">
+                                <input 
+                                    type="checkbox" 
+                                    className="w-4 h-4 rounded border-brand-border text-brand-primary focus:ring-brand-primary"
+                                    onChange={(e) => handleSelectAll(e.target.checked)} 
+                                />
                             </th>
-                            <th className="p-5">Membre</th>
-                            <th className="p-5">Coordonnées</th>
-                            <th className="p-5">Catégorie</th>
-                            <th className="p-5 text-center">Cotisation</th>
-                            <th className="p-5 text-right">Options</th>
+                            <th className="p-5 text-left">Membre</th>
+                            <th className="p-5 text-left">Localisation</th>
+                            <th className="p-5 text-left">Cotisation</th>
+                            <th className="p-5 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-50">
-                        {members.map(member => (
-                            <tr key={member.id} className={`group transition-colors hover:bg-red-50/20 ${selectedMembers.includes(member.id) ? "bg-red-50/50" : ""}`}>
-                                <td className="p-5 text-center">
-                                    <input 
-                                        type="checkbox" 
-                                        checked={selectedMembers.includes(member.id)} 
-                                        onChange={() => handleSelect(member.id)} 
-                                        className="accent-red-500 w-4 h-4" 
-                                    />
-                                </td>
-                                <td className="p-5">
-                                    <div className="flex items-center gap-4">
-                                        <div className="relative shrink-0">
+                    <tbody className="divide-y divide-brand-bg">
+                        {members.length > 0 ? members.map(m => {
+                            const { paye, reste } = getFinancials(m);
+                            return (
+                                <tr key={m.id} className="group hover:bg-brand-bg/30 transition-all duration-200">
+                                    <td className="p-5 text-center">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={selectedMembers.includes(String(m.id))} 
+                                            onChange={() => handleSelect(String(m.id))}
+                                            className="w-4 h-4 rounded border-brand-border text-brand-primary focus:ring-brand-primary"
+                                        />
+                                    </td>
+                                    <td className="p-5">
+                                        <div className="flex items-center gap-4">
                                             <img 
-                                                src={member.image_url || 'https://ui-avatars.com/api/?name=' + member.first_name} 
-                                                className="w-12 h-12 rounded-2xl border-2 border-white shadow-sm object-cover" 
-                                                alt="avatar" 
+                                                src={getImageUrl(m.imageUrl, m.firstName)} 
+                                                className="w-12 h-12 rounded-2xl object-cover border-2 border-brand-border shadow-sm group-hover:scale-105 transition-transform" 
+                                                alt="" 
                                             />
-                                            {member.email && <AiOutlineSafetyCertificate className="absolute -top-1 -right-1 text-blue-500 bg-white rounded-full p-0.5 shadow-sm" size={18}/>}
+                                            <div>
+                                                <div className="font-black text-sm text-brand-text uppercase leading-tight">{m.firstName} {m.lastName}</div>
+                                                <div className="text-[10px] text-brand-primary font-bold mt-0.5">{m.phoneNumber || "SANS CONTACT"}</div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-gray-900 leading-tight">{member.first_name} {member.last_name}</p>
-                                            <p className="text-[10px] font-bold text-gray-400 mt-1 uppercase">
-                                                {member.email || `REF: ${member.sequence_number}`}
-                                            </p>
+                                    </td>
+                                    <td className="p-5">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-black text-brand-text uppercase">
+                                                {m.districtName || m.district?.name || "N/A"}
+                                            </span>
+                                            <span className="text-[9px] font-bold text-brand-muted uppercase">
+                                                {m.tributeName || m.tribute?.name || "N/A"}
+                                            </span>
                                         </div>
-                                    </div>
-                                </td>
-                                <td className="p-5">
-                                    <p className="text-sm font-bold text-gray-700">{member.phone_number || "Non renseigné"}</p>
-                                    <p className="text-[10px] text-gray-400 font-medium">Né(e) le {member.birth_date}</p>
-                                </td>
-                                <td className="p-5">
-                                    <span className={`px-3 py-1 text-[9px] font-black rounded-full border shadow-sm ${
-                                        member.email 
-                                        ? "bg-blue-50 text-blue-600 border-blue-100" 
-                                        : "bg-emerald-50 text-emerald-600 border-emerald-100"
-                                    }`}>
-                                        {member.email ? "ADMINISTRATEUR" : (member.status || "MEMBRE")}
-                                    </span>
-                                </td>
-                                <td className="p-5 text-center">
-                                    <div className="flex justify-center">
-                                        <CotisationIcon status={member.cotisationStatus} />
-                                    </div>
-                                </td>
-                                <td className="p-5 text-right space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => setMemberToView(member)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-xl transition"><AiOutlineEye size={18}/></button>
-                                    <button className="p-2 text-amber-500 hover:bg-amber-50 rounded-xl transition"><AiOutlineEdit size={18}/></button>
-                                    <button onClick={() => setIsDeletePopupOpen(true)} className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition"><AiOutlineDelete size={18}/></button>
+                                    </td>
+                                    <td className="p-5">
+                                        <div className={`inline-flex flex-col px-3 py-1 rounded-lg ${reste <= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
+                                            <span className={`text-[10px] font-black ${reste <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                {paye.toLocaleString()} Ar
+                                            </span>
+                                            {reste > 0 && (
+                                                <span className="text-[8px] font-bold text-red-400 uppercase tracking-tighter">
+                                                    Reste: {reste.toLocaleString()}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="p-5">
+                                        <div className="flex justify-end gap-2">
+                                            <ActionButton icon={<AiOutlineEye/>} onClick={() => setModals({...modals, view: m})} title="Voir Fiche" />
+                                            <ActionButton icon={<AiOutlineEdit/>} onClick={() => setModals({...modals, edit: m, form: true})} title="Modifier" />
+                                            <ActionButton icon={<AiOutlineDelete/>} onClick={() => setAlert({
+                                                isOpen: true, title: "SUPPRESSION", message: `Supprimer ${m.firstName} ?`,
+                                                onConfirm: () => deleteAction([String(m.id)])
+                                            })} color="hover:text-red-500 hover:bg-red-50" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        }) : (
+                            <tr>
+                                <td colSpan={5} className="p-20 text-center text-brand-muted font-bold uppercase text-[10px] tracking-widest">
+                                    Aucun membre trouvé
                                 </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
             </div>
-
-            {/* Modals */}
-            {memberToView && <Popup isOpen={true} member={memberToView} onClose={() => setMemberToView(null)} />}
-            
-            <Alert 
-                isOpen={isDeletePopupOpen} 
-                variant="danger" 
-                title="Confirmation" 
-                message={`Êtes-vous sûr de vouloir supprimer ${selectedMembers.length} membre(s) sélectionné(s) ? Cette action est irréversible.`} 
-                onConfirm={() => { deleteAction(selectedMembers); setIsDeletePopupOpen(false); }} 
-                onClose={() => setIsDeletePopupOpen(false)} 
+            <MemberFormModal 
+                isOpen={modals.form} 
+                memberToEdit={modals.edit} 
+                onClose={() => setModals({...modals, form: false})} 
+                onSuccess={refreshMembers} 
             />
+            
+            {modals.view && (
+                <Popup 
+                    isOpen={true} 
+                    member={modals.view} 
+                    onClose={() => setModals({...modals, view: null})} 
+                />
+            )}
+
+            <Alert {...alert} onClose={() => setAlert({...alert, isOpen: false})} />
         </div>
     );
 };
 
-export default MemberPage;
+export default Member;

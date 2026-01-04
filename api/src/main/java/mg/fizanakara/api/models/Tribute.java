@@ -34,5 +34,6 @@ public class Tribute {
 
     @OneToMany(mappedBy = "tribute", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<Members> members = new ArrayList<>();
 }

@@ -1,66 +1,93 @@
-import { createContext, useState, useEffect,type ReactNode } from 'react';
+import { createContext, useState, useEffect, type ReactNode, useCallback } from 'react';
 import api from '../services/api';
+import { authService } from '../services/authService';
 import type { Admin, AuthContextType } from '../utils/types/types';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [admin, setAdmin] = useState<Admin | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  // Initialisation avec vérification de sécurité sur le localStorage
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+  const [admin, setAdmin] = useState<Admin | null>(() => {
+    const savedAdmin = localStorage.getItem('admin');
+    if (!savedAdmin || savedAdmin === "undefined") return null;
+    try {
+      return JSON.parse(savedAdmin);
+    } catch (e) {
+      return null;
+    }
+  });
+
   const [loading, setLoading] = useState(true);
 
-  // Synchronisation du token avec Axios au démarrage
+  // Synchronisation du header Authorization d'Axios
   useEffect(() => {
-    const initializeAuth = async () => {
-      const savedToken = localStorage.getItem('token');
-      if (savedToken) {
-        try {
-          // Optionnel : On peut vérifier la validité du token ici via un endpoint /me
-          // const res = await api.get('/auth/me');
-          // setAdmin(res.data);
-          
-          // Pour l'instant on récupère l'admin stocké en local
-          const savedAdmin = localStorage.getItem('admin');
-          if (savedAdmin) setAdmin(JSON.parse(savedAdmin));
-        } catch (err) {
-          logout();
-        }
-      }
-      setLoading(false);
-    };
-    initializeAuth();
-  }, []);
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      delete api.defaults.headers.common['Authorization'];
+    }
+    setLoading(false);
+  }, [token]);
 
-  const login = async (email: string, password: string, rememberMe: boolean) => {
+  // ✅ FONCTION DE MISE À JOUR (Pour la Navbar et le Profil)
+  const updateAdminState = (updatedAdmin: Admin) => {
+    setAdmin({ ...updatedAdmin }); // On recrée un objet pour forcer le refresh React
+    localStorage.setItem('admin', JSON.stringify(updatedAdmin));
+  };
+
+  // ✅ LOGIN COMPLET (avec Token et RefreshToken)
+ const login = async (email: string, password: string) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
-      const { accessToken, adminData } = response.data;
-
-      setToken(accessToken);
-      setAdmin(adminData);
-
-      if (rememberMe) {
-        localStorage.setItem('token', accessToken);
-        localStorage.setItem('admin', JSON.stringify(adminData));
-      }
+      const data = await authService.login(email, password);
       
-      // On injecte le token manuellement pour la première requête après login
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Identifiants incorrects");
+      // ✅ ON "MAPPE" LES DONNÉES POUR CORRIGER LE BACKEND
+      const formattedUser: Admin = {
+        ...data.user,
+        // On transforme 'firstname' (backend) en 'firstName' (frontend)
+        firstName: data.user.firstName || data.user.firstName,
+        lastName: data.user.lastName || data.user.lastName,
+        // On s'assure que l'imageUrl est bien là (si le backend l'envoie enfin)
+        imageUrl: data.user.imageUrl || data.user.imageUrl || "" 
+      };
+
+      setToken(data.accessToken);
+      setAdmin(formattedUser);
+
+      localStorage.setItem('token', data.accessToken);
+      localStorage.setItem('admin', JSON.stringify(formattedUser));
+      
+      api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
+    } catch (error) {
+      console.error("Échec de connexion", error);
+      throw error;
     }
   };
 
-  const logout = () => {
+  const register = useCallback(async (userData: any) => {
+    return await authService.register(userData);
+  }, []);
+
+  // ✅ LOGOUT COMPLET (Nettoyage total)
+  const logout = useCallback(() => {
     setToken(null);
     setAdmin(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('admin');
     delete api.defaults.headers.common['Authorization'];
-  };
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ admin, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ 
+        admin, 
+        token, 
+        login, 
+        logout, 
+        register, 
+        loading, 
+        updateAdminState 
+    }}>
       {!loading && children}
     </AuthContext.Provider>
   );

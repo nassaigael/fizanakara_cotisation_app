@@ -30,6 +30,9 @@ public interface MemberRepository extends JpaRepository<Members, String> {
                                     @Param("status") MemberStatus status,
                                     @Param("currentId") String currentId);
 
+    @Query("SELECT m FROM Members m WHERE :yearValue - YEAR(m.birthDate) > 18 OR (:yearValue = YEAR(m.birthDate) AND MONTH(m.birthDate) < 12 AND DAY(m.birthDate) <= 31)")
+    List<Members> findEligibleMembersForContribution(@Param("yearValue") int yearValue);
+
     @Query("SELECT m FROM Members m WHERE m.district.id = :districtId")
     List<Members> findByDistrictId(@Param("districtId") Long districtId);
 

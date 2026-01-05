@@ -57,7 +57,7 @@ public class AdminsAuthController {
         return ResponseEntity.ok(new AdminResponseDto(saved));
     }
 
-    // LOGIN (public)
+    // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Validated LoginRequestDTO req) {
         try {

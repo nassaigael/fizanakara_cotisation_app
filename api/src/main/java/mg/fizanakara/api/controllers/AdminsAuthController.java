@@ -133,7 +133,7 @@ public class AdminsAuthController {
         return ResponseEntity.ok(Map.of("accessToken", accessToken));
     }
 
-    // FORGOT PASSWORD (public)
+    // FORGOT PASSWORD
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
         String email = body.get("email");

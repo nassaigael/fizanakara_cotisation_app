@@ -124,7 +124,7 @@ public class ChildrenService {
         return  mapToResponseDto(saved);
     }
 
-    // UPDATE partial (optional fields)
+    // UPDATE
     @Transactional
     public ChildrenResponseDto updateChild(String id, ChildrenUpdateDto dto) {
         log.info("Partial update for child - ID: {}, provided fields: firstName={}, lastName={}, birthDate={}, gender={}",

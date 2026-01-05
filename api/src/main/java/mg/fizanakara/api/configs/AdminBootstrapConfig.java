@@ -43,7 +43,7 @@ public class AdminBootstrapConfig {
                 adminRepository.save(superAdmin);
                 log.info("SuperAdmin initial créé : {}", superAdmin.getEmail());
             } else {
-                log.info("SuperAdmin existe déjà – bootstrap sauté.");
+                log.info("SuperAdmin exist déjà – bootstrap sauté.");
             }
         };
     }

@@ -48,8 +48,7 @@ public class PaymentService {
         // Fetch cotisation
         Contribution contribution = contributionRepository.findById(dto.getContributionId())
                 .orElseThrow(() -> new ContributionNotFoundException("Contribution not found with ID: " + dto.getContributionId()));
-
-        // Check overpayment avant création
+        
         BigDecimal currentTotalPaid = paymentRepository.getTotalPaidByContributionId(dto.getContributionId());
         if (currentTotalPaid == null) currentTotalPaid = BigDecimal.ZERO;
         BigDecimal projectedTotal = currentTotalPaid.add(dto.getAmountPaid());

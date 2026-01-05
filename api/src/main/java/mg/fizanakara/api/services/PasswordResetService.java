@@ -60,7 +60,7 @@ public class PasswordResetService {
             PasswordResetToken existingToken = existingTokenOpt.get();
             tokenRepo.delete(existingToken);
             tokenRepo.flush();
-            log.debug("Ancien token de reset supprimé pour admin : {}", admin.getEmail());
+            log.debug("old token of reset deleted of admin : {}", admin.getEmail());
         } else {
             log.debug("Aucun ancien token trouvé pour admin : {}", admin.getEmail());
         }

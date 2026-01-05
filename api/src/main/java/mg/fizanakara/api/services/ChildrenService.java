@@ -164,7 +164,15 @@ public class ChildrenService {
             child.setMember(member);
         }
 
-        if (childrenRepository.hasDuplicateByKeyFields(child.getFirstName(), child.getLastName(), child.getBirthDate(), child.getPhoneNumber(), child.getDistrict().getId(), child.getTribute().getId(), child.getStatus(), child.getMember().getId(), id)) {
+        if (childrenRepository.hasDuplicateByKeyFields(child.getFirstName(),
+                child.getLastName(),
+                child.getBirthDate(),
+                child.getPhoneNumber(),
+                child.getDistrict().getId(),
+                child.getTribute().getId(),
+                child.getStatus(),
+                child.getMember().getId(),
+                id)) {
             throw new IllegalArgumentException("Child with these details already exists for this member");
         }
 

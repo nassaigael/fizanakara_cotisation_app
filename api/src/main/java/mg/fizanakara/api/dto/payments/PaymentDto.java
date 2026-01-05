@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;  // ← MODIFIÉ : LocalDateTime pour heure précise
+import java.time.LocalDateTime;
 import mg.fizanakara.api.models.enums.PaymentStatus;
 
 @Data

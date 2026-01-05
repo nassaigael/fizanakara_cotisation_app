@@ -37,7 +37,7 @@ public class AdminsAuthController {
     private final RefreshTokenService refreshTokenService;
     private final PasswordResetService passwordResetService;
 
-    // REGISTER – ← FIX : Protégé par SUPERADMIN (seul superadmin crée admins)
+    // REGISTER
     @PreAuthorize("hasRole('SUPERADMIN')")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Validated RegisterRequestDTO req) throws AdminsException {

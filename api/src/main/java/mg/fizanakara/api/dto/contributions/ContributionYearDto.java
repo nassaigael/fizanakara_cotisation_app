@@ -8,5 +8,5 @@ import java.time.Year;
 @Data
 public class ContributionYearDto {
     @NotNull(message = "Year is required")
-    private Year year;  // Année pour génération batch (ex. : 2026)
+    private Year year;
 }

@@ -152,7 +152,7 @@ public class AdminsAuthController {
         return ResponseEntity.ok("Password reset successfully.");
     }
 
-    // GET ME – Protégé par ADMIN (self-access)
+    // GET ME
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admins/me")
     public ResponseEntity<?> me(Authentication authentication) {

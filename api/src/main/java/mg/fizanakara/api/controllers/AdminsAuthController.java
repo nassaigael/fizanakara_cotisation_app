@@ -95,7 +95,7 @@ public class AdminsAuthController {
         }
     }
 
-    // DELETE BY ID – Protégé par SUPERADMIN
+    // DELETE BY ID
     @PreAuthorize("hasRole('SUPERADMIN')")
     @DeleteMapping("/admins/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable String id) {

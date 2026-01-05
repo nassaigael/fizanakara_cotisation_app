@@ -109,8 +109,7 @@ public class ChildrenService {
         child.setId(child.generatedCustomId());
 
         Children saved = childrenRepository.save(child);
-
-        // ← FIX : Auto-génération single cotisation pour année courante si éligible (pas batch, childId = saved.getId())
+        
         Year currentYear = Year.now();  // 2026
         LocalDate dueDate = LocalDate.of(currentYear.getValue(), 12, 31);
         if (saved.getCreatedAt().isBefore(dueDate) && isEligibleForContribution(saved, currentYear)) {

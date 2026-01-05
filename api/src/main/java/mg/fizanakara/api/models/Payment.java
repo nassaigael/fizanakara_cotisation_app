@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter;
 public class Payment {
 
     @Id
-    private String id;  // "PAY2025-12-30T14:30:22"
+    private String id;
 
     @Column(nullable = false, precision = 10, scale = 2)
     @NotNull(message = "Amount paid is required")

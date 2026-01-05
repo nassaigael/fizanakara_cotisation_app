@@ -23,7 +23,7 @@ public class SequenceService {
             return nextVal;
         } catch (Exception e) {
             log.error("Error generation sequence {} : {}", seqName, e.getMessage());
-            throw new RuntimeException("Impossible de générer séquence " + seqName, e);
+            throw new RuntimeException("Impossible to generate sequence " + seqName, e);
         }
     }
 }

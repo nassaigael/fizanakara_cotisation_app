@@ -35,7 +35,7 @@ public class Payment {
     @Column(nullable = false)
     @NotNull(message = "Payment date is required")
     @Builder.Default
-    private LocalDateTime paymentDate = LocalDateTime.now();  // LocalDateTime pour heure précise
+    private LocalDateTime paymentDate = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
     @Column

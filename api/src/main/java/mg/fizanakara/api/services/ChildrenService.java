@@ -34,7 +34,7 @@ public class ChildrenService {
     private final TributeRepository tributeRepository;
     private final MemberRepository memberRepository;
     private final SequenceService sequenceService;
-    private final ContributionService contributionService;  // ← FIX : Pour auto single
+    private final ContributionService contributionService;
 
     // GET ALL
     @Transactional(readOnly = true)

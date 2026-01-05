@@ -78,7 +78,7 @@ public class ContributionService {
             Contribution contribution = createSingleContribution(year, amount, ContributionStatus.PENDING, member.getId(), null);
             created.add(mapToResponseDto(contribution));
         }
-        
+
         for (Children child : eligibleChildren) {
             String parentMemberId = child.getMember().getId();
             String childId = child.getId();
@@ -95,7 +95,6 @@ public class ContributionService {
         return created;
     }
 
-    // ← FIX : Création single pour membre (auto-génération)
     @Transactional
     public ContributionResponseDto createSingleContributionForMember(Year year, String memberId) {
         if (contributionRepository.hasDuplicateByMemberAndYear(memberId, year, null)) {

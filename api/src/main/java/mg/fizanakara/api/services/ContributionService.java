@@ -78,8 +78,7 @@ public class ContributionService {
             Contribution contribution = createSingleContribution(year, amount, ContributionStatus.PENDING, member.getId(), null);
             created.add(mapToResponseDto(contribution));
         }
-
-        // Génération pour enfants (childId = child ID)
+        
         for (Children child : eligibleChildren) {
             String parentMemberId = child.getMember().getId();
             String childId = child.getId();

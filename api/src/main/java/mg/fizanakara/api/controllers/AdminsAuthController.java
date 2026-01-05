@@ -164,7 +164,7 @@ public class AdminsAuthController {
         return ResponseEntity.ok(new AdminResponseDto(admin));
     }
 
-    // UPDATE ME – Protégé par ADMIN (self-update)
+    // UPDATE ME
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/admins/me")
     public ResponseEntity<?> updateMe(@RequestBody @Validated UpdateAdminDto req, Authentication authentication) {

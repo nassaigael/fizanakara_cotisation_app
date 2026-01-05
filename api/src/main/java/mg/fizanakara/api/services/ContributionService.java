@@ -205,7 +205,7 @@ public class ContributionService {
         contributionRepository.save(contribution);
     }
 
-    // Mapper vers DTO
+    // DTO
     private ContributionResponseDto mapToResponseDto(Contribution contribution) {
         ContributionResponseDto dto = new ContributionResponseDto();
         dto.setId(contribution.getId());

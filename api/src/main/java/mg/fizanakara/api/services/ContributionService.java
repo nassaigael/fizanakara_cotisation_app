@@ -238,8 +238,7 @@ public class ContributionService {
 
         return dto;
     }
-
-    // ← FIX : createSingleContribution avec suffix unique
+    
     private Contribution createSingleContribution(Year year, BigDecimal amount, ContributionStatus status, String memberId, String childId) {
         Members member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Member ID: " + memberId));

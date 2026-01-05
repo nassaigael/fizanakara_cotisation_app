@@ -62,7 +62,7 @@ public class PasswordResetService {
             tokenRepo.flush();
             log.debug("old token of reset deleted of admin : {}", admin.getEmail());
         } else {
-            log.debug("Aucun ancien token trouvé pour admin : {}", admin.getEmail());
+            log.debug("no old token found for admin : {}", admin.getEmail());
         }
 
         String token = UUID.randomUUID().toString();

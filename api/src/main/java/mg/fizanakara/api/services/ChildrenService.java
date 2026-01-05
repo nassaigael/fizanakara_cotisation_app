@@ -118,7 +118,6 @@ public class ChildrenService {
                 log.info("Auto-generated contribution for new child {} in year {}", saved.getId(), currentYear);
             } catch (Exception e) {
                 log.warn("Failed to auto-generate contribution for new child {}: {}", saved.getId(), e.getMessage());
-                // Non-bloquant
             }
         }
 

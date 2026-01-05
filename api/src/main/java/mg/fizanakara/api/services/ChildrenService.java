@@ -109,8 +109,8 @@ public class ChildrenService {
         child.setId(child.generatedCustomId());
 
         Children saved = childrenRepository.save(child);
-        
-        Year currentYear = Year.now();  // 2026
+
+        Year currentYear = Year.now();
         LocalDate dueDate = LocalDate.of(currentYear.getValue(), 12, 31);
         if (saved.getCreatedAt().isBefore(dueDate) && isEligibleForContribution(saved, currentYear)) {
             try {

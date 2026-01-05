@@ -251,10 +251,10 @@ public class ContributionService {
                 .member(member)
                 .childId(childId)
                 .build();
-        
+
         String suffix = String.format("%03d", sequenceCounter.getAndIncrement());
         contribution.setSequenceSuffix(suffix);
-        contribution.setId(contribution.generatedCustomId());  // "COT2026-001"
+        contribution.setId(contribution.generatedCustomId());
 
         return contributionRepository.save(contribution);
     }

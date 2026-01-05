@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/admins/districts")
+@RequestMapping("/api/admins/districts")
 @RequiredArgsConstructor
 @Slf4j
 public class DistrictController {

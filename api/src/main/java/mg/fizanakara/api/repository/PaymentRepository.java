@@ -11,7 +11,6 @@ import java.util.List;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, String> {
-    // Paiements par cotisation
     List<Payment> findByContributionId(String contributionId);
 
     // Somme payée par cotisation (query native pour perf)

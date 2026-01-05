@@ -19,7 +19,7 @@ public class SequenceService {
     public Long getNextSequence(String seqName) {
         try {
             Long nextVal = ((Number) em.createNativeQuery("SELECT nextval('" + seqName + "')").getSingleResult()).longValue();
-            log.debug("Séquence {} générée : {}", seqName, nextVal);
+            log.debug("Sequence {} generated : {}", seqName, nextVal);
             return nextVal;
         } catch (Exception e) {
             log.error("Erreur génération séquence {} : {}", seqName, e.getMessage());

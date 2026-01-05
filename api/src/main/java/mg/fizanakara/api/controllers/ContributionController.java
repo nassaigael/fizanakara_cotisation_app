@@ -17,7 +17,7 @@ import java.time.Year;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admins/contributions")
+@RequestMapping("/api/admins/contributions")
 @RequiredArgsConstructor
 @Slf4j
 public class ContributionController {

@@ -59,8 +59,8 @@ public class PaymentService {
             log.warn("Overpayment blocked for contribution {}: projected total {} > amount {} (surplus: {})",
                     dto.getContributionId(), projectedTotal, contribution.getAmount(), surplus);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Map.of(
-                    "error", "Surpaiement détecté",
-                    "message", String.format("Montant total projeté (%s) excède la cotisation (%s). Excédent : %s AR",
+                    "error", "Overpaid detected",
+                    "message", String.format("Amount total project (%s) overwrought the contribution (%s). excess : %s AR",
                             projectedTotal, contribution.getAmount(), surplus),
                     "contributionId", dto.getContributionId(),
                     "amountPaid", dto.getAmountPaid()

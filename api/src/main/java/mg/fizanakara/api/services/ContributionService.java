@@ -182,7 +182,6 @@ public class ContributionService {
         contributionRepository.delete(contribution);
     }
 
-    // Mise à jour status après paiement
     @Transactional
     public void updateContributionStatusAfterPayment(String contributionId) {
         Contribution contribution = contributionRepository.findById(contributionId)

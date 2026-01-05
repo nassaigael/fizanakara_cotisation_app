@@ -55,7 +55,7 @@ public class ContributionController {
         return ResponseEntity.ok(contributionService.updateContribution(id, dto));
     }
 
-    // DELETE
+    // DELETE BY ID
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteContribution(@PathVariable String id) {

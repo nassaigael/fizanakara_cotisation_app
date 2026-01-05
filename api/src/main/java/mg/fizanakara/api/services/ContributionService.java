@@ -67,7 +67,6 @@ public class ContributionService {
 
         List<ContributionResponseDto> created = new ArrayList<>();
 
-        // ← FIX : Reset compteur pour cette génération
         sequenceCounter.set(1);
 
         // Génération pour membres (childId = null)

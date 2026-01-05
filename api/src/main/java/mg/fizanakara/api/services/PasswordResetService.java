@@ -79,7 +79,6 @@ public class PasswordResetService {
         String resetLink = clientResetUrl + "?token=" + token;
         String emailBody = String.format(emailBodyTemplate, tokenExpirationMinutes, resetLink);
 
-        // Format To avec nom (du DB)
         String toAddress = admin.getFirstName() + " " + admin.getLastName() + " <" + admin.getEmail() + ">";
 
         String fromAddress = "FIZANAKARA <ton-email@gmail.com>";

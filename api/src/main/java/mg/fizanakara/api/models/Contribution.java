@@ -58,7 +58,7 @@ public class Contribution {
     @Column(name = "child_id", nullable = true)
     private String childId;
 
-    @Column(name = "sequence_suffix", nullable = true)  // ← FIX : Suffix pour ID unique ("001")
+    @Column(name = "sequence_suffix", nullable = true)
     private String sequenceSuffix;
 
     // ← FIX : Generated ID = "COT" + year + "-" + suffix (ex. : "COT2026-001")

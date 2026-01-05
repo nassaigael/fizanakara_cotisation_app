@@ -142,7 +142,7 @@ public class AdminsAuthController {
         return ResponseEntity.ok("Password reset email sent if the account exists.");
     }
 
-    // RESET PASSWORD (public)
+    // RESET PASSWORD
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
         String token = body.get("token");

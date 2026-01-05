@@ -122,8 +122,7 @@ public class ContributionService {
         Contribution saved = contributionRepository.save(contribution);
         return mapToResponseDto(saved);
     }
-
-    // ← FIX : Création single pour enfant (auto-génération)
+    
     @Transactional
     public ContributionResponseDto createSingleContributionForChild(Year year, String parentMemberId, String childId) {
         if (contributionRepository.hasDuplicateByMemberAndYear(parentMemberId, year, childId)) {

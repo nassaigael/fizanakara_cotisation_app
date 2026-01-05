@@ -31,7 +31,7 @@ public class Admins extends Users {
     // ← NEW:: default ROLE in SUPERADMIN
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.ADMIN;  // Default ADMIN, SUPERADMIN pour bootstrap
+    private Role role = Role.ADMIN;
 
     @OneToMany(mappedBy = "admin", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore

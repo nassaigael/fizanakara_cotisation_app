@@ -74,7 +74,7 @@ public class PasswordResetService {
                 .build();
         tokenRepo.save(prt);
 
-        log.info("Token de réinitialisation de mot de passe créé pour l'admin : {}", admin.getEmail());
+        log.info("Token of reinitialisation of password created for admin : {}", admin.getEmail());
 
         String resetLink = clientResetUrl + "?token=" + token;
         String emailBody = String.format(emailBodyTemplate, tokenExpirationMinutes, resetLink);

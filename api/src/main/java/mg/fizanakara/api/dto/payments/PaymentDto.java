@@ -12,7 +12,7 @@ public class PaymentDto {
     @NotNull(message = "Amount paid is required")
     private BigDecimal amountPaid;
 
-    private LocalDateTime paymentDate = LocalDateTime.now();  // ← MODIFIÉ : LocalDateTime au lieu de LocalDate
+    private LocalDateTime paymentDate = LocalDateTime.now();
 
     private PaymentStatus status = PaymentStatus.COMPLETED;
 

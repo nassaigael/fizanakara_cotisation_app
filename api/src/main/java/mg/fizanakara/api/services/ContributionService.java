@@ -10,7 +10,6 @@ import mg.fizanakara.api.exceptions.ContributionNotFoundException;
 import mg.fizanakara.api.models.Children;
 import mg.fizanakara.api.models.Contribution;
 import mg.fizanakara.api.models.Members;
-import mg.fizanakara.api.models.Payment;
 import mg.fizanakara.api.models.enums.ContributionStatus;
 import mg.fizanakara.api.models.enums.MemberStatus;
 import mg.fizanakara.api.repository.ChildrenRepository;

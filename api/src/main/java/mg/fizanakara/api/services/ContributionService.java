@@ -122,7 +122,7 @@ public class ContributionService {
         Contribution saved = contributionRepository.save(contribution);
         return mapToResponseDto(saved);
     }
-    
+
     @Transactional
     public ContributionResponseDto createSingleContributionForChild(Year year, String parentMemberId, String childId) {
         if (contributionRepository.hasDuplicateByMemberAndYear(parentMemberId, year, childId)) {
@@ -145,8 +145,7 @@ public class ContributionService {
                 .member(member)
                 .childId(childId)
                 .build();
-
-        // ← FIX : Set suffix unique
+        
         String suffix = String.format("%03d", sequenceCounter.getAndIncrement());
         contribution.setSequenceSuffix(suffix);
         contribution.setId(contribution.generatedCustomId());  // "COT2026-002"

@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import mg.fizanakara.api.models.enums.ContributionStatus;
 
-import java.math.BigDecimal;
 import java.time.Year;
 
 @Data

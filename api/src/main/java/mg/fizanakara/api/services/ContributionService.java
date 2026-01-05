@@ -69,7 +69,6 @@ public class ContributionService {
 
         sequenceCounter.set(1);
 
-        // Génération pour membres (childId = null)
         for (Members member : eligibleMembers) {
             if (contributionRepository.hasDuplicateByMemberAndYear(member.getId(), year, null)) {
                 log.warn("Contribution for member {} and year {} already exists – skipping", member.getId(), year);

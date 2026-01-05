@@ -114,7 +114,7 @@ public class ChildrenService {
         LocalDate dueDate = LocalDate.of(currentYear.getValue(), 12, 31);
         if (saved.getCreatedAt().isBefore(dueDate) && isEligibleForContribution(saved, currentYear)) {
             try {
-                ContributionResponseDto newContribution = contributionService.createSingleContributionForChild(currentYear, saved.getMember().getId(), saved.getId());  // ← FIX : Méthode single pour enfant
+                ContributionResponseDto newContribution = contributionService.createSingleContributionForChild(currentYear, saved.getMember().getId(), saved.getId());
                 log.info("Auto-generated contribution for new child {} in year {}", saved.getId(), currentYear);
             } catch (Exception e) {
                 log.warn("Failed to auto-generate contribution for new child {}: {}", saved.getId(), e.getMessage());

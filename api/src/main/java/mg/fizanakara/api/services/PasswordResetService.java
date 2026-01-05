@@ -72,7 +72,7 @@ public class PasswordResetService {
                 .admin(admin)
                 .expiryDate(expiry)
                 .build();
-        tokenRepo.save(prt);  // Maintenant safe : pas de doublon
+        tokenRepo.save(prt);
 
         log.info("Token de réinitialisation de mot de passe créé pour l'admin : {}", admin.getEmail());
 

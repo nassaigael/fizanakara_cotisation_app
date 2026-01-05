@@ -116,7 +116,7 @@ public class AdminsAuthController {
         }
     }
 
-    // REFRESH TOKEN (public)
+    // REFRESH TOKEN
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> body) {
         String token = body.get("refreshToken");

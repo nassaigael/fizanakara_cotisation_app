@@ -193,8 +193,7 @@ public class ChildrenService {
         return childrenRepository.findById(id)
                 .orElseThrow(() -> new ChildrenNotFoundException("Child not found with ID: " + id));
     }
-
-    // ← FIX : Méthode privée pour check éligibilité (>18 ans)
+    
     private boolean isEligibleForContribution(Children child, Year year) {
         int age = calculateAgeAtYear(child.getBirthDate(), year);
         return age >= 18;

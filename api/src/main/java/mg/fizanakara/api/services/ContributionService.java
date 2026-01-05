@@ -258,8 +258,7 @@ public class ContributionService {
 
         return contributionRepository.save(contribution);
     }
-
-    // Calcul générique
+    
     private BigDecimal calculateAmountForUser(Object user, Year year) {
         LocalDate birthDate = (user instanceof Members) ? ((Members) user).getBirthDate() : ((Children) user).getBirthDate();
         MemberStatus status = (user instanceof Members) ? ((Members) user).getStatus() : ((Children) user).getStatus();

@@ -47,7 +47,7 @@ public class ContributionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contributionService.createContributionsForYear(dto));
     }
 
-    // UPDATE
+    // UPDATE BY ID
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ContributionResponseDto> updateContribution(@PathVariable String id, @RequestBody ContributionUpdateDto dto) {

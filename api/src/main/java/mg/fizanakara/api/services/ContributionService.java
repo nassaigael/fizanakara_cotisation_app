@@ -145,10 +145,10 @@ public class ContributionService {
                 .member(member)
                 .childId(childId)
                 .build();
-        
+
         String suffix = String.format("%03d", sequenceCounter.getAndIncrement());
         contribution.setSequenceSuffix(suffix);
-        contribution.setId(contribution.generatedCustomId());  // "COT2026-002"
+        contribution.setId(contribution.generatedCustomId());
 
         Contribution saved = contributionRepository.save(contribution);
         return mapToResponseDto(saved);

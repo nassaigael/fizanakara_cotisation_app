@@ -36,7 +36,6 @@ public class ContributionService {
     private final MemberRepository memberRepository;
     private final ChildrenRepository childrenRepository;
 
-    // ← FIX : Compteur pour suffix ID (reset par batch)
     private final AtomicInteger sequenceCounter = new AtomicInteger(1);
 
     // GET ALL

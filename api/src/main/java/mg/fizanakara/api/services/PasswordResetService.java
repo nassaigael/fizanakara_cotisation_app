@@ -91,7 +91,7 @@ public class PasswordResetService {
 
         try {
             emailSender.send(message);
-            log.info("E-mail de réinitialisation de mot de passe envoyé à : {}", admin.getEmail());
+            log.info("mail of reinitialisation of password send to : {}", admin.getEmail());
         } catch (Exception e) {
             log.error("Échec de l'envoi de l'e-mail de réinitialisation à {} : {}", admin.getEmail(), e.getMessage(), e);
         }

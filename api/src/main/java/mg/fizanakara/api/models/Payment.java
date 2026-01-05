@@ -46,8 +46,7 @@ public class Payment {
     @JoinColumn(name = "contribution_id", nullable = false)
     @NotNull(message = "Contribution is required")
     private Contribution contribution;
-
-    // Generated ID = "PAY" + paymentDate formatée (ex. : "PAY2025-12-30T14:30:22")
+    
     public String generatedCustomId() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         return "PAY" + this.getPaymentDate().format(formatter);

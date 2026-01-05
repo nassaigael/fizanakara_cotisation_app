@@ -40,15 +40,14 @@ public class PaymentService {
                 .collect(Collectors.toList());
     }
 
-    // CREATE (Admin) – Blocage si overpayment
+    // CREATE
     @Transactional
     public PaymentResponseDto createPayment(PaymentDto dto) {
         log.info("Creating payment for contribution ID: {} amount: {}", dto.getContributionId(), dto.getAmountPaid());
 
-        // Fetch cotisation
         Contribution contribution = contributionRepository.findById(dto.getContributionId())
                 .orElseThrow(() -> new ContributionNotFoundException("Contribution not found with ID: " + dto.getContributionId()));
-        
+
         BigDecimal currentTotalPaid = paymentRepository.getTotalPaidByContributionId(dto.getContributionId());
         if (currentTotalPaid == null) currentTotalPaid = BigDecimal.ZERO;
         BigDecimal projectedTotal = currentTotalPaid.add(dto.getAmountPaid());
@@ -70,14 +69,13 @@ public class PaymentService {
                 .amountPaid(dto.getAmountPaid())
                 .paymentDate(dto.getPaymentDate() != null ? dto.getPaymentDate() : LocalDateTime.now())
                 .status(dto.getStatus() != null ? dto.getStatus() : PaymentStatus.COMPLETED)
-                .contribution(contribution)  // Liaison cotisation (pour @NotNull)
+                .contribution(contribution)
                 .build();
 
         payment.setId(payment.generatedCustomId());
 
         Payment saved = paymentRepository.save(payment);
 
-        // Recalcul status cotisation
         contributionService.updateContributionStatusAfterPayment(dto.getContributionId());
 
         return mapToResponseDto(saved);
@@ -95,10 +93,8 @@ public class PaymentService {
 
         log.info("Updating payment ID: {}", id);
 
-        // Fix compilation : save(payment) au lieu de save(updated)
         Payment updated = paymentRepository.save(payment);
 
-        // Recalcul cotisation
         contributionService.updateContributionStatusAfterPayment(updated.getContribution().getId());
 
         return mapToResponseDto(updated);
@@ -112,11 +108,10 @@ public class PaymentService {
         log.info("Deleting payment ID: {}", id);
         paymentRepository.delete(payment);
 
-        // Recalcul cotisation
         contributionService.updateContributionStatusAfterPayment(payment.getContribution().getId());
     }
 
-    // Mapper DTO
+    // DTO
     private PaymentResponseDto mapToResponseDto(Payment payment) {
         PaymentResponseDto dto = new PaymentResponseDto();
         dto.setId(payment.getId());

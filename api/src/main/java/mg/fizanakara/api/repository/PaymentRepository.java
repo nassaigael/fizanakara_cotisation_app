@@ -12,8 +12,6 @@ import java.util.List;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, String> {
     List<Payment> findByContributionId(String contributionId);
-
-    // Somme payée par cotisation (query native pour perf)
     @Query(value = "SELECT SUM(p.amount_paid) FROM payments p WHERE p.contribution_id = :contributionId", nativeQuery = true)
     BigDecimal getTotalPaidByContributionId(@Param("contributionId") String contributionId);
 }

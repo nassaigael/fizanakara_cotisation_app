@@ -42,7 +42,7 @@ public class ContributionController {
     // CREATE (batch pour année)
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ContributionResponseDto>> createContributionsForYear(@RequestBody @Validated ContributionYearDto dto) {  // ← MODIFIÉ : Input year seulement, return List
+    public ResponseEntity<List<ContributionResponseDto>> createContributionsForYear(@RequestBody @Validated ContributionYearDto dto) {
         log.info("Generating annual contributions for year: {}", dto.getYear());
         return ResponseEntity.status(HttpStatus.CREATED).body(contributionService.createContributionsForYear(dto));
     }

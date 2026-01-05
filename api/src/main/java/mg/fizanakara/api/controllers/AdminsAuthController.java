@@ -3,9 +3,9 @@ package mg.fizanakara.api.controllers;
 import mg.fizanakara.api.dto.admins.AdminResponseDto;
 import mg.fizanakara.api.dto.admins.LoginRequestDTO;
 import mg.fizanakara.api.dto.admins.RegisterRequestDTO;
+import mg.fizanakara.api.dto.admins.UpdateAdminDto;
 import mg.fizanakara.api.exceptions.AdminsException;
 import mg.fizanakara.api.models.Admins;
-import mg.fizanakara.api.dto.admins.UpdateAdminDto;
 import mg.fizanakara.api.models.enums.Gender;
 import mg.fizanakara.api.security.JwtUtil;
 import mg.fizanakara.api.services.AdminsService;
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +37,8 @@ public class AdminsAuthController {
     private final RefreshTokenService refreshTokenService;
     private final PasswordResetService passwordResetService;
 
-    // REGISTER (public)
+    // REGISTER – ← FIX : Protégé par SUPERADMIN (seul superadmin crée admins)
+    @PreAuthorize("hasRole('SUPERADMIN')")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Validated RegisterRequestDTO req) throws AdminsException {
         Admins admin = Admins.builder()
@@ -51,7 +53,7 @@ public class AdminsAuthController {
                 .build();
 
         Admins saved = adminsService.register(admin);
-        log.info("New admin saved : {}", saved.getEmail());
+        log.info("New admin saved: {}", saved.getEmail());
         return ResponseEntity.ok(new AdminResponseDto(saved));
     }
 
@@ -60,19 +62,18 @@ public class AdminsAuthController {
     public ResponseEntity<?> login(@RequestBody @Validated LoginRequestDTO req) {
         try {
             Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
+                    new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
             );
 
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             String accessToken = jwtUtil.generateAccessToken(req.getEmail());
-            // ✅ Fix Null Safety: Ajout d'une gestion d'exception si non trouvé
             Admins admin = adminsService.findByEmail(req.getEmail())
                     .orElseThrow(() -> new AdminsException("Admin non trouvé après authentification"));
-            
+
             var rt = refreshTokenService.createRefreshToken(admin);
 
-            log.info("Login success of : {}", req.getEmail());
+            log.info("Login success for: {}", req.getEmail());
             return ResponseEntity.ok(Map.of(
                     "user", Map.of(
                             "id", admin.getId(),
@@ -84,37 +85,38 @@ public class AdminsAuthController {
                     "refreshToken", rt.getToken()
             ));
         } catch (BadCredentialsException e) {
-            log.warn("Login failed for {} : Credentials invalids", req.getEmail());
+            log.warn("Login failed for {}: Invalid credentials", req.getEmail());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Email or password incorrect", "success", false));
         } catch (Exception e) {
-            log.error("Error login for {} : {}", req.getEmail(), e.getMessage());
+            log.error("Error logging in for {}: {}", req.getEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Failed authentication", "success", false));
         }
     }
 
-    // DELETE BY ID
+    // DELETE BY ID – Protégé par SUPERADMIN
+    @PreAuthorize("hasRole('SUPERADMIN')")
     @DeleteMapping("/admins/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable String id) {
         try {
             Admins admin = adminsService.findById(id)
-                    .orElseThrow(() -> new AdminsException("Admin not found with ID : " + id));
+                    .orElseThrow(() -> new AdminsException("Admin not found with ID: " + id));
             adminsService.deleteAdmins(admin);
-            log.info("Admin Deleted : {}", id);
-            return ResponseEntity.ok(Map.of("message", "Admin deleted with success", "success", true));
+            log.info("Admin deleted: {}", id);
+            return ResponseEntity.ok(Map.of("message", "Admin deleted successfully", "success", true));
         } catch (AdminsException e) {
-            log.warn("Delete admin failed : ID {} not found", id);
+            log.warn("Delete admin failed: ID {} not found", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage(), "success", false));
         } catch (Exception e) {
-            log.error("Failed delete admin {} : {}", id, e.getMessage());
+            log.error("Failed to delete admin {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed of delete admin", "success", false));
+                    .body(Map.of("error", "Failed to delete admin", "success", false));
         }
     }
 
-    // REFRESH TOKEN
+    // REFRESH TOKEN (public)
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> body) {
         String token = body.get("refreshToken");
@@ -127,64 +129,66 @@ public class AdminsAuthController {
         }
 
         String accessToken = jwtUtil.generateAccessToken(stored.getAdmin().getEmail());
-        log.debug("Refresh token success for : {}", stored.getAdmin().getEmail());
+        log.debug("Refresh token success for: {}", stored.getAdmin().getEmail());
         return ResponseEntity.ok(Map.of("accessToken", accessToken));
     }
 
-    // FORGOT PASSWORD
+    // FORGOT PASSWORD (public)
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
         String email = body.get("email");
-        log.info("Demand reset password for : {}", email);
+        log.info("Password reset request for: {}", email);
         passwordResetService.createAndSendPasswordResetToken(email);
         return ResponseEntity.ok("Password reset email sent if the account exists.");
     }
 
-    // RESET PASSWORD
+    // RESET PASSWORD (public)
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
         String token = body.get("token");
         String newPassword = body.get("newPassword");
         passwordResetService.resetPassword(token, newPassword);
-        log.info("Password reset with success for token : {}", token != null ? token.substring(0, Math.min(token.length(), 8)) + "..." : "null");
+        log.info("Password reset successful for token: {}", token != null ? token.substring(0, Math.min(token.length(), 8)) + "..." : "null");
         return ResponseEntity.ok("Password reset successfully.");
     }
 
+    // GET ME – Protégé par ADMIN (self-access)
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admins/me")
     public ResponseEntity<?> me(Authentication authentication) {
         if (authentication == null) return ResponseEntity.status(401).body("Unauthorized");
         String email = authentication.getName();
-        // ✅ Fix Null Safety: Utilisation de findByEmail avec gestion d'erreur
         Admins admin = adminsService.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Profil non trouvé pour : " + email));
-        log.debug("Profile recuperate for : {}", email);
+                .orElseThrow(() -> new RuntimeException("Profile not found for: " + email));
+        log.debug("Profile retrieved for: {}", email);
         return ResponseEntity.ok(new AdminResponseDto(admin));
     }
 
-    // UPDATE
+    // UPDATE ME – Protégé par ADMIN (self-update)
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/admins/me")
     public ResponseEntity<?> updateMe(@RequestBody @Validated UpdateAdminDto req, Authentication authentication) {
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Not authentify", "success", false));
+                    .body(Map.of("error", "Not authenticated", "success", false));
         }
         String email = authentication.getName();
         try {
             AdminResponseDto updated = adminsService.updateAdmin(email, req);
-            log.info("Update profile success for : {}", email);
+            log.info("Profile update successful for: {}", email);
             return ResponseEntity.ok(Map.of(
-                    "message", "Profile updated with success",
+                    "message", "Profile updated successfully",
                     "success", true,
                     "user", updated
             ));
         } catch (AdminsException e) {
-            log.warn("Update profile failed for {} : {}", email, e.getMessage());
+            log.warn("Profile update failed for {}: {}", email, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", e.getMessage(), "success", false));
         } catch (Exception e) {
-            log.error("Error of update profile {} : {}", email, e.getMessage());
+            log.error("Error updating profile for {}: {}", email, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed update", "success", false));
+                    .body(Map.of("error", "Failed to update profile", "success", false));
         }
     }
 }

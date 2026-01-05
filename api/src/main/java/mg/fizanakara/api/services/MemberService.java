@@ -2,6 +2,7 @@ package mg.fizanakara.api.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mg.fizanakara.api.dto.contributions.ContributionResponseDto;
 import mg.fizanakara.api.dto.members.MemberDto;
 import mg.fizanakara.api.dto.members.MemberResponseDto;
 import mg.fizanakara.api.exceptions.MemberNotFoundException;
@@ -11,11 +12,15 @@ import mg.fizanakara.api.models.Tribute;
 import mg.fizanakara.api.repository.DistrictRepository;
 import mg.fizanakara.api.repository.MemberRepository;
 import mg.fizanakara.api.repository.TributeRepository;
+import mg.fizanakara.api.services.ContributionService;  // ← FIX : Pour auto single
+import mg.fizanakara.api.services.SequenceService;  // Existant
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +30,7 @@ public class MemberService {
     private final DistrictRepository districtRepository;
     private final TributeRepository tributeRepository;
     private final SequenceService sequenceService;
+    private final ContributionService contributionService;  // ← FIX : Pour auto single
 
     // GET ALL
     @Transactional(readOnly = true)
@@ -83,6 +89,20 @@ public class MemberService {
         member.setId(member.generatedCustomId());
 
         Members saved = memberRepository.save(member);
+
+        // ← FIX : Auto-génération single cotisation pour année courante si éligible (pas batch, childId null)
+        Year currentYear = Year.now();  // 2026
+        LocalDate dueDate = LocalDate.of(currentYear.getValue(), 12, 31);
+        if (saved.getCreatedAt().isBefore(dueDate) && isEligibleForContribution(saved, currentYear)) {
+            try {
+                ContributionResponseDto newContribution = contributionService.createSingleContributionForMember(currentYear, saved.getId());  // ← FIX : Méthode single sans DTO
+                log.info("Auto-generated contribution for new member {} in year {}", saved.getId(), currentYear);
+            } catch (Exception e) {
+                log.warn("Failed to auto-generate contribution for new member {}: {}", saved.getId(), e.getMessage());
+                // Non-bloquant
+            }
+        }
+
         return mapToResponseDto(saved);
     }
 
@@ -152,6 +172,17 @@ public class MemberService {
     @Transactional
     public void deleteAllMembers() {
         memberRepository.deleteAll();
+    }
+
+    // ← FIX : Méthode privée pour check éligibilité (>18 ans)
+    private boolean isEligibleForContribution(Members member, Year year) {
+        int age = calculateAgeAtYear(member.getBirthDate(), year);
+        return age >= 18;
+    }
+
+    private int calculateAgeAtYear(LocalDate birthDate, Year year) {
+        LocalDate endOfYear = LocalDate.of(year.getValue(), 12, 31);
+        return endOfYear.getYear() - birthDate.getYear() - (endOfYear.isBefore(birthDate.withDayOfYear(birthDate.getDayOfYear())) ? 1 : 0);
     }
 
     // PRIVATE METHODE FOR MAPPING DTO

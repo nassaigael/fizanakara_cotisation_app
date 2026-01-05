@@ -82,7 +82,7 @@ public class PasswordResetService {
         // Format To avec nom (du DB)
         String toAddress = admin.getFirstName() + " " + admin.getLastName() + " <" + admin.getEmail() + ">";
 
-        String fromAddress = "Fizanakara App <ton-email@gmail.com>";
+        String fromAddress = "FIZANAKARA <ton-email@gmail.com>";
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromAddress);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import mg.fizanakara.api.models.enums.Role;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,11 @@ public class Admins extends Users {
     @Builder.Default
     @Column(nullable = false)
     private boolean verified = false;
+
+    // ← NOUVEAU : Champ role pour sécurité
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.ADMIN;  // Default ADMIN, SUPERADMIN pour bootstrap
 
     @OneToMany(mappedBy = "admin", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore

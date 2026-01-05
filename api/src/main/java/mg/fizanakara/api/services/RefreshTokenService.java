@@ -4,7 +4,6 @@ import mg.fizanakara.api.models.Admins;
 import mg.fizanakara.api.models.RefreshToken;
 import mg.fizanakara.api.repository.AdminsRepository;
 import mg.fizanakara.api.repository.RefreshTokenRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

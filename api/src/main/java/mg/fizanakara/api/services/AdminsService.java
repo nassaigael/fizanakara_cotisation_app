@@ -7,7 +7,7 @@ import mg.fizanakara.api.dto.admins.UpdateAdminDto;
 import mg.fizanakara.api.models.enums.Gender;
 import mg.fizanakara.api.repository.AdminsRepository;
 import mg.fizanakara.api.repository.RefreshTokenRepository;
-import mg.fizanakara.api.repository.PasswordResetTokenRepository; // AJOUTÉ
+import mg.fizanakara.api.repository.PasswordResetTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

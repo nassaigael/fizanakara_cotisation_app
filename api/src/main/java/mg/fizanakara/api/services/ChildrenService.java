@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import mg.fizanakara.api.dto.children.ChildrenCreateDto;
 import mg.fizanakara.api.dto.children.ChildrenResponseDto;
 import mg.fizanakara.api.dto.children.ChildrenUpdateDto;
+import mg.fizanakara.api.dto.contributions.ContributionResponseDto;
 import mg.fizanakara.api.exceptions.ChildrenNotFoundException;
 import mg.fizanakara.api.models.Children;
 import mg.fizanakara.api.models.District;
@@ -14,10 +15,13 @@ import mg.fizanakara.api.repository.ChildrenRepository;
 import mg.fizanakara.api.repository.DistrictRepository;
 import mg.fizanakara.api.repository.MemberRepository;
 import mg.fizanakara.api.repository.TributeRepository;
+import mg.fizanakara.api.services.ContributionService;  // ← FIX : Pour auto single
+import mg.fizanakara.api.services.SequenceService;  // Existant
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +34,7 @@ public class ChildrenService {
     private final TributeRepository tributeRepository;
     private final MemberRepository memberRepository;
     private final SequenceService sequenceService;
+    private final ContributionService contributionService;  // ← FIX : Pour auto single
 
     // GET ALL
     @Transactional(readOnly = true)
@@ -104,6 +109,20 @@ public class ChildrenService {
         child.setId(child.generatedCustomId());
 
         Children saved = childrenRepository.save(child);
+
+        // ← FIX : Auto-génération single cotisation pour année courante si éligible (pas batch, childId = saved.getId())
+        Year currentYear = Year.now();  // 2026
+        LocalDate dueDate = LocalDate.of(currentYear.getValue(), 12, 31);
+        if (saved.getCreatedAt().isBefore(dueDate) && isEligibleForContribution(saved, currentYear)) {
+            try {
+                ContributionResponseDto newContribution = contributionService.createSingleContributionForChild(currentYear, saved.getMember().getId(), saved.getId());  // ← FIX : Méthode single pour enfant
+                log.info("Auto-generated contribution for new child {} in year {}", saved.getId(), currentYear);
+            } catch (Exception e) {
+                log.warn("Failed to auto-generate contribution for new child {}: {}", saved.getId(), e.getMessage());
+                // Non-bloquant
+            }
+        }
+
         return  mapToResponseDto(saved);
     }
 
@@ -167,6 +186,17 @@ public class ChildrenService {
     private Children findEntityById(String id) {
         return childrenRepository.findById(id)
                 .orElseThrow(() -> new ChildrenNotFoundException("Child not found with ID: " + id));
+    }
+
+    // ← FIX : Méthode privée pour check éligibilité (>18 ans)
+    private boolean isEligibleForContribution(Children child, Year year) {
+        int age = calculateAgeAtYear(child.getBirthDate(), year);
+        return age >= 18;
+    }
+
+    private int calculateAgeAtYear(LocalDate birthDate, Year year) {
+        LocalDate endOfYear = LocalDate.of(year.getValue(), 12, 31);
+        return endOfYear.getYear() - birthDate.getYear() - (endOfYear.isBefore(birthDate.withDayOfYear(birthDate.getDayOfYear())) ? 1 : 0);
     }
 
     // PRIVATE METHODE FOR MAPPING DTO

@@ -238,7 +238,7 @@ public class ContributionService {
 
         return dto;
     }
-    
+
     private Contribution createSingleContribution(Year year, BigDecimal amount, ContributionStatus status, String memberId, String childId) {
         Members member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Member ID: " + memberId));
@@ -251,8 +251,7 @@ public class ContributionService {
                 .member(member)
                 .childId(childId)
                 .build();
-
-        // ← FIX : Set suffix unique
+        
         String suffix = String.format("%03d", sequenceCounter.getAndIncrement());
         contribution.setSequenceSuffix(suffix);
         contribution.setId(contribution.generatedCustomId());  // "COT2026-001"

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/admins/children")
+@RequestMapping("/api/admins/children")
 @RequiredArgsConstructor
 @Slf4j
 public class ChildrenController {

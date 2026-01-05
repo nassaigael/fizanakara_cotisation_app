@@ -114,8 +114,7 @@ public class ContributionService {
                 .member(member)
                 .childId(null)
                 .build();
-
-        // ← FIX : Set suffix unique
+        
         String suffix = String.format("%03d", sequenceCounter.getAndIncrement());
         contribution.setSequenceSuffix(suffix);
         contribution.setId(contribution.generatedCustomId());  // "COT2026-001"

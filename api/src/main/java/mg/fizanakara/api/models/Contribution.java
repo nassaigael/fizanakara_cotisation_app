@@ -60,8 +60,7 @@ public class Contribution {
 
     @Column(name = "sequence_suffix", nullable = true)
     private String sequenceSuffix;
-
-    // ← FIX : Generated ID = "COT" + year + "-" + suffix (ex. : "COT2026-001")
+    
     public String generatedCustomId() {
         if (this.getYear() == null || this.getSequenceSuffix() == null) {
             throw new IllegalStateException("Year and sequenceSuffix must be set before generating ID");

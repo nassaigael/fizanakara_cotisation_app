@@ -31,7 +31,7 @@ public class AdminBootstrapConfig {
                         .lastName("Admin")
                         .birthDate(LocalDate.of(1990, 1, 1))
                         .gender(Gender.MALE)
-                        .imageUrl("default-avatar.jpg")
+                        .imageUrl("gaelAdmin.jpeg")
                         .phoneNumber("+261389682194")
                         .email("fizanakara.super.adm@gmail.com")
                         .password(passwordEncoder.encode("SuperAdminPassword!"))

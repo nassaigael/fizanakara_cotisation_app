@@ -1,4 +1,3 @@
-// models/Finance.schema.ts
 import { z } from "zod";
 
 export const PaymentSchema = z.object({

@@ -1,12 +1,10 @@
+import React from "react";
 import type { ButtonVariant } from "./Common.type";
 
-export interface ButtonProps
-{
-    children: React.ReactNode;
-    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-    to?: string;
-    variant?: ButtonVariant;
-    className?: string;
-    type?: "button" | "submit" | "reset";
-    disabled?: boolean;
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  isLoading?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  children: React.ReactNode;
 }

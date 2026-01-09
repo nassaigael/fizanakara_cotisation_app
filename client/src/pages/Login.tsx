@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Alert from '../components/ui/Alert';
-import { useLoginLogic } from '../hooks/useLoginLogic';
+import { useLogin } from '../hooks/useLogin';
 import { THEME } from '../styles/theme';
 
 /**

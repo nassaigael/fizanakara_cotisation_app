@@ -1,12 +1,10 @@
-export interface InputProps {
+import React from "react";
+
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  name: string;
-  placeholder?: string;
-  value: string | number;
-  type?: "text" | "password" | "email" | "date" | "tel" | "number";
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  icon?: React.ReactNode;
+  name: string; // Obligatoire pour Zod/React Hook Form
   error?: string;
+  icon?: React.ReactNode;
   success?: boolean;
-  disabled?: boolean;
+  containerClassName?: string;
 }

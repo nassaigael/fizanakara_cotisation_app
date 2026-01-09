@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 
 /**
- * useLoginLogic - Gère la logique métier du formulaire d'authentification.
+ * useLogin - Gère la logique métier du formulaire d'authentification et du registre
  * Optimisé pour réduire le nombre de re-renders via un état groupé.
  */
-export const useLoginLogic = () => {
+export const useLogin = () => {
   const { login, register } = useAuth();
   const navigate = useNavigate();
 

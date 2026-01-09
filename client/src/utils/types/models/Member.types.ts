@@ -1,17 +1,6 @@
-import type { Gender, MemberStatus } from './Common.types';
+import type { UserBase, MemberStatus } from "./Common.types";
 
-
-export interface MemberResponse
-{
-    id: string;
-    firstName: string;
-    lastName: string;
-    birthDate: string;
-    gender: Gender;
-    imageUrl: string;
-    phoneNumber: string;
-    createdAt: string;
-    sequenceNumber: number;
+export interface MemberResponse extends UserBase {
     status: MemberStatus;
     districtId: number;
     districtName: string;
@@ -19,17 +8,13 @@ export interface MemberResponse
     tributeName: string;
 }
 
-export interface MemberCreateRequest
-{
-    firstName: string;
-    lastName: string;
-    birthDate: string;
-    gender: Gender;
-    imageUrl: string;
-    phoneNumber: string;
+export interface ChildResponse extends UserBase {
     status: MemberStatus;
     districtId: number;
+    districtName: string;
     tributeId: number;
+    tributeName: string;
+    memberId: string;
+    memberFirstName: string;
+    memberLastName: string;
 }
-
-

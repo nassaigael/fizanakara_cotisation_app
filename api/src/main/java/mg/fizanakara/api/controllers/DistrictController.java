@@ -40,7 +40,7 @@ public class DistrictController {
 
     // CREATE
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<District> createDistrict(@RequestBody @Validated DistrictDto dto) {
         log.info("Created district : {}", dto.getName());
         District created = districtService.createDistrict(dto);

@@ -58,7 +58,7 @@ public class DistrictController {
 
     // DELETE BY ID
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<Map<String, Object>> deleteDistrict(@PathVariable Long id) {
         log.info("Deleted district ID : {}", id);
         districtService.deleteDistrict(id);

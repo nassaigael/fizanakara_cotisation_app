@@ -18,10 +18,8 @@ public class MemberResponseDto {
     private LocalDate createdAt;
     private Long sequenceNumber;
     private MemberStatus status;
-
     private Long districtId;
     private String districtName;
-
     private Long tributeId;
     private String tributeName;
 }

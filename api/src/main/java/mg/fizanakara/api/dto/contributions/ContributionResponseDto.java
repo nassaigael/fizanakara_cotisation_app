@@ -16,10 +16,10 @@ public class ContributionResponseDto {
     private BigDecimal amount;
     private ContributionStatus status;
     private LocalDate dueDate;
-    private BigDecimal totalPaid;  // Somme paiements
-    private BigDecimal remaining;  // Solde restant
+    private BigDecimal totalPaid;
+    private BigDecimal remaining;
     private String memberId;
-    private String memberName;  // Nested nom parent
-    private String childId;  // Optionnel : ID enfant si cotisation enfant
-    private List<PaymentResponseDto> payments;  // Liste paiements
+    private String memberName;
+    private String childId;
+    private List<PaymentResponseDto> payments;
 }

@@ -7,9 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 public class ContributionUpdateDto {
-    private BigDecimal amount;  // Optionnel : ajuster montant
-
-    private ContributionStatus status;  // Optionnel : changer status
-
+    private BigDecimal amount;
+    private ContributionStatus status;
     private String memberId;
 }

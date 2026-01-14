@@ -1,6 +1,7 @@
 package mg.fizanakara.api.security;
 
 import mg.fizanakara.api.models.Admins;
+import mg.fizanakara.api.models.enums.Role;  // ← AJOUT : Import enum Role pour mapping dynamique
 import mg.fizanakara.api.repository.AdminsRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
@@ -23,9 +24,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found " + email));
 
-        // Role with prefix "ROLE_" for @hasRole('ADMIN')
+        // ← FIX : Mapping dynamique du rôle enum → "ROLE_" + name (ex. : ROLE_SUPERADMIN pour SuperAdmin)
         Collection<SimpleGrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_ADMIN")
+                new SimpleGrantedAuthority("ROLE_" + admin.getRole().name())  // ← FIX : admin.getRole().name() au lieu hardcoded "ADMIN"
         );
 
         return User.builder()

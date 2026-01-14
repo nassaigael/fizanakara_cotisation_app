@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import mg.fizanakara.api.models.Person;  // ← FIX : Import Person (remplace Members)
 import mg.fizanakara.api.models.enums.ContributionStatus;
 
 import java.math.BigDecimal;
@@ -50,17 +51,17 @@ public class Contribution {
     private LocalDate dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    @NotNull(message = "Member is required")
+    @JoinColumn(name = "member_id", nullable = false)  // FK vers persons.id
+    @NotNull(message = "Person is required")  // ← FIX : Message pour Person
     @JsonIgnore
-    private Members member;
+    private Person member;  // ← FIX : Typé Person (générique, remplace Members)
 
     @Column(name = "child_id", nullable = true)
-    private String childId;
+    private String childId;  // Optionnel pour mineurs
 
     @Column(name = "sequence_suffix", nullable = true)
     private String sequenceSuffix;
-    
+
     public String generatedCustomId() {
         if (this.getYear() == null || this.getSequenceSuffix() == null) {
             throw new IllegalStateException("Year and sequenceSuffix must be set before generating ID");

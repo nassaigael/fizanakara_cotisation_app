@@ -82,10 +82,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/login",
-                    "/register",
+//                    "/register",
                     "/forgot-password",
                     "/reset-password"
                 ).permitAll()
+                            .requestMatchers("/register").hasRole("SUPERADMIN")
                 .requestMatchers("/admins/me")
                 .authenticated()
                 .requestMatchers("/admins/districts/**")

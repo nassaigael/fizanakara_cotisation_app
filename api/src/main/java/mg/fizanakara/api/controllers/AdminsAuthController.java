@@ -81,6 +81,7 @@ public class AdminsAuthController {
                             "firstname", admin.getFirstName(),
                             "lastname", admin.getLastName(),
                             "gender", admin.getGender()),
+                    "role", admin.getRole(),
                     "accessToken", accessToken,
                     "refreshToken", rt.getToken()
             ));

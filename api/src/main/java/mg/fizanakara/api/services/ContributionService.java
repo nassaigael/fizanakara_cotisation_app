@@ -7,12 +7,12 @@ import mg.fizanakara.api.dto.contributions.ContributionUpdateDto;
 import mg.fizanakara.api.dto.contributions.ContributionYearDto;
 import mg.fizanakara.api.dto.payments.PaymentResponseDto;
 import mg.fizanakara.api.exceptions.ContributionNotFoundException;
-import mg.fizanakara.api.models.Children;
 import mg.fizanakara.api.models.Contribution;
-import mg.fizanakara.api.models.Members;
+import mg.fizanakara.api.models.Person;
 import mg.fizanakara.api.models.enums.ContributionStatus;
 import mg.fizanakara.api.models.enums.MemberStatus;
 import mg.fizanakara.api.repository.ContributionRepository;
+import mg.fizanakara.api.repository.PersonRepository;
 import mg.fizanakara.api.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +31,7 @@ import java.util.stream.Collectors;
 public class ContributionService {
     private final ContributionRepository contributionRepository;
     private final PaymentRepository paymentRepository;
-    private final MemberRepository memberRepository;
-    private final ChildrenRepository childrenRepository;
+    private final PersonRepository personRepository;
 
     private final AtomicInteger sequenceCounter = new AtomicInteger(1);
 
@@ -45,47 +44,37 @@ public class ContributionService {
                 .collect(Collectors.toList());
     }
 
-    // GET BY MEMBER AND YEAR
+    // GET BY PERSON AND YEAR (utilise membreId standard)
     @Transactional(readOnly = true)
-    public List<ContributionResponseDto> getContributionsByMemberAndYear(String memberId, Year year) {
-        log.info("Retrieving contributions for member ID: {} and year: {}", memberId, year);
-        return contributionRepository.findByMemberIdAndYear(memberId, year).stream()
+    public List<ContributionResponseDto> getContributionsByPersonAndYear(String personId, Year year) {
+        log.info("Retrieving contributions for person ID: {} and year: {}", personId, year);
+        return contributionRepository.findByMemberIdAndYear(personId, year).stream()  // ← FIX : Appel standard
                 .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
     }
 
+    // BATCH CRÉATION ANNUELLE (unifié pour Persons)
     @Transactional
     public List<ContributionResponseDto> createContributionsForYear(ContributionYearDto dto) {
         Year year = dto.getYear();
         int yearValue = year.getValue();
         log.info("Generating annual contributions for year: {}", year);
 
-        List<Members> eligibleMembers = memberRepository.findEligibleMembersForContribution(yearValue);
-        List<Children> eligibleChildren = childrenRepository.findEligibleChildrenForContribution(yearValue);
+        List<Person> eligiblePersons = personRepository.findEligiblePersonsForContribution(yearValue);
 
         List<ContributionResponseDto> created = new ArrayList<>();
 
         sequenceCounter.set(1);
 
-        for (Members member : eligibleMembers) {
-            if (contributionRepository.hasDuplicateByMemberAndYear(member.getId(), year, null)) {
-                log.warn("Contribution for member {} and year {} already exists – skipping", member.getId(), year);
+        for (Person person : eligiblePersons) {
+            String personId = person.getId();
+            String childId = person.isActiveMember() ? null : personId;
+            if (contributionRepository.hasDuplicateByMemberAndYear(personId, year, childId)) {
+                log.warn("Contribution for person {} and year {} already exists – skipping", personId, year);
                 continue;
             }
-            BigDecimal amount = calculateAmountForUser(member, year);
-            Contribution contribution = createSingleContribution(year, amount, ContributionStatus.PENDING, member.getId(), null);
-            created.add(mapToResponseDto(contribution));
-        }
-
-        for (Children child : eligibleChildren) {
-            String parentMemberId = child.getMember().getId();
-            String childId = child.getId();
-            if (contributionRepository.hasDuplicateByMemberAndYear(parentMemberId, year, childId)) {
-                log.warn("Contribution for child {} (parent {}) and year {} already exists – skipping", childId, parentMemberId, year);
-                continue;
-            }
-            BigDecimal amount = calculateAmountForUser(child, year);
-            Contribution contribution = createSingleContribution(year, amount, ContributionStatus.PENDING, parentMemberId, childId);
+            BigDecimal amount = calculateAmountForUser(person, year);
+            Contribution contribution = createSingleContribution(year, amount, ContributionStatus.PENDING, personId, childId);
             created.add(mapToResponseDto(contribution));
         }
 
@@ -93,55 +82,25 @@ public class ContributionService {
         return created;
     }
 
+    // SINGLE POUR PERSON
     @Transactional
-    public ContributionResponseDto createSingleContributionForMember(Year year, String memberId) {
-        if (contributionRepository.hasDuplicateByMemberAndYear(memberId, year, null)) {
-            throw new IllegalArgumentException("Contribution for this member and year already exists");
+    public ContributionResponseDto createSingleContributionForPerson(Year year, String personId) {
+        if (contributionRepository.hasDuplicateByMemberAndYear(personId, year, null)) {
+            throw new IllegalArgumentException("Contribution for this person and year already exists");
         }
 
-        Members member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Member ID: " + memberId));
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Person ID: " + personId));
 
-        BigDecimal amount = calculateAmountForUser(member, year);
+        BigDecimal amount = calculateAmountForUser(person, year);
 
         Contribution contribution = Contribution.builder()
                 .year(year)
                 .amount(amount)
                 .status(ContributionStatus.PENDING)
                 .dueDate(LocalDate.of(year.getValue(), 12, 31))
-                .member(member)
-                .childId(null)
-                .build();
-
-        String suffix = String.format("%03d", sequenceCounter.getAndIncrement());
-        contribution.setSequenceSuffix(suffix);
-        contribution.setId(contribution.generatedCustomId());
-
-        Contribution saved = contributionRepository.save(contribution);
-        return mapToResponseDto(saved);
-    }
-
-    @Transactional
-    public ContributionResponseDto createSingleContributionForChild(Year year, String parentMemberId, String childId) {
-        if (contributionRepository.hasDuplicateByMemberAndYear(parentMemberId, year, childId)) {
-            throw new IllegalArgumentException("Contribution for this child and year already exists");
-        }
-
-        Members member = memberRepository.findById(parentMemberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Parent Member ID: " + parentMemberId));
-
-        Children child = childrenRepository.findById(childId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Child ID: " + childId));
-
-        BigDecimal amount = calculateAmountForUser(child, year);
-
-        Contribution contribution = Contribution.builder()
-                .year(year)
-                .amount(amount)
-                .status(ContributionStatus.PENDING)
-                .dueDate(LocalDate.of(year.getValue(), 12, 31))
-                .member(member)
-                .childId(childId)
+                .member(person)
+                .childId(person.isEligibleForContribution(year) ? null : personId)
                 .build();
 
         String suffix = String.format("%03d", sequenceCounter.getAndIncrement());
@@ -161,9 +120,9 @@ public class ContributionService {
         if (dto.getAmount() != null) contribution.setAmount(dto.getAmount());
         if (dto.getStatus() != null) contribution.setStatus(dto.getStatus());
         if (dto.getMemberId() != null) {
-            Members member = memberRepository.findById(dto.getMemberId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid Member ID"));
-            contribution.setMember(member);
+            Person person = personRepository.findById(dto.getMemberId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid Person ID"));
+            contribution.setMember(person);  // ← FIX : OK avec type Person
         }
 
         log.info("Updating contribution ID: {}", id);
@@ -180,6 +139,7 @@ public class ContributionService {
         contributionRepository.delete(contribution);
     }
 
+    // UPDATE STATUS POST-PAIEMENT
     @Transactional
     public void updateContributionStatusAfterPayment(String contributionId) {
         Contribution contribution = contributionRepository.findById(contributionId)
@@ -203,7 +163,7 @@ public class ContributionService {
         contributionRepository.save(contribution);
     }
 
-    // DTO
+    // MAPPING DTO
     private ContributionResponseDto mapToResponseDto(Contribution contribution) {
         ContributionResponseDto dto = new ContributionResponseDto();
         dto.setId(contribution.getId());
@@ -237,16 +197,17 @@ public class ContributionService {
         return dto;
     }
 
-    private Contribution createSingleContribution(Year year, BigDecimal amount, ContributionStatus status, String memberId, String childId) {
-        Members member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Member ID: " + memberId));
+    // HELPER PRIVATE (adapté pour Person)
+    private Contribution createSingleContribution(Year year, BigDecimal amount, ContributionStatus status, String personId, String childId) {
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Person ID: " + personId));
 
         Contribution contribution = Contribution.builder()
                 .year(year)
                 .amount(amount)
                 .status(status)
                 .dueDate(LocalDate.of(year.getValue(), 12, 31))
-                .member(member)
+                .member(person)  // ← FIX : OK avec type Person
                 .childId(childId)
                 .build();
 
@@ -256,19 +217,14 @@ public class ContributionService {
 
         return contributionRepository.save(contribution);
     }
-    
-    private BigDecimal calculateAmountForUser(Object user, Year year) {
-        LocalDate birthDate = (user instanceof Members) ? ((Members) user).getBirthDate() : ((Children) user).getBirthDate();
-        MemberStatus status = (user instanceof Members) ? ((Members) user).getStatus() : ((Children) user).getStatus();
-        int age = calculateAgeAtYear(birthDate, year);
+
+    // CALCUL AMOUNT (adapté pour Person)
+    private BigDecimal calculateAmountForUser(Person person, Year year) {
+        int age = person.calculateAgeAtYear(person.getBirthDate(), year);
+        MemberStatus status = person.getStatus();
         if (age >= 18 && age <= 21 && status == MemberStatus.STUDENT) {
             return BigDecimal.valueOf(30000);
         }
         return BigDecimal.valueOf(40000);
-    }
-
-    private int calculateAgeAtYear(LocalDate birthDate, Year year) {
-        LocalDate endOfYear = LocalDate.of(year.getValue(), 12, 31);
-        return endOfYear.getYear() - birthDate.getYear() - (endOfYear.isBefore(birthDate.withDayOfYear(birthDate.getDayOfYear())) ? 1 : 0);
     }
 }

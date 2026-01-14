@@ -239,6 +239,7 @@ public class PersonService {
         dto.setParentId(person.getParent() != null ? person.getParent().getId() : null);
         dto.setParentName(person.getParent() != null ? person.getParent().getFirstName() + " " + person.getParent().getLastName() : null);
         dto.setChildrenCount(person.getChildren().size());
+        dto.setChildren(person.getChildren());
 
         return dto;
     }

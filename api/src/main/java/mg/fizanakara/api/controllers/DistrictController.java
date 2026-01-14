@@ -49,7 +49,7 @@ public class DistrictController {
 
     // UPDATE BY ID
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<District> updateDistrict(@PathVariable Long id, @RequestBody @Validated DistrictDto dto) {
         log.info("Updated district ID {} : {}", id, dto.getName());
         District updated = districtService.updateDistrict(id, dto);

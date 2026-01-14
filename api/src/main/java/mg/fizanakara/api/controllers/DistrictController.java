@@ -67,7 +67,7 @@ public class DistrictController {
 
     // DELETE ALL
     @DeleteMapping("/delete-all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<Map<String, Object>> deleteAllDistricts() {
         log.info("Suppression all districts)");
         return districtService.deleteAllDistricts();

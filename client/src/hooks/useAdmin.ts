@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { adminService } from '../services/adminService';
 import { toast } from 'react-hot-toast';
-import type { AdminResponse, UpdateAdminDto } from '../utils/types/types';
+import type { AdminResponse, UpdateAdminDto } from '../utils/types/models/Admin.types';
 
 export const Admin = () => {
     const auth = useContext(AuthContext);

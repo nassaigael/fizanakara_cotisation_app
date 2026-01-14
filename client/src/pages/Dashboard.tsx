@@ -5,7 +5,7 @@ import {
 } from 'react-icons/ai';
 import { StatCard3D } from '../components/dashboard/StatCard3D';
 import { THEME } from '../styles/theme';
-import { useDashboardLogic } from '../hooks/Dashboard.hooks';
+import { useDashboardLogic } from '../hooks/useDashbord';
 
 const Dashboard: React.FC = () => {
   const { selectedYear, setSelectedYear, loading, stats, membersCount } = useDashboardLogic();

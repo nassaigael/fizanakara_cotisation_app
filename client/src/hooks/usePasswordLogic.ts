@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import api from '../services/api';
+import { authService } from '../services/authService';
 
 export const usePasswordLogic = () => {
   const [searchParams] = useSearchParams();
@@ -9,42 +9,37 @@ export const usePasswordLogic = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | 'warning' } | null>(null);
+  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
-    const token = searchParams.get('token');
-    if (token) setIsResetMode(true);
+    if (searchParams.get('token')) setIsResetMode(true);
   }, [searchParams]);
 
   const handleRequestEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/forgot-password', { email });
-      setMessage({ text: "Lien envoyé ! Vérifiez votre boîte mail.", type: 'success' });
+      await authService.forgotPassword(email);
+      setMessage({ text: "Si ce compte existe, un lien a été envoyé.", type: 'success' });
     } catch (err) {
-      setMessage({ text: "Compte introuvable ou erreur serveur.", type: 'error' });
-    } finally {
-      setLoading(false);
-    }
+      setMessage({ text: "Erreur lors de l'envoi de l'email.", type: 'error' });
+    } finally { setLoading(false); }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setMessage({ text: "Les mots de passe ne correspondent pas.", type: 'warning' });
+      setMessage({ text: "Les mots de passe ne correspondent pas.", type: 'error' });
       return;
     }
     setLoading(true);
     try {
-      const token = searchParams.get('token');
-      await api.post('/reset-password', { token, newPassword: password });
-      setMessage({ text: "Mot de passe modifié avec succès !", type: 'success' });
+      const token = searchParams.get('token') || "";
+      await authService.resetPassword({ token, newPassword: password });
+      setMessage({ text: "Mot de passe mis à jour ! Redirection...", type: 'success' });
     } catch (err) {
-      setMessage({ text: "Le lien est invalide ou a expiré.", type: 'error' });
-    } finally {
-      setLoading(false);
-    }
+      setMessage({ text: "Lien invalide ou expiré.", type: 'error' });
+    } finally { setLoading(false); }
   };
 
   return { isResetMode, email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, loading, message, handleRequestEmail, handleResetPassword };

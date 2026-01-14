@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
-export const AlertHooks=() =>
+export const useAlert=() =>
 {
     useEffect(() => {
         if (isOpen) document.body.style.overflow = 'hidden';

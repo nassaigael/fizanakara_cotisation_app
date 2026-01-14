@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { AuthContextType } from "../types/types";
+import type { AuthContextType } from "../types/models/Admin.types";
 import { 
   AiOutlineUser, AiOutlineSetting, AiOutlineLogout, 
    AiOutlineMessage, AiOutlineDashboard, 

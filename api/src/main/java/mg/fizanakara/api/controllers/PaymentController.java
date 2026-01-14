@@ -22,7 +22,7 @@ public class PaymentController {
 
     // GET BY CONTRIBUTION ID
     @GetMapping("/contribution/{contributionId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<List<PaymentResponseDto>> getPaymentsByContributionId(@PathVariable String contributionId) {
         log.debug("Retrieving payments for contribution ID: {}", contributionId);
         return ResponseEntity.ok(paymentService.getPaymentsByContributionId(contributionId));

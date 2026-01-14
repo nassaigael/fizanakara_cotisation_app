@@ -30,7 +30,7 @@ public class PaymentController {
 
     // CREATE
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<PaymentResponseDto> createPayment(@RequestBody @Validated PaymentDto dto) {
         log.info("Creating payment for contribution ID: {} amount: {}", dto.getContributionId(), dto.getAmountPaid());
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.createPayment(dto));

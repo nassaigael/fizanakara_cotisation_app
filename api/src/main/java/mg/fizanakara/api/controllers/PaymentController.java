@@ -38,7 +38,7 @@ public class PaymentController {
 
     // UPDATE
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<PaymentResponseDto> updatePayment(@PathVariable String id, @RequestBody PaymentDto dto) {
         log.info("Updating payment ID: {}", id);
         return ResponseEntity.ok(paymentService.updatePayment(id, dto));

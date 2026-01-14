@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Admin } from '../hooks/Admin.hooks';
+import { Admin } from '../hooks/useAdmin';
 import { getImageUrl } from '../utils/constants/constants';
 import { Shield, Trash2, Edit2, Save, X, Globe } from 'lucide-react';
 import {Alert} from '../components';

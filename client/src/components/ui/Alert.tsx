@@ -1,90 +1,65 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, memo } from "react";
 import { createPortal } from "react-dom";
-import type { AlertProps } from "../../utils/types/types";
+import type { AlertProps } from "../../utils/types/components/Alert.types";
 import { THEME } from "../../styles/theme";
+import Button from "./Button";
 
 const Alert: React.FC<AlertProps> = ({
-    isOpen,
-    title,
-    message,
-    onClose,
-    onConfirm,
-    confirmText = "Confirmer",
-    variant = "warning",
+    isOpen, title, message, onClose, onConfirm,
+    confirmText = "Confirmer", cancelText = "Annuler", variant = "warning",
 }) => {
     useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
+        if (isOpen) document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = 'unset'; };
     }, [isOpen]);
 
-    useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose();
-        };
-        if (isOpen) window.addEventListener('keydown', handleEsc);
-        return () => window.removeEventListener('keydown', handleEsc);
-    }, [isOpen, onClose]);
-
     const handleConfirm = useCallback(() => {
-        onConfirm();
+        if (onConfirm) onConfirm();
         onClose();
     }, [onConfirm, onClose]);
 
     if (!isOpen) return null;
 
-    const variantStyles = {
-        danger: "text-brand-primary border-brand-primary-dark bg-brand-primary/10",
-        success: "text-green-500 border-green-600 bg-green-50",
-        warning: "text-orange-500 border-orange-600 bg-orange-50",
-        info: "text-blue-500 border-blue-600 bg-blue-50",
+    const variantColors = {
+        success: "text-green-500 bg-green-50 border-green-200",
+        danger: "text-red-500 bg-red-50 border-red-200",
+        warning: "text-brand-primary bg-brand-primary/5 border-brand-primary/20",
+        info: "text-blue-500 bg-blue-50 border-blue-200"
     };
 
     const content = (
-        <div 
-            className="fixed inset-0 z-9999 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
-            onClick={onClose} // Fermer si on clique sur l'overlay
-        >
-            <div 
-                className={`${THEME.card} w-full max-w-md overflow-hidden transform animate-in zoom-in-95 duration-300 bg-white`}
-                onClick={(e) => e.stopPropagation()} // Empêcher la fermeture en cliquant sur la carte
-            >
-                <div className="p-8 text-center">
-                    <div className={`mx-auto w-16 h-16 rounded-2xl border-2 border-b-4 flex items-center justify-center mb-4 ${variantStyles[variant]}`}>
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-4xl lg:rounded-[40px] w-full max-w-sm overflow-hidden border-4 border-white shadow-2xl animate-in zoom-in duration-300">
+                <div className="p-6 lg:p-8 text-center">
+                    <div className={`mx-auto w-14 h-14 lg:w-16 lg:h-16 rounded-2xl lg:rounded-3xl border-2 border-b-4 flex items-center justify-center mb-4 lg:mb-6 ${variantColors[variant]}`}>
                         <span className="text-2xl font-black">!</span>
                     </div>
 
-                    <h2 className={`text-2xl ${THEME.font.black} mb-2 text-brand-text`}>
+                    <h2 className={`text-lg lg:text-xl ${THEME.font.black} mb-2 text-brand-text uppercase leading-tight`}>
                         {title}
                     </h2>
-                    <p className="text-brand-muted font-bold leading-relaxed px-4">
+                    <p className="text-brand-muted text-xs lg:text-sm font-bold leading-relaxed px-2">
                         {message}
                     </p>
                 </div>
                 
-                <div className="bg-brand-bg p-6 flex flex-col sm:flex-row justify-center gap-4 border-t-2 border-brand-border">
-                    <button 
-                        onClick={onClose} 
-                        className={`${THEME.buttonSecondary} px-8 py-3 rounded-2xl flex-1 text-sm ${THEME.font.black}`}
-                    >
-                        Annuler
-                    </button>
-                    <button 
+                <div className="bg-brand-bg p-4 lg:p-6 flex flex-col sm:flex-row gap-3 border-t-2 border-brand-border">
+                    <Button variant="secondary" onClick={onClose} className="flex-1 py-3 lg:py-4 order-2 sm:order-1">
+                        {cancelText}
+                    </Button>
+                    <Button 
+                        variant={variant === "danger" ? "danger" : "primary"} 
                         onClick={handleConfirm} 
-                        className={`${THEME.buttonPrimary} px-8 py-3 rounded-2xl flex-1 text-sm ${THEME.font.black}`}
+                        className="flex-1 py-3 lg:py-4 order-1 sm:order-2"
                     >
                         {confirmText}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
     );
 
-    // Injection à la racine du document
     return createPortal(content, document.body);
 };
 
-export default React.memo(Alert); // Optimisation : n'est re-rendu que si les props changent
+export default memo(Alert);

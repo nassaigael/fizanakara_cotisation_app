@@ -8,7 +8,7 @@ export interface UserBase {
     id: string;
     firstName: string;
     lastName: string;
-    birthDate: string; // ISO String "YYYY-MM-DD"
+    birthDate: string;
     gender: Gender;
     imageUrl: string;
     phoneNumber: string;

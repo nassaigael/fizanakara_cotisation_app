@@ -1,20 +1,15 @@
 import axios from 'axios';
-// encoder tous les trafics pour la securité
+
 const api = axios.create({
   baseURL: '/api', 
   headers: { 'Content-Type': 'application/json' },
 });
 
-api.interceptors.request.use(
-  (config) => {
+api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken'); 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,
@@ -26,7 +21,7 @@ api.interceptors.response.use(
       
       if (refreshToken) {
         try {
-          const res = await axios.post('http://localhost:8080/refresh', { refreshToken });
+          const res = await axios.post('/api/refresh', { refreshToken });
           const { accessToken } = res.data;
           localStorage.setItem('accessToken', accessToken); 
           api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;

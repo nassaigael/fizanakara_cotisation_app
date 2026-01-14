@@ -6,13 +6,11 @@ export interface Admin extends UserBase {
     role: Role;
 }
 
-// Pour l'authentification (Synchronisé avec LoginRequestDTO.java)
 export interface LoginRequest {
     email: string;
     password: string;
 }
 
-// Pour l'inscription (Synchronisé avec RegisterRequestDTO.java)
 export interface RegisterRequest extends Omit<Admin, "id" | "verified" | "createdAt" | "sequenceNumber" | "role"> {
     password: string;
 }
@@ -20,5 +18,16 @@ export interface RegisterRequest extends Omit<Admin, "id" | "verified" | "create
 export interface LoginResponse {
     accessToken: string;
     refreshToken: string;
-    user: Admin;
+    user: Admin; 
 }
+
+export interface AuthContextType {
+    admin: Admin | null;
+    token: string | null;
+    login: (data: LoginResponse) => Promise<void>;
+    logout: () => void;
+    register: (userData: RegisterRequest) => Promise<Admin>;
+    loading: boolean;
+    updateAdminState: (updatedAdmin: Admin) => void;
+}
+

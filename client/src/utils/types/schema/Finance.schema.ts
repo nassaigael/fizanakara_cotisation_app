@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const PaymentSchema = z.object({
     amountPaid: z.number().positive("Le montant doit être supérieur à 0"),
-    contributionId: z.string().startsWith("COT", "ID de contribution invalide"),
+    contributionId: z.string().min(1, "ID de contribution requis"), 
 });
 
 export const ContributionUpdateSchema = z.object({

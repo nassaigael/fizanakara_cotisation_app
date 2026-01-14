@@ -35,7 +35,7 @@ export interface LoginResponse {
         email: string;
         firstname: string;
         lastname: string;
-        gender: string;
+        gender: Gender;
     };
     accessToken: string;
     refreshToken: string;

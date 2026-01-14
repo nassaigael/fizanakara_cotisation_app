@@ -1,140 +1,60 @@
-import React, { useEffect, memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import { createPortal } from 'react-dom';
-import { 
-  AiOutlineClose, AiOutlinePhone, AiOutlineEnvironment, 
-  AiOutlineCalendar, AiOutlineTeam, AiOutlineIdcard 
-} from "react-icons/ai";
-import { THEME } from '../../styles/theme';
+import { AiOutlinePhone, AiOutlineEnvironment, AiOutlineClose } from "react-icons/ai";
 import { getImageUrl } from '../../utils/constants/constants';
-
-const Popup: React.FC<{ isOpen: boolean; member: any; onClose: () => void }> = ({ isOpen, member, onClose }) => {
-  
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleEsc);
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-      window.removeEventListener('keydown', handleEsc);
-    };
-  }, [isOpen, onClose]);
-
-  // Gestion de l'image avec fallback
-  const avatarUrl = useMemo(() => {
-    return getImageUrl(member?.imageUrl, member?.firstName);
-  }, [member?.imageUrl, member?.firstName]);
-
+import Button from './Button';
+const Popup: React.FC<any> = ({ isOpen, member, onClose, onEdit }) => {
   if (!isOpen || !member) return null;
 
-  // Formatage de la date (ex: 12 juin 2005)
-  const formattedDate = member.birthDate 
-    ? new Date(member.birthDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-    : 'Non renseignée';
-
-  const content = (
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
-      <div 
-        className={`w-full max-w-2xl ${THEME.card} bg-white dark:bg-brand-bg overflow-hidden animate-in zoom-in duration-300 shadow-2xl relative`}
-        onClick={(e) => e.stopPropagation()}
-      >
+  return createPortal(
+    <div className="fixed inset-0 z-100 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-t-[40px] sm:rounded-[40px] w-full max-w-lg overflow-hidden border-x-4 border-t-4 sm:border-4 border-white shadow-2xl animate-in slide-in-from-bottom sm:zoom-in duration-300">
         
-        {/* Header Coloré */}
-        <div className="relative h-20 bg-brand-primary border-b-4 border-brand-primary-dark">
-          <button 
-            onClick={onClose} 
-            className="absolute top-4 right-4 p-2 bg-black/10 hover:bg-black/20 rounded-xl text-white transition-all active:scale-90 z-10"
-          >
-            <AiOutlineClose size={20} />
-          </button>
+        <div className="relative h-28 lg:h-32 bg-brand-primary/10 flex items-center justify-center">
+            <button onClick={onClose} className="absolute top-4 right-4 z-20 bg-white/80 p-2 rounded-full sm:hidden">
+                <AiOutlineClose size={20} />
+            </button>
+            <img 
+              src={getImageUrl(member.imageUrl, member.firstName)} 
+              className="w-20 h-20 lg:w-24 lg:h-24 rounded-3xl border-4 border-white shadow-xl translate-y-8 object-cover"
+              alt={member.firstName}
+            />
         </div>
-
-        <div className="px-10 pb-8">
-          {/* Avatar flottant */}
-          <div className="relative flex justify-between items-end -mt-12 mb-6">
-            <div className="w-28 h-28 rounded-3xl border-4 border-white bg-white border-b-8 border-b-brand-border-dark overflow-hidden shadow-lg">
-              <img 
-                src={avatarUrl} 
-                className="w-full h-full object-cover"
-                alt={`${member.firstName} avatar`}
-                onError={(e) => { 
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${member.firstName}&background=FF4B4B&color=fff`;
-                }}
-              />
-            </div>
-            <span className={`px-4 py-2 rounded-xl text-[10px] ${THEME.font.black} bg-brand-primary/10 text-brand-primary border-2 border-brand-primary border-b-4 uppercase`}>
-              {member.status || "MEMBRE"}
+        
+        <div className="pt-10 pb-6 lg:pb-8 px-6 lg:px-10 text-center">
+          <h2 className="text-xl lg:text-2xl font-black text-brand-text uppercase leading-tight">
+            {member.firstName} <br className="sm:hidden" /> {member.lastName}
+          </h2>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <span className="px-4 py-1 rounded-full bg-brand-bg text-[10px] font-black text-brand-primary border border-brand-border uppercase">
+                {member.status}
             </span>
           </div>
 
-          <h2 className={`text-2xl ${THEME.font.black} text-brand-text mb-1 tracking-tight uppercase`}>
-            {member.firstName} {member.lastName}
-          </h2>
-          
-          <div className="flex items-center gap-2 mb-6">
-            <p className={`text-brand-primary ${THEME.font.black} text-[10px] flex items-center gap-2 uppercase tracking-widest`}>
-                <AiOutlineIdcard size={16}/> ID MATRICULE : {member.id}
-            </p>
-          </div>
-
-          {/* Grille d'informations corrigée selon le MemberDto */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6 border-t-2 border-brand-border">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 text-left">
             <InfoItem icon={<AiOutlinePhone />} label="Téléphone" value={member.phoneNumber} />
-            
-            {/* Si districtName n'existe pas encore dans le DTO, on affiche l'ID */}
-            <InfoItem 
-                icon={<AiOutlineEnvironment />} 
-                label="Quartier / District" 
-                value={member.districtName || (member.districtId ? `District N°${member.districtId}` : 'Non renseigné')} 
-            />
-            
-            <InfoItem 
-                icon={<AiOutlineTeam />} 
-                label="Genre" 
-                value={member.gender === 'MALE' ? 'Masculin' : 'Féminin'} 
-            />
-            
-            <InfoItem icon={<AiOutlineCalendar />} label="Date de Naissance" value={formattedDate} />
-            
-            {/* Si tributeName n'existe pas encore dans le DTO, on affiche l'ID */}
-            <InfoItem 
-                icon={<AiOutlineTeam />} 
-                label="Tribu" 
-                value={member.tributeName || (member.tributeId ? `Tribu N°${member.tributeId}` : 'Non renseignée')} 
-            />
-            
-            <InfoItem icon={<AiOutlineIdcard />} label="Situation" value={member.status} />
+            <InfoItem icon={<AiOutlineEnvironment />} label="Quartier" value={member.districtName || 'N/A'} />
           </div>
         </div>
 
-        <div className="bg-brand-bg px-10 py-6 flex justify-end border-t-2 border-brand-border gap-4">
-            <button onClick={onClose} className="px-8 py-3 rounded-2xl border-2 border-brand-border font-black text-[11px] uppercase hover:bg-white transition-all">
-                Retour
-            </button>
-            <button onClick={onClose} className="px-10 py-3 rounded-2xl bg-brand-primary border-2 border-brand-primary-dark border-b-4 text-white font-black text-[11px] uppercase hover:brightness-105 active:border-b-0 active:translate-y-1 transition-all">
-                Modifier le profil
-            </button>
+        <div className="p-6 bg-brand-bg flex flex-col sm:flex-row gap-3">
+          <Button variant="secondary" onClick={onClose} className="flex-1 order-2 sm:order-1">Fermer</Button>
+          <Button variant="primary" onClick={() => onEdit?.(member.id)} className="flex-1 order-1 sm:order-2">Modifier</Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
-
-  return createPortal(content, document.body);
 };
 
-const InfoItem = memo(({ icon, label, value }: { icon: React.ReactElement, label: string, value: any }) => (
-  <div className="flex items-center gap-4 group">
-    <div className="w-10 h-10 flex items-center justify-center bg-brand-bg border-2 border-brand-border border-b-4 border-b-brand-border-dark text-brand-primary rounded-2xl shrink-0 group-hover:scale-110 transition-transform">
-      {React.cloneElement(icon)}
+const InfoItem = ({ icon, label, value }: any) => (
+    <div className="flex items-center gap-3 p-3 bg-white rounded-2xl border-2 border-brand-border border-b-4">
+        <div className="text-brand-primary shrink-0">{icon}</div>
+        <div className="min-w-0">
+            <p className="text-[9px] font-black text-brand-muted uppercase truncate">{label}</p>
+            <p className={`text-xs font-bold text-brand-text truncate`}>{value}</p>
+        </div>
     </div>
-    <div className="overflow-hidden">
-      <p className={`text-[9px] ${THEME.font.black} text-brand-muted leading-none mb-1 uppercase tracking-tighter`}>{label}</p>
-      <p className={`text-brand-text font-bold text-sm truncate`}>{value || 'Non renseigné'}</p>
-    </div>
-  </div>
-));
+);
 
 export default memo(Popup);

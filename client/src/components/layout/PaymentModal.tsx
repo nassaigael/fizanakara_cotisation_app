@@ -1,101 +1,108 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { AiOutlineDollarCircle, AiOutlineClose } from "react-icons/ai";
 import { THEME } from "../../styles/theme";
-import { memberService } from "../../services/memberService";
+// ✅ Correction de l'import : On utilise memberService ou financeService selon ton projet
+// Si le fichier s'appelle financeService, garde l'ancien. Sinon utilise memberService
+import { memberService } from "../../services/memberService"; 
 import { toast } from "react-hot-toast";
-import type { Member as MemberType } from "../../utils/types/types";
 import Button from "../ui/Button";
+import type { ContributionResponse } from "../../utils/types/models/Finance.types";
 
 interface PaymentModalProps {
     isOpen: boolean;
-    member: MemberType | null;
+    contribution: ContributionResponse | null; 
     onClose: () => void;
     onSuccess: () => void;
 }
 
-export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, member, onClose, onSuccess }) => {
+export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, contribution, onClose, onSuccess }) => {
     const [amount, setAmount] = useState<number>(0);
     const [isSaving, setIsSaving] = useState(false);
-    if (!isOpen || !member) return null;
+
+    if (!isOpen || !contribution) return null;
 
     const handleSave = async () => {
         if (amount <= 0) {
-            toast.error("Veuillez entrer un montant positif");
+            toast.error("Le montant doit être supérieur à 0");
             return;
         }
-
         setIsSaving(true);
         try {
-            await memberService.addPayment(member.id.toString(), {
+            await memberService.addPayment(contribution.memberId, {
                 amount: amount,
+                contributionId: contribution.id,
                 date: new Date().toISOString(),
-                year: new Date().getFullYear(),
                 method: "Liquide"
             });
             
-            toast.success(`Paiement de ${amount.toLocaleString()} Ar enregistré !`);
+            toast.success(`Versement de ${amount.toLocaleString()} Ar enregistré`);
             setAmount(0);
             onSuccess();
             onClose();
         } catch (err: any) {
-            console.log("Détails du 403:", err.response?.data); 
-            const errorMsg = err.response?.status === 403 
-                ? "Session expirée ou droits insuffisants (403)" 
-                : "Erreur lors de l'enregistrement";
-            toast.error(errorMsg);
-        }finally {
+            toast.error("Erreur lors de l'enregistrement du paiement");
+        } finally {
             setIsSaving(false);
         }
     };
 
     return (
-        <div className="fixed inset-0 z-100 flex items-center justify-center bg-brand-text/60 backdrop-blur-md p-4 animate-in fade-in duration-200" onClick={onClose}>
-            <div 
-                className="bg-white w-full max-w-md rounded-4xl border-2 border-b-8 border-brand-border p-8 shadow-2xl relative overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <button onClick={onClose} className="absolute top-6 right-6 text-brand-muted hover:text-brand-text">
-                    <AiOutlineClose size={24} />
-                </button>
-
-                <div className="flex items-center gap-4 mb-8">
-                    <div className="p-4 bg-emerald-100 text-emerald-600 rounded-2xl border-2 border-emerald-200 shadow-inner">
-                        <AiOutlineDollarCircle size={32}/>
+        <div className="fixed inset-0 z-150 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white w-full sm:max-w-md rounded-t-[40px] sm:rounded-[40px] overflow-hidden border-x-4 border-t-4 sm:border-4 border-white shadow-2xl animate-in slide-in-from-bottom sm:zoom-in duration-300">
+                
+                {/* Header */}
+                <div className="p-6 border-b-2 border-brand-border flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary">
+                            <AiOutlineDollarCircle size={24} />
+                        </div>
+                        <h2 className={`text-lg ${THEME.font.black} text-brand-text uppercase`}>Nouveau Versement</h2>
                     </div>
-                    <div>
-                        <h3 className={`text-xl ${THEME.font.black} text-brand-text uppercase leading-none`}>Encaissement</h3>
-                        <p className="text-[10px] font-bold text-brand-muted uppercase mt-1 tracking-widest">
-                            {member.firstName} {member.lastName}
-                        </p>
-                    </div>
+                    <button onClick={onClose} className="p-2 hover:bg-brand-bg rounded-full transition-colors">
+                        <AiOutlineClose size={20} className="text-brand-muted" />
+                    </button>
                 </div>
 
-                <div className="space-y-6">
-                    <div className="bg-brand-bg/50 p-6 rounded-3xl border-2 border-dashed border-brand-border">
-                        <label className="block text-[11px] font-black text-brand-text uppercase mb-4 text-center">
+                <div className="p-6 lg:p-8 space-y-6">
+                    {/* Info Membre */}
+                    <div className="text-center p-4 bg-brand-bg/50 rounded-2xl border-2 border-brand-border">
+                        <p className="text-[10px] font-black text-brand-muted uppercase tracking-widest">Cotisation pour</p>
+                        <p className="text-md font-bold text-brand-text">{contribution.memberName}</p>
+                        <p className="text-sm font-black text-brand-primary mt-1">Année {contribution.year}</p>
+                    </div>
+
+                    {/* Input Montant */}
+                    <div className="space-y-3">
+                        <label className={`block text-center text-[11px] ${THEME.font.black} text-brand-muted uppercase`}>
                             Montant à verser (Ar)
                         </label>
-                        <input 
-                            type="number" 
-                            autoFocus
-                            className="w-full bg-transparent text-4xl text-center font-black text-brand-primary outline-none"
-                            placeholder="0"
-                            value={amount || ""}
-                            onChange={(e) => setAmount(Number(e.target.value))}
-                        />
+                        <div className="relative group">
+                            <input 
+                                type="number" 
+                                autoFocus
+                                className="w-full bg-transparent text-5xl text-center font-black text-brand-primary outline-none placeholder:opacity-20"
+                                placeholder="0"
+                                value={amount || ""}
+                                onChange={(e) => setAmount(Number(e.target.value))}
+                            />
+                        </div>
                     </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                        <Button onClick={onClose} variant="ghost" className="py-4 text-[11px]">
+
+                    {/* Actions */}
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                        <Button 
+                            variant="secondary" 
+                            onClick={onClose} 
+                            className="flex-1 py-4 order-2 sm:order-1"
+                        >
                             Annuler
                         </Button>
                         <Button 
-                            onClick={handleSave}
+                            onClick={handleSave} 
                             disabled={isSaving || amount <= 0}
-                            variant="primary"
-                            className="py-4 text-[11px] shadow-[0_4px_0_0_#991b1b]"
+                            className="flex-2 py-4 order-1 sm:order-2"
                         >
-                            {isSaving ? "Chargement..." : "Confirmer"}
+                            {isSaving ? "Enregistrement..." : "Confirmer le paiement"}
                         </Button>
                     </div>
                 </div>
@@ -103,3 +110,5 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, member, onCl
         </div>
     );
 };
+
+export default memo(PaymentModal);

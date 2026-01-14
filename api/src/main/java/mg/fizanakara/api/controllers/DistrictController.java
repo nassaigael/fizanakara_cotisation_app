@@ -24,7 +24,7 @@ public class DistrictController {
     //  🔒 ALL ROUTES IS PROTECTED BY ADMIN TOKEN
     // GET ALL
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<List<District>> getAllDistricts() {
         log.info("Récupération de tous les districts");
         return ResponseEntity.ok(districtService.getAllDistricts());

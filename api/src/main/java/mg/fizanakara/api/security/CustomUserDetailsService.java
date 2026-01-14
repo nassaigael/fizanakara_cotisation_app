@@ -24,7 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found " + email));
 
-        // ← FIX : Mapping dynamique du rôle enum → "ROLE_" + name (ex. : ROLE_SUPERADMIN pour SuperAdmin)
         Collection<SimpleGrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority("ROLE_" + admin.getRole().name())  // ← FIX : admin.getRole().name() au lieu hardcoded "ADMIN"
         );

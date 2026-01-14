@@ -40,7 +40,7 @@ public class ContributionController {
             @PathVariable String personId,  // ← MODIF : personId
             @PathVariable Year year) {
         log.debug("Retrieving contributions for person ID: {} and year: {}", personId, year);
-        return ResponseEntity.ok(contributionService.getContributionsByPersonAndYear(personId, year));  // ← MODIF : Appel service adapté
+        return ResponseEntity.ok(contributionService.getContributionsByPersonAndYear(personId, year));
     }
 
     // CREATE (batch pour année)

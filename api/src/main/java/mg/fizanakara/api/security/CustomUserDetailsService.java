@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found " + email));
 
         Collection<SimpleGrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + admin.getRole().name())  // ← FIX : admin.getRole().name() au lieu hardcoded "ADMIN"
+                new SimpleGrantedAuthority("ROLE_" + admin.getRole().name())
         );
 
         return User.builder()

@@ -1,0 +1,207 @@
+openapi: "3.1.0"
+info:
+  title: "api API"
+  description: "api API"
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:3000"
+paths:
+  /register:
+    post:
+      summary: "POST register"
+      operationId: "register"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /login:
+    post:
+      summary: "POST login"
+      operationId: "login"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /admins/{id}:
+    delete:
+      summary: "DELETE admins/{id}"
+      operationId: "deleteAdmin"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /refresh:
+    post:
+      summary: "POST refresh"
+      operationId: "refreshToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "string"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /forgot-password:
+    post:
+      summary: "POST forgot-password"
+      operationId: "forgotPassword"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "string"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /reset-password:
+    post:
+      summary: "POST reset-password"
+      operationId: "resetPassword"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "string"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /admins/me:
+    get:
+      summary: "GET admins/me"
+      operationId: "me"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+    patch:
+      summary: "PATCH admins/me"
+      operationId: "updateMe"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAdminDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+components:
+  schemas:
+    RegisterRequestDTO:
+      type: "object"
+      properties:
+        firstName:
+          type: "string"
+          nullable: true
+        lastName:
+          type: "string"
+          nullable: true
+        birthDate:
+          type: "string"
+          format: "date"
+          nullable: true
+        gender:
+          type: "string"
+          nullable: true
+        imageUrl:
+          type: "string"
+          nullable: true
+        phoneNumber:
+          type: "string"
+          nullable: true
+        email:
+          type: "string"
+          nullable: true
+        password:
+          type: "string"
+          nullable: true
+    LoginRequestDTO:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+          nullable: true
+        password:
+          type: "string"
+          nullable: true
+    UpdateAdminDto:
+      type: "object"
+      properties:
+        firstName:
+          type: "string"
+          nullable: true
+        lastName:
+          type: "string"
+          nullable: true
+        birthDate:
+          type: "string"
+          format: "date"
+          nullable: true
+        gender:
+          type: "string"
+          nullable: true
+        imageUrl:
+          type: "string"
+          nullable: true
+        phoneNumber:
+          type: "string"
+          nullable: true
+        email:
+          type: "string"
+          nullable: true
+        password:
+          type: "string"
+          nullable: true
+        verified:
+          type: "boolean"
+          nullable: true

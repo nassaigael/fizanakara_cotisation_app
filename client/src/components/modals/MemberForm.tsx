@@ -1,6 +1,9 @@
 import React, { memo, useMemo, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AiOutlineSave, AiOutlineCamera, AiOutlineClose, AiOutlineGlobal, AiOutlineTeam, AiOutlineUser } from 'react-icons/ai';
+import { 
+  AiOutlineSave, AiOutlineClose, AiOutlineGlobal, AiOutlineTeam, 
+  AiOutlineUser, AiOutlineInfoCircle, AiOutlineCamera, AiOutlineCalendar 
+} from 'react-icons/ai';
 import { THEME } from '../../styles/theme';
 import Button from '../shared/Button';
 import Input from '../shared/Input';
@@ -11,141 +14,192 @@ import { DistrictService } from '../../services/district.service';
 import { TributeService } from '../../services/tribute.service';
 import { DistrictDto, TributeDto } from '../../lib/types/models/common.type';
 
-const MemberForm: React.FC<any> = ({ isOpen, onClose, memberToEdit, onSuccess }) => {
+const MemberForm: React.FC<any> = ({ isOpen, onClose, memberToEdit, onSuccess, allMembers }) => {
   const [districts, setDistricts] = useState<DistrictDto[]>([]);
   const [tributes, setTributes] = useState<TributeDto[]>([]);
-
+  const [isChildMode, setIsChildMode] = useState(false);
   const { formData, handleChange, handleSubmit, loading, errors } = useMemberForm(
-    () => { onSuccess?.(); onClose(); }, 
+    () => { onSuccess(); onClose(); }, 
     memberToEdit
   );
 
   useEffect(() => {
     if (isOpen) {
-        DistrictService.getAll().then(setDistricts);
-        TributeService.getAll().then(setTributes);
+        Promise.all([
+            DistrictService.getAll(),
+            TributeService.getAll()
+        ]).then(([distData, tribData]) => {
+            setDistricts(distData);
+            setTributes(tribData);
+        });
+        
+        setIsChildMode(!!memberToEdit?.parentId);
     }
-  }, [isOpen]);
-
-  // Utilise la logique centralisée dans constant.ts pour générer l'URL GitHub
-  const previewUrl = useMemo(() => 
-    getImageUrl(formData.imageUrl, formData.firstName, 'member'), 
-    [formData.imageUrl, formData.firstName]
+  }, [isOpen, memberToEdit]);
+  const parentOptions = useMemo(() => 
+    allMembers
+        ?.filter((m: any) => m.id !== memberToEdit?.id && !m.parentId)
+        .map((m: any) => ({ value: m.id, label: `${m.firstName} ${m.lastName}` })) || [],
+    [allMembers, memberToEdit]
   );
-
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-150 flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:rounded-[40px] flex flex-col border-4 border-white shadow-2xl animate-in slide-in-from-bottom sm:zoom-in duration-300 overflow-hidden">
-        
-        {/* Header */}
-        <div className="p-6 border-b-2 border-brand-border flex justify-between items-center bg-white">
-          <h2 className={`text-xl ${THEME.font.black} text-brand-text uppercase italic`}>
-            {memberToEdit ? 'Modifier la fiche' : 'Nouveau Membre'}
-          </h2>
-          <button onClick={onClose} className="p-2 hover:bg-brand-bg rounded-full transition-colors border-2 border-transparent hover:border-brand-border">
-            <AiOutlineClose size={24} className="text-brand-muted" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-          
-          {/* SECTION APERÇU PROFIL (Nouveau) */}
-          <div className="relative mb-8 p-6 bg-linear-to-br from-brand-bg to-white rounded-4xl border-2 border-brand-border overflow-hidden">
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              {/* Avatar avec cercle de statut */}
-              <div className="relative">
-                <div className="h-28 w-28 bg-white rounded-3xl border-4 border-white shadow-xl overflow-hidden ring-2 ring-brand-border">
-                  <img 
-                    src={previewUrl} 
-                    alt="Aperçu" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                        // Fallback si l'image GitHub n'existe pas encore
-                        (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${formData.firstName || 'User'}&background=random`;
-                    }}
-                  />
-                </div>
-                <div className="absolute -bottom-2 -right-2 bg-brand-primary text-white p-2 rounded-xl shadow-lg">
-                  <AiOutlineCamera size={18} />
-                </div>
-              </div>
-
-              {/* Infos en direct */}
-              <div className="text-center sm:text-left flex-1">
-                <h3 className="text-2xl font-black text-brand-text uppercase leading-none mb-1">
-                  {formData.firstName || 'Prénom'} {formData.lastName || 'Nom'}
-                </h3>
-                <p className="text-sm font-bold text-brand-muted flex items-center justify-center sm:justify-start gap-2">
-                  <span className="px-2 py-0.5 bg-brand-border rounded-lg text-[10px]">
-                    {formData.status === 'STUDENT' ? 'ÉTUDIANT' : 'TRAVAILLEUR'}
-                  </span>
-                  • {formData.phoneNumber || '03X XX XXX XX'}
-                </p>
-              </div>
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-brand-text/60 backdrop-blur-sm p-2 md:p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-[2.5rem] md:rounded-[3rem] w-full max-w-5xl h-full max-h-[98vh] md:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border-4 border-white">
+        <div className="px-6 py-5 border-b border-brand-bg flex justify-between items-center bg-white shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-brand-primary/10 rounded-2xl flex items-center justify-center text-brand-primary border-b-4 border-brand-primary shadow-sm">
+               <AiOutlineTeam size={24} />
+            </div>
+            <div>
+                <h2 className={`text-xl ${THEME.font.black} text-brand-text leading-none`}>
+                {memberToEdit ? 'Modifier Membre' : 'Ajouter Membre'}
+                </h2>
+                <p className="text-[9px] font-bold text-brand-muted uppercase tracking-widest mt-1 italic">Registre Fizanakara</p>
             </div>
           </div>
-
-          {/* Formulaire classique */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="Prénom" name="firstName" value={formData.firstName} onChange={handleChange} error={errors.firstName} placeholder="Ex: Jean" />
-            <Input label="Nom" name="lastName" value={formData.lastName} onChange={handleChange} error={errors.lastName} placeholder="Ex: DUPONT" />
+          <button onClick={onClose} className="p-3 hover:bg-red-50 hover:text-red-500 rounded-2xl transition-all active:scale-90">
+            <AiOutlineClose size={24} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar bg-brand-bg/30">
+          <div className="max-w-sm mx-auto flex gap-2 p-1.5 bg-white border-2 border-brand-border rounded-2xl mb-10 shadow-sm">
+            <button 
+                type="button" 
+                onClick={() => { setIsChildMode(false); handleChange({ target: { name: 'parentId', value: '' } } as any); }}
+                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${!isChildMode ? 'bg-brand-primary text-white shadow-md' : 'text-brand-muted hover:bg-brand-bg'}`}
+            >Titulaire</button>
+            <button 
+                type="button" 
+                onClick={() => setIsChildMode(true)}
+                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isChildMode ? 'bg-brand-primary text-white shadow-md' : 'text-brand-muted hover:bg-brand-bg'}`}
+            >Enfant</button>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="Date de naissance" name="birthDate" type="date" value={formData.birthDate} onChange={handleChange} error={errors.birthDate} />
-            <Input label="Téléphone" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} error={errors.phoneNumber} placeholder="034 XX XXX XX" />
-          </div>
-
-          <div className="p-4 bg-brand-bg/50 rounded-2xl border-2 border-brand-border">
-            <Input 
-                label="Nom du fichier image (sur GitHub)" 
-                name="imageUrl" 
-                value={formData.imageUrl} 
-                onChange={handleChange} 
-                error={errors.imageUrl} 
-                icon={<AiOutlineCamera />} 
-                placeholder="Ex: jean_photo (sans .jpg)" 
-            />
-            <p className="text-[10px] text-brand-muted mt-2 ml-1 font-medium">
-              L'URL finale sera : {previewUrl}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <Select label="Genre" name="gender" value={formData.gender} onChange={handleChange} options={[{ value: 'MALE', label: 'Homme' }, { value: 'FEMALE', label: 'Femme' }]} placeholder={''} />
-             <Select label="Statut" name="status" value={formData.status} onChange={handleChange} options={[{ value: 'STUDENT', label: 'Étudiant' }, { value: 'WORKER', label: 'Travailleur' }]} placeholder={''} />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Select 
-                label="District" 
-                name="districtId" 
-                value={formData.districtId} 
-                onChange={handleChange} 
-                error={errors.districtId}
-                options={districts.map(d => ({ value: d.id ?? 0, label: d.name }))}
-                icon={<AiOutlineGlobal size={20} />}
-            />
-             <Select 
-                label="Tribu" 
-                name="tributeId" 
-                value={formData.tributeId} 
-                onChange={handleChange} 
-                error={errors.tributeId}
-                options={tributes.map(t => ({ value: t.id ?? 0, label: t.name }))}
-                icon={<AiOutlineTeam size={20} />}
-            />
-          </div>
-        </form>
-
-        {/* Footer Actions */}
-        <div className="p-6 bg-gray-50 border-t-2 border-brand-border flex gap-4">
-          <Button variant="secondary" onClick={onClose} className="flex-1 hidden sm:flex">Annuler</Button>
-          <Button type="submit" onClick={handleSubmit} isLoading={loading} className="flex-2 py-4 h-14">
+          <form id="member-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+            <div className="lg:col-span-4 space-y-6">
+                <div className="bg-white p-6 rounded-[2.5rem] border-2 border-brand-border border-b-8 flex flex-col items-center shadow-sm">
+                    <div className="w-36 h-44 bg-brand-bg rounded-3xl border-4 border-white shadow-xl overflow-hidden mb-6 group relative">
+                        <img 
+                            src={getImageUrl(formData.imageUrl, formData.firstName, 'member')} 
+                            alt="Avatar" 
+                            className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                        />
+                    </div>
+                    <Input 
+                        label="Référence Image" 
+                        name="imageUrl" 
+                        value={formData.imageUrl} 
+                        onChange={handleChange} 
+                        placeholder="Ex: membre_01.jpg" 
+                        icon={<AiOutlineCamera />} 
+                    />
+                </div>
+                {isChildMode && (
+                    <div className="p-6 bg-amber-50 rounded-4xl border-2 border-dashed border-amber-200 animate-in slide-in-from-top-4">
+                        <Select 
+                            label="Parent responsable" 
+                            name="parentId" 
+                            value={formData.parentId || ""} 
+                            onChange={handleChange} 
+                            error={errors.parentId} 
+                            options={parentOptions} 
+                            icon={<AiOutlineUser />} 
+                        />
+                        <div className="flex items-start gap-2 mt-4 text-amber-700">
+                            <AiOutlineInfoCircle size={16} className="shrink-0 mt-0.5" />
+                            <p className="text-[9px] font-bold uppercase leading-tight tracking-tight">
+                                L'enfant sera rattaché aux cotisations du parent sélectionné.
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+            <div className="lg:col-span-8 space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Input label="Prénom" name="firstName" value={formData.firstName} onChange={handleChange} error={errors.firstName} placeholder="Ex: Jean" />
+                    <Input label="Nom" name="lastName" value={formData.lastName} onChange={handleChange} error={errors.lastName} placeholder="Ex: DUPONT" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Input 
+                        label="Date de naissance" 
+                        type="date" 
+                        name="birthDate" 
+                        value={formData.birthDate} 
+                        onChange={handleChange} 
+                        error={errors.birthDate} 
+                        icon={<AiOutlineCalendar />} 
+                    />
+                    <Select 
+                        label="Sexe" 
+                        name="gender" 
+                        value={formData.gender} 
+                        onChange={handleChange} 
+                        options={[{ value: 'MALE', label: 'Masculin' }, { value: 'FEMALE', label: 'Féminin' }]} 
+                    />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Select 
+                        label="District" 
+                        name="districtId" 
+                        value={formData.districtId} 
+                        onChange={handleChange} 
+                        error={errors.districtId} 
+                        options={districts.map(d => ({ value: d.id ?? 0, label: d.name }))} 
+                        icon={<AiOutlineGlobal />} 
+                    />
+                    <Select 
+                        label="Tribu" 
+                        name="tributeId" 
+                        value={formData.tributeId} 
+                        onChange={handleChange} 
+                        error={errors.tributeId} 
+                        options={tributes.map(t => ({ value: t.id ?? 0, label: t.name }))} 
+                        icon={<AiOutlineTeam />} 
+                    />
+                    <Select 
+                        label="Statut" 
+                        name="status" 
+                        value={formData.status} 
+                        onChange={handleChange} 
+                        options={[{ value: 'STUDENT', label: 'Étudiant' }, { value: 'WORKER', label: 'Travailleur' }]} 
+                    />
+                </div>
+                
+                <Input 
+                    label="Numéro de téléphone" 
+                    name="phoneNumber" 
+                    value={formData.phoneNumber} 
+                    onChange={handleChange} 
+                    error={errors.phoneNumber} 
+                    placeholder="034 00 000 00" 
+                    icon={<span className="text-xs font-bold text-brand-muted">+261</span>}
+                />
+            </div>
+          </form>
+        </div>
+        <div className="px-8 py-6 bg-white border-t-2 border-brand-border flex flex-col md:flex-row items-center gap-4 shrink-0 shadow-[0_-8px_20px_rgba(0,0,0,0.03)]">
+  
+          <button 
+            type="button"
+            onClick={onClose} 
+            className="w-full md:w-auto px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.15em] 
+                      text-brand-muted bg-white border-2 border-brand-border border-b-4 
+                      hover:bg-brand-bg hover:text-brand-text active:border-b-2 active:translate-y-0.5 
+                      transition-all duration-200"
+          >
+            Annuler
+          </button>
+          <Button 
+            type="submit" 
+            form="member-form" 
+            className="w-full md:flex-1 py-4 text-[10px] flex items-center justify-center 
+                      shadow-[0_6px_0_0_rgba(0,0,0,0.1)] active:shadow-none"
+          >
             <AiOutlineSave size={20} className="mr-2" />
-            {memberToEdit ? 'Mettre à jour' : 'Enregistrer le membre'}
+            <span className="truncate">
+                {memberToEdit ? 'Enregistrer les modifications' : 'Confirmer la création'}
+            </span>
           </Button>
         </div>
       </div>

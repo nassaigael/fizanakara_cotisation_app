@@ -15,7 +15,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const token = localStorage.getItem('accessToken');
         
         if (savedUser && token) {
-            // On restaure l'utilisateur immédiatement sans appeler le backend
             setUser(JSON.parse(savedUser));
         }
         setLoading(false); 
@@ -24,7 +23,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const login = async (credentials: LoginRequestDTO) => {
         try {
             const data = await AuthService.login(credentials);
-            // Stockage strict
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('userData', JSON.stringify(data.user));
             localStorage.setItem('userRole', data.role);

@@ -1,7 +1,11 @@
 import React, { useEffect, memo } from "react";
 import { createPortal } from "react-dom";
 import Button from "./Button";
-import { AiOutlineWarning, AiOutlineCheckCircle, AiOutlineInfoCircle } from "react-icons/ai";
+import {
+  AiOutlineWarning,
+  AiOutlineCheckCircle,
+  AiOutlineInfoCircle,
+} from "react-icons/ai";
 
 interface AlertProps {
   isOpen: boolean;
@@ -15,49 +19,84 @@ interface AlertProps {
 }
 
 const Alert: React.FC<AlertProps> = ({
-  isOpen, title, message, onClose, onConfirm,
-  confirmText = "Confirmer", cancelText = "Annuler", variant = "warning",
+  isOpen,
+  title,
+  message,
+  onClose,
+  onConfirm,
+  confirmText = "Confirmer",
+  cancelText = "Annuler",
+  variant = "warning",
 }) => {
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = 'unset'; };
+    if (isOpen) document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   const config = {
-    success: { icon: <AiOutlineCheckCircle />, color: "text-green-500", bg: "bg-green-50", border: "border-green-200" },
-    danger: { icon: <AiOutlineWarning />, color: "text-brand-primary", bg: "bg-brand-primary/5", border: "border-brand-primary/20" },
-    warning: { icon: <AiOutlineWarning />, color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-200" },
-    info: { icon: <AiOutlineInfoCircle />, color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200" }
+    success: {
+      icon: <AiOutlineCheckCircle size={28} />,
+      color: "text-green-500",
+      bg: "bg-green-50",
+      border: "border-green-200",
+    },
+    danger: {
+      icon: <AiOutlineWarning size={28} />,
+      color: "text-brand-primary",
+      bg: "bg-brand-primary/5",
+      border: "border-brand-primary/20",
+    },
+    warning: {
+      icon: <AiOutlineWarning size={28} />,
+      color: "text-orange-500",
+      bg: "bg-orange-50",
+      border: "border-orange-200",
+    },
+    info: {
+      icon: <AiOutlineInfoCircle size={28} />,
+      color: "text-blue-500",
+      bg: "bg-blue-50",
+      border: "border-blue-200",
+    },
   };
 
   const current = config[variant];
 
+  const handleConfirm = () => {
+    onConfirm?.();
+    onClose();
+  };
+
   return createPortal(
-    <div className="fixed inset-0 z-999 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-brand-border-dark rounded-[2.5rem] w-full max-w-sm overflow-hidden border-4 border-white shadow-2xl animate-in zoom-in-95 duration-200">
-        
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-sm bg-white dark:bg-brand-border-dark rounded-[2.5rem] border-4 border-white shadow-2xl overflow-hidden">
+
         <div className="p-8 text-center">
-          <div className={`mx-auto w-16 h-16 rounded-3xl border-2 border-b-4 flex items-center justify-center mb-6 ${current.bg} ${current.border} ${current.color}`}>
-            {React.cloneElement(current.icon as React.ReactElement)}
+          <div
+            className={`mx-auto w-16 h-16 rounded-3xl border-2 border-b-4 flex items-center justify-center mb-6 ${current.bg} ${current.border} ${current.color}`}
+          >
+            {current.icon}
           </div>
 
-          <h2 className="text-xl font-black text-brand-text mb-2 uppercase tracking-tight">
+          <h2 className="text-xl font-black text-brand-text uppercase mb-2">
             {title}
           </h2>
-          <p className="text-brand-muted text-sm font-bold leading-relaxed px-2">
+          <p className="text-sm font-bold text-brand-muted leading-relaxed">
             {message}
           </p>
         </div>
-        
-        <div className="bg-brand-bg dark:bg-brand-bg/10 p-6 flex gap-3 border-t-2 border-brand-border">
+
+        <div className="p-6 bg-brand-bg dark:bg-brand-bg/10 border-t-2 border-brand-border flex gap-3">
           <Button variant="secondary" onClick={onClose} className="flex-1">
             {cancelText}
           </Button>
-          <Button 
-            variant={variant === "danger" ? "danger" : "primary"} 
-            onClick={() => { onConfirm?.(); onClose(); }} 
+          <Button
+            variant={variant === "danger" ? "danger" : "primary"}
+            onClick={handleConfirm}
             className="flex-1"
           >
             {confirmText}

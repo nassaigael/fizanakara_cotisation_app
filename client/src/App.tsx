@@ -5,19 +5,30 @@ import MainLayout from './components/layout/MainLayout';
 import AdminManagement from './views/AdminManagment';
 import MemberManagement from './views/MemberManagement';
 import ForgotPassword from './views/ForgotPassword';
-const Placeholder = ({ title }: { title: string }) => (
-    <div className="bg-white border-2 border-brand-border border-b-8 p-10 rounded-[2.5rem]">
-        <h2 className="text-2xl font-black text-brand-text uppercase">{title}</h2>
-        <p className="text-brand-muted mt-2">Page en cours de construction...</p>
-    </div>
-);
+import Dashboard from './views/Dashboard';
+import ContributionManagement from './views/ContributionManagement';
+import Profile from './views/Profile';
+import { useEffect } from 'react';
+import { applyThemeToDOM } from './lib/helper/helperTheme';
+import { THEME } from './styles/theme';
 
 export function App() {
-    const { isAuthenticated, isSuperAdmin, loading } = useAuth();
+    const { isAuthenticated, isSuperAdmin, loading, user } = useAuth();
+    useEffect(() => {
+        const savedColor = localStorage.getItem('app-theme-color');
+        
+        if (isAuthenticated && savedColor) {
+            applyThemeToDOM(savedColor);
+        } else {
+            applyThemeToDOM('#E51A1A'); 
+        }
+    }, [isAuthenticated]);
 
     if (loading) return (
         <div className="h-screen flex items-center justify-center bg-brand-bg">
-            <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
+            <div className={THEME.card + " p-5 animate-bounce"}>
+               <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
+            </div>
         </div>
     );
 
@@ -28,16 +39,14 @@ export function App() {
                 element={!isAuthenticated ? <Login /> : <Navigate to="/" />} 
             />
             <Route path='/forgot-password' element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ForgotPassword />} />
-
             {isAuthenticated ? (
                 <Route element={<MainLayout />}>
                     <Route path="/" element={<Navigate to="/dashboard" />} />
-                    
-                    <Route path="/dashboard" element={<Placeholder title="Tableau de Bord" />} />
-                    
+                    <Route path="/profile" element={<Profile/>} />
+
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/members" element={<MemberManagement />} />
-                    
+                    <Route path="/cotisations" element={<ContributionManagement />} />
                     {isSuperAdmin && (
                         <Route path="/management" element={<AdminManagement />} />
                     )}

@@ -1,30 +1,31 @@
 export const THEME = {
   font: {
-    black: "font-[900] uppercase tracking-widest",
-    bold: "font-bold tracking-tight",
-    light: "font-light tracking-wide text-brand-muted",
+    black: "font-black uppercase tracking-wider",
+    bold: "font-bold",
+    light: "font-medium text-brand-muted",
+    mini: "text-[10px] font-black uppercase tracking-widest",
   },
 
-  // EFFET 3D (Signature Duolingo)
-  clickEffect: "active:translate-y-1 active:border-b-0 transition-all duration-150",
+  grid: "duo-grid",
 
-  // CARTES : Utilise les variables définies dans @theme
-  card: `bg-white dark:bg-brand-border-dark 
-         border-2 border-brand-border 
-         border-b-8 border-b-brand-border-dark 
-         rounded-[2.5rem] shadow-sm`,
+  card: "duo-card",
+  cardPrimary: "duo-card-primary",
 
-  // INPUTS
-  input: `bg-brand-bg border-2 border-brand-border 
-          border-t-brand-border-dark rounded-2xl px-4 py-3 outline-none 
-          focus:bg-white focus:border-brand-primary 
-          text-brand-text font-bold transition-all`,
+  section: "p-4 md:p-8 lg:p-12 max-w-7xl mx-auto space-y-8",
 
-  // BOUTONS
-  buttonPrimary: `bg-brand-primary border-brand-primary-dark border-b-4 
-                  text-white font-[900] uppercase text-[11px] tracking-widest
-                  hover:brightness-110 active:translate-y-1 active:border-b-0 transition-all`,
+  input: `
+    w-full bg-brand-bg border-2 border-brand-border
+    rounded-xl px-4 py-3 outline-none
+    focus:bg-white focus:border-brand-primary
+    text-brand-text font-semibold transition-all
+  `,
 
-  buttonSecondary: `bg-white dark:bg-brand-border-dark border-brand-border border-2 border-b-4 
-                    text-brand-muted hover:text-brand-primary transition-all active:translate-y-1 active:border-b-0`,
+  buttonPrimary: "duo-btn-primary",
+  buttonSecondary: `
+    bg-white border-2 border-brand-border border-b-4
+    text-brand-muted hover:text-brand-primary
+    px-6 py-3 rounded-xl font-black uppercase text-[10px]
+    tracking-widest transition-all
+    active:translate-y-1 active:border-b-0
+  `,
 };

@@ -5,6 +5,7 @@ interface ActionButtonProps {
     onClick?: () => void;
     variant?: 'edit' | 'delete' | 'view';
     title?: string;
+    theme?: string; // <-- ajouter cette ligne
 }
 
 export const ActionButton: React.FC<ActionButtonProps> = ({ icon, onClick, variant = 'view', title }) => {

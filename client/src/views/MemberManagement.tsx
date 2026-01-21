@@ -1,229 +1,222 @@
 import React, { useState, useMemo } from "react";
 import { 
   AiOutlineSearch, AiOutlineEye, AiOutlineDelete, 
-  AiOutlinePlus, AiOutlineFilter, AiOutlineEdit 
+  AiOutlinePlus, AiOutlineFilter, AiOutlineEdit, AiOutlineClose,
+  AiOutlineTeam, AiOutlineCalendar, AiOutlinePhone, AiOutlineGlobal,
+  AiOutlineUser
 } from "react-icons/ai";
 import { useMemberLogic } from "../hooks/useMembers";
 import { MemberHelper } from "../lib/helper/member.helper";
-import { getFinancials } from "../lib/helper/finance.helper";
 import Button from "../components/shared/Button";
+import { ActionButton } from "../components/shared/ActionButton";
 import { PersonResponseDto } from "../lib/types/models/person.type";
-
 import MemberForm from "../components/modals/MemberForm";
+import { useAuth } from "../context/AuthContext";
+import { THEME } from "../styles/theme";
 
 const MemberManagement: React.FC = () => {
+    const { currentTheme } = useAuth();
     const { 
-        members, allMembers, loading, search, setSearch, 
+        members, allMembers, search, setSearch, 
         filterSex, setFilterSex, 
         filterDistrict, setFilterDistrict, 
         filterTribe, setFilterTribe, 
-        selectedMembers, handleSelect, handleSelectAll, 
         deleteAction, refreshMembers 
     } = useMemberLogic();
-
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [viewMember, setViewMember] = useState<PersonResponseDto | null>(null);
-
-    /**
-     * État pour la gestion du formulaire (Ajout / Édition)
-     */
-    const [formModal, setFormModal] = useState<{
-        isOpen: boolean;
-        memberToEdit: PersonResponseDto | null;
-    }>({
+    const [formModal, setFormModal] = useState<{isOpen: boolean; memberToEdit: PersonResponseDto | null;}>({
         isOpen: false,
         memberToEdit: null
     });
-
-    const districtOptions = useMemo(() => Array.from(new Set(allMembers.map(m => m.districtName))).filter(Boolean), [allMembers]);
-    const tributeOptions = useMemo(() => Array.from(new Set(allMembers.map(m => m.tributeName))).filter(Boolean), [allMembers]);
-
-    if (loading) return (
-        <div className="flex flex-col items-center justify-center min-h-100">
-            <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="font-black text-[10px] uppercase tracking-widest text-brand-muted">Chargement de la base...</p>
-        </div>
-    );
+    const districtOptions = useMemo(() => Array.from(new Set(allMembers.map(m => m.districtName))), [allMembers]);
+    const tribeOptions = useMemo(() => Array.from(new Set(allMembers.map(m => m.tributeName))), [allMembers]);
 
     return (
-        <div className="p-4 space-y-6">
-            {/* Header */}
-            <div className="flex justify-between items-end">
-                <div>
-                    <h1 className="text-3xl font-black text-brand-text uppercase leading-none tracking-tighter">Membres</h1>
-                    <p className="text-brand-muted font-bold text-[9px] uppercase mt-1 tracking-widest">Répertoire National Fizanakara</p>
+        <div className="h-screen flex flex-col bg-brand-bg/20 overflow-hidden">
+            <header className="p-4 md:px-8 md:py-6 bg-white border-b-2 border-brand-border shrink-0">
+                <div className="max-w-7xl mx-auto flex justify-between items-center">
+                    <div>
+                        <h1 className={`text-xl md:text-3xl ${THEME.font.black} uppercase leading-none`} style={{ color: currentTheme }}>
+                            Membres
+                        </h1>
+                        <p className="text-[9px] font-bold text-brand-muted uppercase mt-1 italic leading-none">
+                            {members.length} inscrits
+                        </p>
+                    </div>
+                    <Button
+                        onClick={() => setFormModal({ isOpen: true, memberToEdit: null })}
+                        className="flex items-center justify-center gap-2 py-3 px-6 md:py-2.5 md:px-8 text-[10px] md:text-[11px] font-black uppercase rounded-[1.75rem] shadow-[0_6px_0_0_rgba(0,0,0,0.15)] transition-all transform hover:-translate-y-1 hover:shadow-[0_10px_0_0_rgba(0,0,0,0.2)] active:translate-y-0 active:shadow-[0_4px_0_0_rgba(0,0,0,0.15)]"
+                        style={{ backgroundColor: currentTheme, color: "#fff" }}
+                    >
+                        <AiOutlinePlus size={18} /> <span className="hidden md:inline">NOUVEAU MEMBRE</span>
+                    </Button>
                 </div>
-                {/* Bouton pour ouvrir le formulaire en mode création */}
-                <Button 
-                    onClick={() => setFormModal({ isOpen: true, memberToEdit: null })}
-                    className="flex items-center gap-2"
-                >
-                    <AiOutlinePlus size={18}/> NOUVEAU
-                </Button>
-            </div>
+            </header>
 
-            {/* Barre de recherche et filtres */}
-            <div className="flex gap-4">
-                <div className="relative flex-1">
-                    <AiOutlineSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-brand-muted" size={20}/>
-                    <input 
-                        type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-                        placeholder="NOM, MATRICULE OU TÉLÉPHONE..." 
-                        className="w-full pl-14 pr-4 h-14 bg-white border-2 border-brand-border rounded-2xl font-black text-[10px] uppercase outline-none focus:border-brand-primary shadow-sm" 
-                    />
+            <section className="px-4 py-3 bg-white/50 border-b border-brand-border shrink-0">
+                <div className="max-w-7xl mx-auto flex flex-col gap-3">
+                    <div className="flex gap-2">
+                        <div className="relative flex-1">
+                            <AiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" size={16} />
+                            <input 
+                                type="text" 
+                                placeholder="Rechercher..." 
+                                className="w-full pl-9 pr-4 py-2.5 bg-white rounded-xl border-2 border-brand-border font-bold text-xs"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
+                        <button 
+                            onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            className={`p-2.5 rounded-xl border-2 transition-all ${isFilterOpen ? `bg-[${currentTheme}] text-white border-[${currentTheme}]` : 'bg-white text-brand-text border-brand-border'}`}
+                        >
+                            <AiOutlineFilter size={20} />
+                        </button>
+                    </div>
+
+                    {isFilterOpen && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 p-3 bg-white rounded-xl border-2 border-brand-primary/20 animate-in fade-in duration-200">
+                            <FilterSelect value={filterSex} onChange={setFilterSex} options={[{v:"MALE", l:"Hommes"}, {v:"FEMALE", l:"Femmes"}]} label="Sexe" />
+                            <FilterSelect value={filterDistrict} onChange={setFilterDistrict} options={districtOptions.map(d=>({v:d, l:d}))} label="District" />
+                            <FilterSelect value={filterTribe} onChange={setFilterTribe} options={tribeOptions.map(t=>({v:t, l:t}))} label="Tribu" />
+                        </div>
+                    )}
                 </div>
-                <button 
-                    onClick={() => setIsFilterOpen(!isFilterOpen)} 
-                    className={`flex items-center gap-2 px-8 rounded-2xl font-black text-[10px] border-2 transition-all ${isFilterOpen ? 'bg-brand-text text-white border-brand-text' : 'bg-white text-brand-text border-brand-border'}`}
-                >
-                    <AiOutlineFilter size={18}/> FILTRES
-                </button>
-            </div>
-
-            {/* Panel Filtres */}
-            {isFilterOpen && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-brand-bg/50 border-2 border-brand-border rounded-3xl animate-in slide-in-from-top-2">
-                    <select value={filterSex} onChange={(e) => setFilterSex(e.target.value)} className="p-3 rounded-xl border-2 border-brand-border font-bold text-[10px] uppercase outline-none focus:border-brand-primary">
-                        <option value="">Tous les genres</option>
-                        <option value="MALE">Homme</option>
-                        <option value="FEMALE">Femme</option>
-                    </select>
-                    <select value={filterDistrict} onChange={(e) => setFilterDistrict(e.target.value)} className="p-3 rounded-xl border-2 border-brand-border font-bold text-[10px] uppercase outline-none focus:border-brand-primary">
-                        <option value="">Tous les districts</option>
-                        {districtOptions.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                    <select value={filterTribe} onChange={(e) => setFilterTribe(e.target.value)} className="p-3 rounded-xl border-2 border-brand-border font-bold text-[10px] uppercase outline-none focus:border-brand-primary">
-                        <option value="">Toutes les tribus</option>
-                        {tributeOptions.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                </div>
-            )}
-
-            {/* Actions Groupées */}
-            {selectedMembers.length > 0 && (
-                <div className="p-4 bg-red-50 border-2 border-red-200 rounded-2xl flex justify-between items-center animate-in zoom-in-95">
-                    <p className="text-[10px] font-black text-red-700 uppercase">{selectedMembers.length} MEMBRES SÉLECTIONNÉS</p>
-                    <button onClick={() => deleteAction(selectedMembers)} className="px-4 py-2 bg-red-600 text-white rounded-xl font-black text-[9px] hover:bg-red-700 transition-colors">SUPPRIMER LA SÉLECTION</button>
-                </div>
-            )}
-
-            {/* Table */}
-            <div className="bg-white border-2 border-brand-border border-b-8 rounded-[2.5rem] overflow-hidden shadow-xl">
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-brand-bg/80 border-b-2 border-brand-border">
-                            <tr className="text-[9px] font-black text-brand-muted uppercase tracking-widest">
-                                <th className="p-5 w-10"><input type="checkbox" onChange={(e) => handleSelectAll(e.target.checked)} /></th>
-                                <th className="p-5 text-left">Membre</th>
-                                <th className="p-5 text-left">Localisation</th>
-                                <th className="p-5 text-left">Cotisation</th>
-                                <th className="p-5 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-brand-bg">
-                            {members.map(m => {
-                                const { paye, reste } = getFinancials(m);
-                                return (
-                                    <tr key={m.id} className="hover:bg-brand-bg/30 transition-all group">
-                                        <td className="p-5 text-center">
-                                            <input type="checkbox" checked={selectedMembers.includes(m.id)} onChange={() => handleSelect(m.id)} />
-                                        </td>
-                                        <td className="p-5">
-                                            <div className="flex items-center gap-4">
-                                                <img src={m.imageUrl} className="w-12 h-12 rounded-2xl object-cover border-2 border-brand-border" alt="" />
-                                                <div>
-                                                    <div className="font-black text-xs uppercase text-brand-text">{m.firstName} {m.lastName}</div>
-                                                    <div className="text-[9px] font-bold text-brand-muted">{m.phoneNumber}</div>
-                                                </div>
+            </section>
+            <main className="flex-1 overflow-hidden p-2 md:p-6">
+                <div className="max-w-7xl mx-auto h-full overflow-y-auto custom-scrollbar">
+                    <div className="hidden md:block bg-white rounded-[2.5rem] border-2 border-brand-border shadow-xl overflow-hidden">
+                        <table className="w-full text-left">
+                            <thead className="bg-brand-bg/50 border-b-2 border-brand-border sticky top-0">
+                                <tr>
+                                    <th className="p-5 text-[9px] font-black uppercase text-brand-muted">Membre</th>
+                                    <th className="p-5 text-[9px] font-black uppercase text-brand-muted">Localisation</th>
+                                    <th className="p-5 text-[9px] font-black uppercase text-brand-muted">Paiement</th>
+                                    <th className="p-5 text-right text-[9px] font-black uppercase text-brand-muted">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-brand-bg">
+                                {members.map(m => (
+                                    <tr key={m.id} className="hover:bg-brand-bg/30 transition-colors">
+                                        <td className="p-4 flex items-center gap-3">
+                                            <img src={m.imageUrl} className="w-10 h-10 rounded-xl object-cover border-2 border-brand-border shadow-md" alt="" />
+                                            <div>
+                                                <div className="font-black text-[11px] uppercase text-brand-text">{m.firstName} {m.lastName}</div>
+                                                <div className="text-[8px] font-bold text-brand-muted">{m.parentId ? `Fils de ${m.parentName}` : 'Titulaire'}</div>
                                             </div>
                                         </td>
-                                        <td className="p-5">
-                                            <div className="font-black text-[10px] uppercase text-brand-primary">{m.districtName}</div>
-                                            <div className="text-[9px] font-bold text-brand-muted uppercase">{m.tributeName}</div>
+                                        <td className="p-4 text-[10px] font-bold uppercase">{m.districtName} <span className="text-[${currentTheme}]">({m.tributeName})</span></td>
+                                        <td className="p-4">
+                                            <PaymentStatusBadge active={m.isActiveMember} theme={currentTheme} />
                                         </td>
-                                        <td className="p-5">
-                                            <div className={`inline-flex flex-col px-3 py-1 rounded-lg ${reste <= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                                <span className="text-[10px] font-black">{paye.toLocaleString()} Ar</span>
-                                                {reste > 0 && <span className="text-[8px] font-bold opacity-70 italic">Reste: {reste.toLocaleString()}</span>}
-                                            </div>
-                                        </td>
-                                        <td className="p-5 text-right">
+                                        <td className="p-4 text-right">
                                             <div className="flex justify-end gap-2">
-                                                {/* Bouton Voir */}
-                                                <button onClick={() => setViewMember(m)} className="p-2 bg-brand-bg border-2 border-brand-border rounded-xl hover:text-brand-primary transition-all shadow-sm" title="Détails">
-                                                    <AiOutlineEye size={18}/>
-                                                </button>
-                                                {/* Bouton Éditer */}
-                                                <button 
-                                                    onClick={() => setFormModal({ isOpen: true, memberToEdit: m })} 
-                                                    className="p-2 bg-brand-bg border-2 border-brand-border rounded-xl hover:text-brand-primary transition-all shadow-sm"
-                                                    title="Modifier"
-                                                >
-                                                    <AiOutlineEdit size={18}/>
-                                                </button>
-                                                {/* Bouton Supprimer */}
-                                                <button onClick={() => deleteAction([m.id])} className="p-2 bg-brand-bg border-2 border-brand-border rounded-xl hover:text-red-500 transition-all shadow-sm" title="Supprimer">
-                                                    <AiOutlineDelete size={18}/>
-                                                </button>
+                                                <ActionButton variant="view" onClick={() => setViewMember(m)} icon={<AiOutlineEye size={18} />} theme={currentTheme}/>
+                                                <ActionButton variant="edit" onClick={() => setFormModal({ isOpen: true, memberToEdit: m })} icon={<AiOutlineEdit size={18} />} theme={currentTheme}/>
+                                                <ActionButton variant="delete" onClick={() => deleteAction([m.id])} icon={<AiOutlineDelete size={18} />} theme={currentTheme}/>
                                             </div>
                                         </td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {/* --- MODAL FORMULAIRE (AJOUT / ÉDITION) --- */}
-            <MemberForm 
-                isOpen={formModal.isOpen} 
-                onClose={() => setFormModal({ isOpen: false, memberToEdit: null })}
-                memberToEdit={formModal.memberToEdit}
-                onSuccess={() => {
-                    refreshMembers(); // Rafraîchit la liste des membres
-                    setFormModal({ isOpen: false, memberToEdit: null }); // Ferme le modal
-                }}
-            />
-
-            {/* Modal de détails (Lecture seule) */}
-            {viewMember && (
-                <div className="fixed inset-0 bg-brand-text/40 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-                    <div className="bg-white border-2 border-brand-border border-b-8 rounded-[3rem] w-full max-w-md p-8 animate-in zoom-in-95 duration-300 relative">
-                        <button 
-                            onClick={() => setViewMember(null)}
-                            className="absolute top-6 right-6 p-2 bg-brand-bg rounded-full border-2 border-brand-border hover:text-brand-primary transition-colors"
-                        >
-                            <AiOutlinePlus className="rotate-45" size={20} />
-                        </button>
-
-                        <div className="flex flex-col items-center text-center">
-                            <img src={viewMember.imageUrl} className="w-28 h-28 rounded-3xl border-4 border-white shadow-2xl -mt-20 object-cover" alt="Profile" />
-                            <h2 className="mt-4 text-2xl font-black uppercase italic leading-none">{viewMember.lastName}</h2>
-                            <p className="text-brand-primary font-black uppercase text-xs mb-6">{viewMember.firstName}</p>
-                            
-                            <div className="grid grid-cols-2 gap-3 w-full text-left">
-                                <DetailBox label="Statut" value={viewMember.status} />
-                                <DetailBox label="Sexe" value={viewMember.gender === 'MALE' ? 'Homme' : 'Femme'} />
-                                <DetailBox label="Naissance" value={MemberHelper.formatDate(viewMember.birthDate)} />
-                                <DetailBox label="Parent" value={viewMember.parentName || "Non spécifié"} />
-                                <div className="col-span-2">
-                                    <DetailBox label="Téléphone" value={viewMember.phoneNumber} />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="md:hidden space-y-3">
+                        {members.map(m => (
+                            <div key={m.id} className="bg-white p-4 rounded-3xl border-2 border-brand-border flex items-center justify-between shadow-md">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <img src={m.imageUrl} className="w-12 h-12 rounded-2xl object-cover border-2 border-brand-border shadow-sm shrink-0" alt="" />
+                                    <div className="truncate">
+                                        <h4 className="font-black text-xs uppercase text-brand-text truncate leading-tight">{m.firstName}</h4>
+                                        <PaymentStatusBadge active={m.isActiveMember} theme={currentTheme}/>
+                                    </div>
+                                </div>
+                                <div className="flex gap-1.5 shrink-0">
+                                    <ActionButton variant="view" onClick={() => setViewMember(m)} icon={<AiOutlineEye size={16} />} theme={currentTheme}/>
+                                    <ActionButton variant="edit" onClick={() => setFormModal({ isOpen: true, memberToEdit: m })} icon={<AiOutlineEdit size={16} />} theme={currentTheme}/>
+                                    <ActionButton variant="delete" onClick={() => deleteAction([m.id])} icon={<AiOutlineDelete size={16} />} theme={currentTheme}/>
                                 </div>
                             </div>
-                            <Button onClick={() => setViewMember(null)} className="mt-8 w-full">FERMER LA FICHE</Button>
+                        ))}
+                    </div>
+                </div>
+            </main>
+            {viewMember && (
+                <div className="fixed inset-0 z-120 flex items-center justify-center p-4 bg-brand-text/40 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[3rem] w-full max-w-lg overflow-hidden shadow-2xl border-4 border-white flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-brand-bg flex justify-between items-center shrink-0">
+                            <h2 className="text-sm font-black uppercase text-brand-text tracking-widest">Détails du membre</h2>
+                            <button onClick={() => setViewMember(null)} className="p-2 hover:bg-brand-bg rounded-full transition-colors"><AiOutlineClose size={22} /></button>
+                        </div>
+                        
+                        <div className="p-6 md:p-10 overflow-y-auto custom-scrollbar text-center">
+                            <div className="relative inline-block mb-8">
+                                <img src={viewMember.imageUrl} className="w-32 h-40 md:w-40 md:h-52 object-cover rounded-[2.5rem] shadow-xl border-4 border-brand-bg rotate-2" alt="" />
+                                <div className="absolute -bottom-2 -right-2 bg-[${currentTheme}] text-white text-[8px] font-black px-4 py-1.5 rounded-full uppercase border-2 border-white shadow-lg">
+                                    {viewMember.parentId ? 'Enfant' : 'Titulaire'}
+                                </div>
+                            </div>
+                            <h3 className="text-2xl md:text-3xl font-black text-brand-text uppercase tracking-tighter mb-1 leading-none">{viewMember.firstName} {viewMember.lastName}</h3>
+                            <p className="text-brand-muted font-bold text-[10px] uppercase tracking-[0.2em] mb-8">Membre ID: {viewMember.sequenceNumber || '---'}</p>           
+                            <div className="grid grid-cols-2 gap-3 text-left">
+                                <DetailBox icon={<AiOutlineCalendar/>} label="Naissance" value={MemberHelper.formatDate?.(viewMember.birthDate) || viewMember.birthDate} theme={currentTheme}/>
+                                <DetailBox icon={<AiOutlineTeam/>} label="Sexe" value={viewMember.gender === 'MALE' ? 'Homme' : 'Femme'} theme={currentTheme}/>
+                                <DetailBox icon={<AiOutlineGlobal/>} label="District" value={viewMember.districtName} theme={currentTheme}/>
+                                <DetailBox icon={<AiOutlineTeam/>} label="Tribu" value={viewMember.tributeName} theme={currentTheme}/>
+                                <DetailBox icon={<AiOutlineUser/>} label="Statut" value={viewMember.status === 'STUDENT' ? 'Étudiant' : 'Travailleur'} theme={currentTheme}/>
+                                <DetailBox icon={<AiOutlinePhone/>} label="Contact" value={viewMember.phoneNumber || "N/A"} theme={currentTheme}/>
+                                <div className="col-span-2">
+                                    <DetailBox icon={<AiOutlineUser/>} label="Parent Responsable" value={viewMember.parentName || "Lui-même (Titulaire)"} theme={currentTheme}/>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-6 bg-brand-bg/30 shrink-0">
+                            <Button onClick={() => setViewMember(null)} className="w-full py-4 text-[10px]" style={{backgroundColor: currentTheme, color: "#fff"}}>FERMER LA FICHE</Button>
                         </div>
                     </div>
                 </div>
             )}
+            <MemberForm 
+                isOpen={formModal.isOpen} 
+                onClose={() => setFormModal({ isOpen: false, memberToEdit: null })} 
+                memberToEdit={formModal.memberToEdit}
+                onSuccess={refreshMembers}
+                allMembers={allMembers} 
+            />
         </div>
     );
 };
+const PaymentStatusBadge = ({ active, theme }: { active: boolean; theme: string }) => (
+    <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase inline-block`} 
+        style={{ 
+            backgroundColor: active ? '#D1FAE5' : '#FEE2E2', 
+            color: active ? '#065F46' : '#B91C1C', 
+            borderColor: active ? '#A7F3D0' : '#FECACA', 
+            borderStyle: 'solid',
+            borderWidth: 1
+        }}>
+        {active ? 'À JOUR' : 'IMPAYÉ'}
+    </span>
+);
 
-const DetailBox = ({ label, value }: { label: string, value: string }) => (
-    <div className="bg-brand-bg p-3 rounded-2xl border-2 border-brand-border">
-        <p className="text-[7px] font-black text-brand-muted uppercase tracking-widest">{label}</p>
-        <p className="font-bold text-[10px] uppercase truncate">{value}</p>
+const DetailBox = ({ label, value, icon, theme }: { label: string; value: string; icon: any; theme: string }) => (
+    <div className="bg-brand-bg/50 p-3 rounded-2xl border-2 border-brand-border/50 flex items-start gap-2">
+        <div className="text-brand-primary mt-0.5 opacity-50">{icon}</div>
+        <div className="min-w-0">
+            <p className="text-[7px] font-black text-brand-muted uppercase tracking-widest leading-none mb-1">{label}</p>
+            <p className="font-bold text-[10px] uppercase text-brand-text truncate leading-none">{value}</p>
+        </div>
+    </div>
+);
+
+const FilterSelect = ({ label, value, onChange, options }: any) => (
+    <div className="flex flex-col">
+        <label className="text-[7px] font-black text-brand-muted uppercase ml-2 mb-1">{label}</label>
+        <select value={value} onChange={(e) => onChange(e.target.value)} className="bg-brand-bg p-2 rounded-xl border-none font-bold text-[10px] uppercase">
+            <option value="">Tous</option>
+            {options.map((o:any) => <option key={o.v} value={o.v}>{o.l}</option>)}
+        </select>
     </div>
 );
 

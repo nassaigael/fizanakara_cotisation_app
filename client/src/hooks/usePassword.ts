@@ -10,46 +10,21 @@ export const usePassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
-  const [profile, setProfile] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    imageUrl: ""
-  });
-
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  // Détection du token dans l'URL pour passer en mode "Changement de mot de passe"
+  // On détecte uniquement si le token est présent pour afficher le formulaire de changement
   useEffect(() => {
     const token = searchParams.get('token');
     if (token) {
       setIsResetMode(true);
-      fetchAdminInfo(token);
+    } else {
+      setIsResetMode(false);
     }
   }, [searchParams]);
 
-  // Récupération des infos de l'admin via le token pour le Badge visuel
-  const fetchAdminInfo = async (token: string) => {
-    try {
-      const response = await AuthService.verifyResetToken(token);
-      if (response && response.data) {
-        setProfile({
-          firstName: response.data.firstName || "",
-          lastName: response.data.lastName || "",
-          phone: response.data.phoneNumber || "",
-          imageUrl: response.data.imageUrl || ""
-        });
-      }
-    } catch (err) {
-      // Échec silencieux pour la sécurité et la fluidité
-      console.log("Mode reset activé. Profil non pré-chargé.");
-    }
-  };
-
   /**
    * PHASE 1 : Demande de lien par Email
-   * Inclut la sécurité anti-énumération
    */
   const handleRequestEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,13 +39,12 @@ export const usePassword = () => {
 
     try {
       await AuthService.forgotPassword(email);
-      
       setMessage({ 
         text: "Si ce compte existe, un lien a été envoyé.", 
         type: 'success' 
       });
     } catch (err: any) {
-
+      // Sécurité : même si l'email n'existe pas, on affiche un message de succès
       if (err.response?.status === 404 || err.response?.status === 400) {
         setMessage({ 
             text: "Si ce compte existe, un lien a été envoyé.", 
@@ -84,9 +58,6 @@ export const usePassword = () => {
     }
   };
 
-  /**
-   * PHASE 2 : Réinitialisation du mot de passe
-   */
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -94,6 +65,7 @@ export const usePassword = () => {
       setMessage({ text: "Les mots de passe ne correspondent pas.", type: 'error' });
       return;
     }
+    
     if (password.length < 6) {
         setMessage({ text: "Le mot de passe est trop court (min 6).", type: 'error' });
         return;
@@ -102,6 +74,7 @@ export const usePassword = () => {
     setLoading(true);
     try {
       const token = searchParams.get('token') || "";
+      
       await AuthService.resetPassword({ 
         token, 
         newPassword: password 
@@ -109,7 +82,7 @@ export const usePassword = () => {
       
       setMessage({ text: "Mot de passe mis à jour avec succès.", type: 'success' });
     } catch (err) {
-      setMessage({ text: "Lien invalide ou expiré.", type: 'error' });
+      setMessage({ text: "Le lien est invalide ou a expiré.", type: 'error' });
     } finally { 
         setLoading(false); 
     }
@@ -120,7 +93,6 @@ export const usePassword = () => {
     email, setEmail, 
     password, setPassword, 
     confirmPassword, setConfirmPassword, 
-    profile, setProfile,
     loading, 
     message, 
     handleRequestEmail, 

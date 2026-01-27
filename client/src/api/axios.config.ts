@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 
 const api = axios.create({
     // AJOUT DE /api POUR CORRESPONDRE AU BACKEND
-    baseURL: 'http://localhost:3000', 
+    baseURL: 'https://fizanakara-cotisation-app.onrender.com', 
     headers: {
         'Content-Type': 'application/json',
     },

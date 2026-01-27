@@ -18,13 +18,16 @@ import toast from "react-hot-toast";
 
 const Profile: React.FC = () => {
   const { user, isSuperAdmin, refreshUser } = useAuth();
+  
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: ""
   });
+
   const [passwords, setPasswords] = useState({ new: "", confirm: "" });
   const [currentTheme, setCurrentTheme] = useState(localStorage.getItem("app-theme-color") || "#E51A1A");
+
   const themes = [
     { name: "Rouge", color: "#E51A1A" },
     { name: "Vert", color: "#10B981" },
@@ -32,6 +35,8 @@ const Profile: React.FC = () => {
     { name: "Violet", color: "#8B5CF6" },
     { name: "Orange", color: "#F59E0B" }
   ];
+
+  // Synchronisation avec le backend (gère le décalage de nommage firstname/firstName)
   useEffect(() => {
     if (user) {
       setFormData({
@@ -41,21 +46,27 @@ const Profile: React.FC = () => {
       });
     }
   }, [user]);
+
   const handleUpdateTheme = (color: string) => {
     setCurrentTheme(color);
     applyThemeToDOM(color);
     toast.success("Thème mis à jour !");
   };
+
   const handleUpdateInfo = async () => {
     try {
       const updateData: any = { ...formData };
+      
+      // Si l'utilisateur tente de changer de mot de passe
       if (passwords.new) {
         if (passwords.new !== passwords.confirm) {
           return toast.error("Les mots de passe ne correspondent pas");
         }
         updateData.password = passwords.new;
       }
+
       const response = await AuthService.updateMe(updateData);
+      
       if (response.success || response.id) {
         toast.success("Profil mis à jour !");
         setPasswords({ new: "", confirm: "" });
@@ -87,14 +98,19 @@ const Profile: React.FC = () => {
           </h1>
           <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
             <span className="bg-brand-primary/10 text-brand-primary border border-brand-primary/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-              {isSuperAdmin ? 'Super Administrateur' : 'Gestionnaire'}
+              {isSuperAdmin ? 'Super Administrateur' : 'Administrateur'}
             </span>
             <AiOutlineCheckCircle className="text-green-500" size={16} />
           </div>
         </div>
       </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        
+        {/* COLONNE GAUCHE : FORMULAIRES */}
         <div className="lg:col-span-2 space-y-6 md:space-y-8">
+          
+          {/* INFORMATIONS PERSONNELLES */}
           <section className={THEME.card + " p-6 md:p-8"}>
             <h2 className={THEME.font.bold + " text-lg mb-8 flex items-center gap-3"}>
                <AiOutlineUser className="text-brand-primary" /> Informations du compte
@@ -140,6 +156,7 @@ const Profile: React.FC = () => {
               />
             </div>
           </section>
+
           <Button 
             className="w-full py-4 text-sm shadow-lg" 
             onClick={handleUpdateInfo}
@@ -147,6 +164,8 @@ const Profile: React.FC = () => {
             Enregistrer les modifications
           </Button>
         </div>
+
+        {/* COLONNE DROITE : APPARENCE */}
         <div className="space-y-6 md:space-y-8">
           <section className={THEME.card + " p-6 md:p-8"}>
             <h2 className={THEME.font.mini + " mb-6 flex items-center gap-2"}>

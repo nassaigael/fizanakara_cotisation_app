@@ -13,16 +13,17 @@ export const personSchema = z.object({
     firstName: z.string().min(1, "Le prénom est obligatoire"),
     lastName: z.string().min(1, "Le nom est obligatoire"),
     birthDate: z.string().refine(val => {
-        const age = calculateAge(val);
-        return age >= 0; 
-    }, "Date de naissance invalide"),
+        return true; 
+    }, "Date invalide"),
+    
     parentId: z.string().nullable().optional(), 
+    
     gender: z.enum(["MALE", "FEMALE"]),
     imageUrl: z.string().min(1, "L'URL de l'image est requise"),
     phoneNumber: z.string().min(1, "Le numéro de téléphone est obligatoire"),
     status: z.string().min(1, "Le statut est requis"),
-    districtId: z.number().gt(0, "Veuillez sélectionner un District"),
-    tributeId: z.number().gt(0, "Veuillez sélectionner un Tribut"),
+    districtId: z.number().positive("Le District est requis"),
+    tributeId: z.number().positive("Le Tribut est requis"),
 });
 
 export const paymentSchema = z.object({
